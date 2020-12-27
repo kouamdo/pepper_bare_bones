@@ -82,6 +82,25 @@ debug_second_boot:
         -ex 'break entry' \
 	-ex 'continue'
 
+
+debug_link_file: k_main.o $(OBJECTS) $(OBJECTS_ASM)
+	@echo "$(OBJECTS)"
+	@echo "$(OBJECTS_ASM)"
+	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	rm $(OBJECTS)
+	rm $(OBJECTS_ASM)
+
+debug_kernel:
+	make debug_link_file
+	qemu-system-i386 -fda disk.img -S -s &
+	gdb bin/kernel.elf  \
+        -ex 'target remote localhost:1234' \
+        -ex 'layout src' \
+        -ex 'layout reg' \
+        -ex 'break main' \
+-ex 'continue' 
+
+
 mixt: k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"

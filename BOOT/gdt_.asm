@@ -14,7 +14,7 @@ load_gdt:
 	push eax
 	push ecx
 		mov ecx , 4*255
-		mov ax , __gdt_entry__
+		mov eax , __gdt_entry__
 		add eax , ecx
 		mov word[gdtr] , ax
 
@@ -27,6 +27,12 @@ load_gdt:
     	or al, 1
  		mov cr0, eax
 
+
+		jmp 0x08:next_
+
+	bits 32
+		 next_:
+
 		mov ax , 0x10
 		mov ds , ax
 		mov es , ax
@@ -36,10 +42,9 @@ load_gdt:
 		mov ax , 0x18
 		mov ss , ax
 
+		mov esp , 0x90000
+	 	
 
-	 	jmp 0x08:next_
-
-	bits 32
-		 next_:
+	
 
 		 jmp 0x9000

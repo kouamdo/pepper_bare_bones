@@ -28,7 +28,7 @@ read_sectors:
 
 	mov bx , 0x9000
 
-	mov dh , 30
+	mov dh , 50
 
 	push dx
 
