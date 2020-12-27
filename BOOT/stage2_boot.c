@@ -4,6 +4,8 @@ extern void load_gdt(), read_sectors();
 
 int err_ = 1; // contain 1 if error
 
+short bootdrive ;
+
 void _simple_print_boot__(char* msg)
 {
     int i = 0;

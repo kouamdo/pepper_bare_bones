@@ -26,19 +26,22 @@ entry:
 	mov ss , ax
 	mov sp , __stack_top
 	cld
-	call main_boot
+	jmp main_boot
 
 call_second_boot:
+	push word[bootdrive]	;push the bootdrive hard disk
 	jmp 0x7e00
 
 
 read_sectors:
 
-clc
+	clc
 	mov [bootdrive] , dl
 
+	reset_disk:
 	xor ax , ax
 	int 0x13
+	jc reset_disk
 	
 
 	mov bx , 0x7E00
@@ -62,7 +65,6 @@ clc
 
 	cmp dh , al
 	jne .disk_err_
-
 	ret
 
 .disk_err_:

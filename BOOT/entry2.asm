@@ -1,13 +1,13 @@
 bits 16
 
 
-global entry
+global entry, read_sectors
 extern main
-extern err_ , read_sectors
+extern err_ , bootdrive
 
 section .text
 
-bootdrive resw 0
+
 
 entry:
 	cli
@@ -15,11 +15,15 @@ entry:
 
 read_sectors:
 
-clc
-	mov [bootdrive] , dl
+	;load the bootdrive 
+	mov ax , word[esp-2]
+	mov word[bootdrive] , ax
 
+	reset_disk:
+	mov dl ,[bootdrive]
 	xor ax , ax
 	int 0x13
+	jc reset_disk
 	
 
 	mov bx , 0x9000
