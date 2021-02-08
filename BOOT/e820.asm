@@ -10,7 +10,7 @@ section .text
 ;https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
 
 load_e820_mem_table:
-	mov di, e820_mem_table         ; Set di to 0x8004. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
+	mov di, e820_mem_table         ; Set di to e820_mem_table address. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
 	add di , 0x4
 	xor ebx, ebx		; ebx must be 0 to start
 	xor bp, bp		; keep an entry count in bp
