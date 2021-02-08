@@ -46,7 +46,7 @@ read_sectors:
 
 	mov bx , 0x7E00
 
-	mov dh , 3
+	mov dh , 4
 
 	push dx
 

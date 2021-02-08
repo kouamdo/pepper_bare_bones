@@ -39,10 +39,11 @@ boot:
 
 	nasm -g -f elf32 -F dwarf -o $(BIN)/entry2.o BOOT/entry2.asm
 	nasm -g -f elf32 -F dwarf -o $(BIN)/gdt_.o BOOT/gdt_.asm
+	nasm -g -f elf32 -F dwarf -o $(BIN)/e820.o BOOT/e820.asm
 	gcc -c -m16 -ggdb3 -ffreestanding -fno-PIE -nostartfiles -nostdlib -o $(BIN)/stage2_boot.o -std=c99 BOOT/stage2_boot.c
 	gcc -c -m16 -ggdb3 -ffreestanding -fno-PIE -nostartfiles -nostdlib -o $(BIN)/gdt.o -std=c99 BOOT/gdt.c
 	nasm  -felf32 -F dwarf -o $(BIN)/a20.o BOOT/a20.asm
-	ld -m elf_i386 -o $(BIN)/boot2.elf -T BOOT/linker2.ld $(BIN)/entry2.o $(BIN)/stage2_boot.o $(BIN)/a20.o $(BIN)/gdt.o $(BIN)/gdt_.o
+	ld -m elf_i386 -o $(BIN)/boot2.elf -T BOOT/linker2.ld $(BIN)/entry2.o $(BIN)/stage2_boot.o $(BIN)/a20.o $(BIN)/gdt.o $(BIN)/gdt_.o $(BIN)/e820.o
 	objcopy -O binary bin/boot2.elf bin/boot2.img
 
 

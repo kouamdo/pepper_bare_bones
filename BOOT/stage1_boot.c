@@ -19,11 +19,10 @@ void main_boot(void)
     read_sectors();
 
     if (err == 1)
-        __simple_print_boot__("Bad booted device\n");
+        __simple_print_boot__("Bad boot device\n");
 
     else
         call_second_boot();
-
 end:
     goto end;
 }
