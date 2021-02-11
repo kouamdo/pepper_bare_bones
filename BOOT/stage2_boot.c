@@ -12,7 +12,7 @@ typedef struct e820_mem
     uint32_t ext_attrib ;
 }__attribute__((packed)) e820_mem ;
 
-e820_mem e820_mem_table[0x6] ;
+e820_mem e820_mem_table[0x5] ;
 
 int err_ = 1; // contain 1 if error
 

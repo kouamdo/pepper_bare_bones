@@ -1,13 +1,16 @@
+;https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
+
+
 bits 16
 
 extern err_ , e820_mem_table
 
 global load_e820_mem_table
 
+int_loop dd 5
+
+
 section .text
-
-
-;https://wiki.osdev.org/Detecting_Memory_(x86)#Getting_an_E820_Memory_Map
 
 load_e820_mem_table:
 	mov di, e820_mem_table         ; Set di to e820_mem_table address. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
@@ -40,6 +43,13 @@ load_e820_mem_table:
 	test byte [es:di + 20], 1	; if so: is the "ignore this data" bit clear?
 	je short .skipent
 .notext:
+	mov ecx , dword[int_loop]
+	cmp ecx , 0
+	je .e820f
+	dec ecx
+
+	mov dword[int_loop] , ecx
+
 	mov ecx, [es:di + 8]	; get lower uint32_t of memory region length
 	or ecx, [es:di + 12]	; "or" it with upper uint32_t to test for zero
 	jz .skipent		; if length uint64_t is 0, skip entry
@@ -49,7 +59,6 @@ load_e820_mem_table:
 	test ebx, ebx		; if ebx resets to 0, list is complete
 	jne short .e820lp
 .e820f:
-	mov [e820_mem_table], bp	; store the entry count
 	clc			; there is "jc" on end of list to this point, so the carry must be cleared
 	ret
 .failed:
