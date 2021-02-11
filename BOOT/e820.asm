@@ -7,14 +7,14 @@ extern err_ , e820_mem_table
 
 global load_e820_mem_table
 
-int_loop dd 5
+int_loop dd 6
 
 
 section .text
 
 load_e820_mem_table:
 	mov di, e820_mem_table         ; Set di to e820_mem_table address. Otherwise this code will get stuck in `int 0x15` after some entries are fetched 
-	add di , 0x4
+	add di , 24
 	xor ebx, ebx		; ebx must be 0 to start
 	xor bp, bp		; keep an entry count in bp
 	mov edx, 0x0534D4150	; Place "SMAP" into edx
@@ -43,19 +43,18 @@ load_e820_mem_table:
 	test byte [es:di + 20], 1	; if so: is the "ignore this data" bit clear?
 	je short .skipent
 .notext:
-	mov ecx , dword[int_loop]
-	cmp ecx , 0
-	je .e820f
-	dec ecx
-
-	mov dword[int_loop] , ecx
-
 	mov ecx, [es:di + 8]	; get lower uint32_t of memory region length
 	or ecx, [es:di + 12]	; "or" it with upper uint32_t to test for zero
 	jz .skipent		; if length uint64_t is 0, skip entry
 	inc bp			; got a good entry: ++count, move to next storage spot
 	add di, 24
 .skipent:
+	mov ecx , dword[int_loop]
+	cmp ecx , 0
+	je .e820f
+	dec ecx
+
+	mov dword[int_loop] , ecx
 	test ebx, ebx		; if ebx resets to 0, list is complete
 	jne short .e820lp
 .e820f:
