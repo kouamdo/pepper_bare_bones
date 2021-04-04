@@ -22,6 +22,8 @@ static void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t v
 void init_idt()
 {
     Init_PIT((uint16_t)0xDAAD);
+
+    
     // On itiialise les intérruptions qu'on va utiliser
     PIC_remap(0x20, 0x28);
 
@@ -67,8 +69,4 @@ void init_idt()
 
     /* initialisation de la structure pour IDTR */
     load_idt();
-
-    kprintf(2, 15, "[K:PIC]\tInterruptions mapped\n");
-    kprintf(2, 15, "[K:PIT]\tUpdate system timer\n");
-    kprintf(2, 15, "[K:CPU]\tInterruptions initialized\n");
 }

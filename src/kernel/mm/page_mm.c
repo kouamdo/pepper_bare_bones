@@ -50,8 +50,6 @@ void init_page_mem_manage()
 
     _page_area_track_ = MEMORY_SPACES_PAGES;
 
-    kprintf(2, 15, "[K:PHY_MEM]\tInitialsation of physical memory manager\n");
-
     // __RUN_TEST__(__phy_mem_manager__);
 }
 

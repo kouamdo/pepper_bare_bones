@@ -7,9 +7,9 @@
 #define KERNEL__PAGE_MM
 #include <i386types.h>
 #include <init/video.h>
-#include <mm.h>
+#include <kernel/mm.h>
 #include <stddef.h>
-#include <task.h>
+#include <kernel/task.h>
 
 sheduler_t sheduler;
 

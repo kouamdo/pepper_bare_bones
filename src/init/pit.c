@@ -14,9 +14,9 @@ uint8_t status_PIT = 0;
 
 void conserv_status_byte()
 {
-    pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
+     set_pit_count(PIT_0, PIT_reload_value);
 
-    set_pit_count(PIT_0, PIT_reload_value);
+    pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
 
     compteur++;
     print_frequence(system_timer_ms);
@@ -50,8 +50,6 @@ void Init_PIT(uint16_t frequence)
        */
     frequency = frequence;
     calculate_frequency();
-
-    cli;
 
     pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
 

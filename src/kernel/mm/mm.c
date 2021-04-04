@@ -3,7 +3,7 @@
 #define TEST_H
 #define _TEST_
 
-#include <mm.h>
+#include <kernel/mm.h>
 #include <string.h>
 #include <test.h>
 #include <video.h>
@@ -25,8 +25,6 @@ void init_vmm()
         MM_BLOCK[i].size = 0;
     }
     _head_vmm_ = MM_BLOCK;
-
-    kprintf(2, 15, "[K:VM]\tVirtual Memory Initialized\n");
 
     // __RUN_TEST__(__vm_mm_manager__);
 }

@@ -52,10 +52,6 @@ void init_paging()
         (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR);
 
     _EnablingPaging_();
-
-    kprintf(2, 15, "[K:CPU]\tPaging enabled and mapped\n");
-    kprintf(2, 15, "[K:CPU]\tMapping 4Mo of physical memory\n");
-
     // __RUN_TEST__(paging_test);
 }
 

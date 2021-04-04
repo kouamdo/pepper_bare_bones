@@ -53,8 +53,6 @@ void init_gdt(void)
     init_gdt_entry(0, 0xFFFFFF, TSS_PRIVILEGE_0,
                    SEG_GRANULARITY(0) | SEG_SIZE(1) | 0x0, &__gdt_entry__[4]);
 
-    kprintf(2, 15, "[K:CPU]\tBytes per block as limit for each segment\n");
-
     // Chargement de la GDT
     load_gdt();
 

@@ -1,5 +1,7 @@
 #include "../../include/init/video.h"
 #include <stdarg.h>
+#include <stdint.h>
+#include <init/io.h>
 
 static int CURSOR_Y = 0;
 static int CURSOR_X = 0;
@@ -13,8 +15,6 @@ void volatile pepper_screen()
         screen[i + 1] = 0x0;
         i += 2;
     }
-    kprintf(2, LOADING_COLOR,
-            "PEPPER_OS \t: https://github.com/kouamdo/pepper_ia32\n\n");
 }
 
 void volatile print_frequence(unsigned int freq)
@@ -62,32 +62,6 @@ void volatile kprintf(int nmber_param, ...)
 
     va_end(ap);
 }
-
-// void volatile   write_string(unsigned char colour, const char string[40]) {
-//     if (CURSOR_Y >= 25) {
-//         scrollup();
-//         CURSOR_X = 0;
-//         CURSOR_Y = 0;
-//     }
-
-//      unsigned char *vid;
-
-//     while (*string != 0) {
-//         vid = (unsigned char *)(VIDEO_MEM + 160 * CURSOR_Y + 2 * CURSOR_X);
-//         if (*string == 10) {
-//             CURSOR_X = 0;
-//             CURSOR_Y++;
-//             string++;
-//         } else {
-//             *(vid) = *string;
-//             *(vid + 1) = colour;
-//             string++;
-//             vid += 2;
-
-//             CURSOR_X++;
-//         }
-//     }
-// }
 
 void volatile scrollup()
 {
@@ -181,4 +155,21 @@ void volatile print_address(unsigned char color, unsigned int adress__)
         for (i = 0; i < 10; i++)
             putchar(color, p[i]);
     }
+}
+
+void move_cursor(uint8_t x , uint8_t y)
+{
+    uint16_t c_pos;
+
+    c_pos = y * 80 + x;
+
+	outb(0x3d4, 0x0f);
+	outb(0x3d5, (uint8_t) c_pos);
+	outb(0x3d4, 0x0e);
+	outb(0x3d5, (uint8_t) (c_pos >> 8));
+}
+
+void show_cursor(void)
+{
+	move_cursor(CURSOR_X, CURSOR_Y);
 }

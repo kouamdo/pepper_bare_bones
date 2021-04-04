@@ -7,7 +7,7 @@
 #define TEST_M
 #define KERNEL__Vir_MM
 
-#include "../../../../include/mm.h"
+#include "../../../../include/kernel/mm.h"
 #include "../../../../include/test.h"
 #include <stddef.h>
 

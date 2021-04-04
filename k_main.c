@@ -1,3 +1,4 @@
+#include "include/init/video.h"
 #define KERNEL__PAGE_MM
 #define KERNEL__Vir_MM
 
@@ -14,27 +15,29 @@
 
 void main()
 {
+    //On initialise le necessaire avant de lancer la console
     pepper_screen();
 
     cli;
 
-    init_gdt();
-
     init_idt();
 
     init_paging();
+    kprintf(2 ,READY_COLOR ,"pepper kernel IA32bits laboratory\n\n");
+
+    kprintf(2 ,READY_COLOR ,"K > ");
 
     sti;
 
-    init_page_mem_manage();
+    // init_page_mem_manage();
 
-    init_vmm();
+    // init_vmm();
 
-    init_multitasking();
+    // init_multitasking();
 
-    enable_local_apic();
+    // enable_local_apic();
 
-    program_IOAPIC();
+    // program_IOAPIC();
 
     while (1)
         ;

@@ -1,4 +1,6 @@
 #include "gdt.h"
+#include "lib.h"
+
 extern void enable_a20();
 extern void load_gdt(), read_sectors();
 
@@ -17,16 +19,6 @@ e820_mem e820_mem_table[0x6] ;
 int err_ = 1; // contain 1 if error
 
 short bootdrive ;
-
-void _simple_print_boot__(char* msg)
-{
-    int i = 0;
-
-    while (msg[i] != '\0') {
-        __asm__("int $0x10" ::"a"((0x0E << 8) | msg[i]), "b"(0x07));
-        ++i;
-    }
-}
 
 void main()
 {

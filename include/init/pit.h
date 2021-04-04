@@ -140,7 +140,7 @@ extern void irq_PIT(), calculate_frequency();
  */
 #define set_pit_count(channel, data)        \
     ({                                      \
-        outb(channel, (int8_t)(data));      \
+        outb(channel, (int8_t)(read_pit_count(PIT_0)));      \
         outb(channel, (int8_t)(data >> 8)); \
     })
 

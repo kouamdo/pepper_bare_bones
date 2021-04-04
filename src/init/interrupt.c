@@ -3,6 +3,8 @@
 #include "../../include/init/video.h"
 
 extern void spurious_IRQ(unsigned char irq);
+extern void keyboard_irq() ; 
+
 
 void irq0_handler(void)
 {
@@ -13,7 +15,7 @@ void irq0_handler(void)
 void irq1_handler(void)
 {
     spurious_IRQ(1);
-
+    keyboard_irq() ; 
     PIC_sendEOI(1);
 }
 
