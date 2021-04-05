@@ -55,6 +55,8 @@
 	//Reset and start self-test
 	#define _8042_reset_start_seltest outb(_8042_COMMAND_STATUS , 0xFF)
 
+	void reinitialise_kbd();
+
 uint8_t kbdmap[] = {
 	0x1B, 0x1B, 0x1B, 0x1B,	/*      esc     (0x01)  */
 	'1', '!', '1', '1',
