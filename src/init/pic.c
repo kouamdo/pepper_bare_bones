@@ -1,5 +1,6 @@
 #include "../../include/init/pic.h"
 #include "../../include/init/io.h"
+#include <stdint.h>
 
 /*
  *	Suivre le Manuel Intel pour les Controlleur PIC
@@ -9,7 +10,7 @@
  *	Les EOI s'applique par le maitre sur les IRQ8-IRQ15
  */
 
-void PIC_sendEOI(unsigned int irq)
+void PIC_sendEOI(uint8_t irq)
 {
     // IRQ for Slaves PIC
     if (irq >= 0x8)
@@ -19,9 +20,9 @@ void PIC_sendEOI(unsigned int irq)
     outb(PIC1_COMMAND, PIC_EOI);
 }
 
-void PIC_remap(unsigned int offset1, unsigned int offset2)
+void PIC_remap(uint8_t offset1, uint8_t offset2)
 {
-    unsigned char a1, a2;
+    uint8_t a1, a2;
 
     /*
                 *	les registres ICW (Initialization Command Word), qui
@@ -73,10 +74,10 @@ void PIC_remap(unsigned int offset1, unsigned int offset2)
     outb(PIC2_DATA, a2);
 }
 
-void IRQ_set_mask(unsigned char irqline)
+void IRQ_set_mask(uint8_t irqline)
 {
-    unsigned short port;
-    unsigned char value;
+    uint16_t port;
+    uint8_t value;
 
     if (irqline < 8)
         port = PIC1_DATA;
@@ -96,10 +97,10 @@ void IRQ_set_mask(unsigned char irqline)
     outb(port, value);
 }
 
-void IRQ_clear_mask(unsigned char irqline)
+void IRQ_clear_mask(uint8_t irqline)
 {
-    unsigned char value;
-    unsigned int port;
+    uint8_t value;
+    uint32_t port;
 
     if (irqline < 8)
         port = PIC1_DATA;
@@ -112,7 +113,7 @@ void IRQ_clear_mask(unsigned char irqline)
     outb(port, value);
 }
 
-static unsigned short int __pic_get_irq_reg(int ocw3)
+static uint16_t  __pic_get_irq_reg(uint8_t ocw3)
 {
     /*
      * OCW3 to PIC CMD to get the register value . PIC2 is chained
@@ -129,30 +130,24 @@ static unsigned short int __pic_get_irq_reg(int ocw3)
  * the PIC will send interrupts from the IRR to the CPU, at which point they are marked in the ISR.
  */
 
-unsigned short int(pic_get_isr)()
+uint16_t (pic_get_isr)()
 {
     return __pic_get_irq_reg(PIC_READ_ISR);
 }
 
-unsigned short int(__pic_get_irr)()
+uint16_t (__pic_get_irr)()
 {
     return __pic_get_irq_reg(PIC_READ_IRR);
 }
 
-void spurious_IRQ(unsigned char irq)
+
+//If request get in ISR is differnet to irq
+void spurious_IRQ(uint8_t irq)
 {
-    unsigned char request1, request2;
-    unsigned short request;
+    uint16_t isr_request = pic_get_isr() ;
 
-    request = __pic_get_irr();
+    //send the EOI to the master PIC because the master PIC itself 
+    //won't know that it was a spurious IRQ from the slave. 
 
-    request1 = request & 0x00FF;
-
-    if (irq < 8 && request1 != irq)
-        IRQ_set_mask(irq);
-
-    request2 = (request & 0xFF00) >> 8;
-
-    if (irq >= 8 && request2 != irq)
-        PIC_sendEOI(irq - 8);
+    if (isr_request != irq) PIC_sendEOI(isr_request%8) ;
 }

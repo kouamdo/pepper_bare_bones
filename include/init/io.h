@@ -32,11 +32,6 @@
 // Forcer le CPU à attendre une opération E/S
 #define io_wait __asm__ __volatile__("jmp 1f;1:jmp 2f;2:")
 
-// Si nous voulons utiliser le APIC ou le IOAPIC
-#define disabling         \
-    __asm__ __volatile__( \
-        "movw $0xFF , %%ax ; outb %%al , $0xA1 ; outb %%al , $0x21;" ::)
-
 /*Lit un octet avec temporiasation*/
 
 #define inbp(port)                                                             \

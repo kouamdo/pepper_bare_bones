@@ -6,11 +6,6 @@ extern void spurious_IRQ(unsigned char irq);
 extern void keyboard_irq() ; 
 
 
-void irq0_handler(void)
-{
-    spurious_IRQ(0);
-    PIC_sendEOI(0);
-}
 
 void irq1_handler(void)
 {
