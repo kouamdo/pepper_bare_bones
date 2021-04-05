@@ -29,7 +29,6 @@ typedef struct IDT_entry {
     uint16_t offset_higherbits;
 } __attribute__((__packed__)) __idt_entry__;
 
-extern int irq0();
 extern int irq1();
 extern int irq2();
 extern int irq3();
