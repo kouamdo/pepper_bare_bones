@@ -3,9 +3,7 @@
 #include <init/video.h>
 
 extern void show_cursor() ;
-static void reinitialise_kbd() , void wait () ;
-
-
+static void wait_8042_ACK ();
 
 void keyboard_irq()
 {
@@ -38,6 +36,9 @@ void keyboard_irq()
 		case 0x37:
 			alt_enable = 1;
 			break;
+		case 0x0D:
+				putchar(READY_COLOR  , i);
+			break;
 		default:
 			putchar(READY_COLOR ,  kbdmap
 			       [i * 4 + (lshift_enable || rshift_enable)]);
@@ -61,25 +62,24 @@ void keyboard_irq()
 	}
 
 	show_cursor() ;
-
-	reinitialise_kbd();
-
 }
 
-
-static void reinitialise_kbd()
+void reinitialise_kbd()
 {
 	_8042_send_get_current_scan_code ;
-	wait();
+	wait_8042_ACK ();
+
 	_8042_set_typematic_rate ; 
-	wait();
+	wait_8042_ACK ();
+	
 	_8042_set_leds ;
-	wait();
+	wait_8042_ACK ();
+	
 	_8042_enable_scanning ;
-	wait();
+	wait_8042_ACK ();
 }
 
-static void wait ()
+static void wait_8042_ACK ()
 {
 	while(_8042_get_status  != _8042_ACK);
 }

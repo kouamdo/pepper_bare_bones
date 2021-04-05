@@ -88,6 +88,12 @@ void volatile putchar(unsigned char color, unsigned const char c)
         CURSOR_Y++;
     }
 
+    else if(c == 0x0D) {
+        CURSOR_X--;
+        unsigned char* v = (unsigned char*)(VIDEO_MEM + CURSOR_X * 2 + 160 * CURSOR_Y);
+        *v = ' ';
+    }
+
     else if (c == '\t')
         CURSOR_X += 5;
 
@@ -113,8 +119,6 @@ void volatile print_address(unsigned char color, unsigned int adress__)
 {
     char p[10] = {0};
 
-    p[0] |= '0';
-    p[1] |= 'x';
 
     if (CURSOR_Y >= 25) {
         scrollup();
@@ -132,22 +136,22 @@ void volatile print_address(unsigned char color, unsigned int adress__)
             c /= 16;
 
             if (adress__ == 15)
-                p[10 - i] |= 'F';
+                p[10 - i] |= 'f';
 
             else if (adress__ == 14)
-                p[10 - i] |= 'E';
+                p[10 - i] |= 'e';
 
             else if (adress__ == 13)
-                p[10 - i] |= 'D';
+                p[10 - i] |= 'd';
 
             else if (adress__ == 12)
-                p[10 - i] |= 'C';
+                p[10 - i] |= 'c';
 
             else if (adress__ == 11)
-                p[10 - i] |= 'B';
+                p[10 - i] |= 'b';
 
             else if (adress__ == 10)
-                p[10 - i] |= 'A';
+                p[10 - i] |= 'a';
 
             else
                 p[10 - i] |= (char)(adress__ + 0x30);

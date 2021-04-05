@@ -5,8 +5,6 @@
 extern void spurious_IRQ(unsigned char irq);
 extern void keyboard_irq() ; 
 
-
-
 void irq1_handler(void)
 {
     spurious_IRQ(1);
