@@ -141,7 +141,7 @@ uint16_t (__pic_get_irr)()
 }
 
 
-//If request get in ISR is differnet to irq
+//If request getting in ISR is differnet to irq
 void spurious_IRQ(uint8_t irq)
 {
     uint16_t isr_request = pic_get_isr() ;
