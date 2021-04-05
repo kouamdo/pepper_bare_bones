@@ -30,6 +30,8 @@ OBJECTS		:= $(SOURCES:.c=.o)
 SOURCES_ASM := $(wildcard $(patsubst %,%/*.asm, $(SOURCEDIRS)))
 OBJECTS_ASM := $(SOURCES_ASM:.asm=.o)
 
+all: boot mixt disk cpy_obj_file
+
 boot:
 	nasm -g -f elf32 -F dwarf -o $(BIN)/entry.o BOOT/entry.asm
 	gcc -c  -ggdb3 -m16 -ffreestanding -fno-PIE -nostartfiles -nostdlib -o $(BIN)/stage1_boot.o -std=c99 BOOT/stage1_boot.c
@@ -60,7 +62,7 @@ disk:
 	dd if=/dev/zero of=disk.img bs=512 count=2880
 	dd if=bin/boot1.img of=disk.img bs=512 conv=notrunc
 	dd if=bin/boot2.img of=disk.img seek=1 bs=512 conv=notrunc
-	dd if=bin/kernel.elf of=disk.img bs=512 seek=4 conv=notrunc
+	dd if=bin/kernel.bin of=disk.img bs=512 seek=4 conv=notrunc
 
 %.o : %.c
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES)
@@ -68,7 +70,7 @@ disk:
 %.o:%.asm		
 	nasm -felf32 $< -o $@
 
-qemu: boot mixt disk
+qemu:
 	clear
 	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log
 
@@ -110,12 +112,17 @@ debug_kernel:
         -ex 'break main' \
 -ex 'continue' 
 
+cpy_obj_file: debug_link_file
+	objdump -S bin/boot1.elf > obj/boot/boot1.asm
+	objdump -S bin/boot2.elf > obj/boot/boot2.asm
+	objdump -S bin/kernel.elf > obj/kernel/kernel.asm
 
 mixt: k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"
-	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.bin
+	
 
 clean:
 	rm  $(OBJECTS)
