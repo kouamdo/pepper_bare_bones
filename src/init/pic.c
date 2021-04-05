@@ -149,5 +149,5 @@ void spurious_IRQ(uint8_t irq)
     //send the EOI to the master PIC because the master PIC itself 
     //won't know that it was a spurious IRQ from the slave. 
 
-    if (isr_request != irq) PIC_sendEOI((uint8_t)(isr_request)) ;
+    if (isr_request != irq) PIC_sendEOI((uint8_t)(isr_request%8)) ;
 }
