@@ -1,6 +1,6 @@
 #include <init/keyboard.h>
 #include <stdint.h>
-#include <init/video.h>
+#include <init/console.h>
 
 extern void show_cursor() ;
 static void wait_8042_ACK ();
@@ -37,10 +37,10 @@ void keyboard_irq()
 			alt_enable = 1;
 			break;
 		case 0x0D:
-				putchar(READY_COLOR  , i);
+				cputchar(READY_COLOR  , i);
 			break;
 		default:
-			putchar(READY_COLOR ,  kbdmap
+			cputchar(READY_COLOR ,  kbdmap
 			       [i * 4 + (lshift_enable || rshift_enable)]);
 		}
 	} else {		/* touche relachee */

@@ -6,7 +6,6 @@
 #include <kernel/mm.h>
 #include <string.h>
 #include <test.h>
-#include <video.h>
 
 static char VMM_ZONE[4024];
 

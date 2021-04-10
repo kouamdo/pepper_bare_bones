@@ -3,26 +3,26 @@
 
 #include <i386types.h>
 #define PAGE_DIRECTORY_OFFSET 0x400
-#define PAGE_DIRECTORY_SIZE 0X1000
+#define PAGE_DIRECTORY_SIZE   0X1000
 
-#define PAGE_TABLE_OFFSET 0X400
-#define PAGE_TABLE_SIZE 0X1000
+#define PAGE_TABLE_OFFSET   0X400
+#define PAGE_TABLE_SIZE     0X1000
 #define NO_PHYSICAL_ADDRESS ((physaddr_t)("NoPhysAddr"))
-#define PAGE_SIZE (uint32_t)(0x1000)
+#define PAGE_SIZE           (uint32_t)(0x1000)
 
-#define PAGE_PRESENT(x) (x)      // Page present in table or directory
-#define PAGE_READ_WRITE (1 << 1) // Page read or write in table or directory
-#define PAGE_READ_ONLY (0 << 1)  // Page read only
-#define PAGE_USER_SUPERVISOR (1 << 2)     // Access for all
-#define PAGE_SUPERVISOR (0 << 2)          // Acces only by supervisor
-#define PAGE_WRITE_THROUGH (1 << 3)       // Write through the page
-#define PAGE_WRITE_BACK (0 << 3)          // Write back the page
+#define PAGE_PRESENT(x)        (x)        // Page present in table or directory
+#define PAGE_READ_WRITE        (1 << 1)   // Page read or write in table or directory
+#define PAGE_READ_ONLY         (0 << 1)   // Page read only
+#define PAGE_USER_SUPERVISOR   (1 << 2)   // Access for all
+#define PAGE_SUPERVISOR        (0 << 2)   // Acces only by supervisor
+#define PAGE_WRITE_THROUGH     (1 << 3)   // Write through the page
+#define PAGE_WRITE_BACK        (0 << 3)   // Write back the page
 #define PAGE_CACHE_DISABLED(x) ((x) << 4) // Page will not be cached
-#define PAGE_ACCESSED(x) ((x) << 5)       // Page accessed
-#define PAGE_SIZE_4KiB (0 << 6)           // Page for 4Kib
-#define PAGE_SIZE_4MiB (1 << 6)           // Page for 4Mib
-#define PAGE_DIRTY(x) ((x) << 6)          //  Page with dirty flag
-#define PAGE_GLOBAL(x) ((x) << 7)
+#define PAGE_ACCESSED(x)       ((x) << 5) // Page accessed
+#define PAGE_SIZE_4KiB         (0 << 6)   // Page for 4Kib
+#define PAGE_SIZE_4MiB         (1 << 6)   // Page for 4Mib
+#define PAGE_DIRTY(x)          ((x) << 6) //  Page with dirty flag
+#define PAGE_GLOBAL(x)         ((x) << 7)
 
 #define PAGE_VALID \
     (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR)

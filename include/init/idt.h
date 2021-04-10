@@ -3,7 +3,7 @@
 #define IDTSIZE 0xFF /* nombre max. de descripteurs dans la table */
 
 #define INTGATE_PRIVILEGE_0 0x8E /* utilise pour gerer les interruptions */
-#define IDTBASE 0x800
+#define IDTBASE             0x800
 
 #include <i386types.h>
 #include <init/pic.h>
@@ -24,8 +24,8 @@ extern void Paging_fault();
 typedef struct IDT_entry {
     uint16_t offset_lowerbits;
     uint16_t selector;
-    uint8_t zero;
-    uint8_t type_attr;
+    uint8_t  zero;
+    uint8_t  type_attr;
     uint16_t offset_higherbits;
 } __attribute__((__packed__)) __idt_entry__;
 

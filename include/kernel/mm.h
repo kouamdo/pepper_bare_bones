@@ -14,8 +14,8 @@ void init_page_mem_manage();
 #define KERNEL__PHY_MEM (virtaddr_t)0X100000
 
 typedef struct _address_order_table_ {
-    virtaddr_t _address_;
-    uint32_t order;
+    virtaddr_t                    _address_;
+    uint32_t                      order;
     struct _address_order_table_* previous_;
     struct _address_order_table_* next_;
 } __attribute__((packed)) _address_order_track_;
@@ -42,14 +42,14 @@ Virtual memory manager defintion
 #define VM__NO_VM_ADDRESS (virtaddr_t)0x0
 
 typedef struct virt_mm {
-    virtaddr_t address;
-    uint32_t size;
+    virtaddr_t      address;
+    uint32_t        size;
     struct virt_mm* next;
 } __attribute__((packed)) _virt_mm_;
 
 void* kmalloc(uint32_t size);
-void init_vmm();
-void free(virtaddr_t _addr__);
+void  init_vmm();
+void  free(virtaddr_t _addr__);
 
 #endif // !Vir_MM
 

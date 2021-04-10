@@ -1,6 +1,6 @@
 #include <init/pic.h>
 #include <init/pit.h>
-#include <init/video.h>
+#include <init/console.h>
 #include <task.h>
 
 extern int32_t system_timer_fractions, system_timer_ms, IRQ0_fractions, IRQ0_ms,
@@ -18,8 +18,6 @@ void conserv_status_byte()
 
     pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
 
-    compteur++;
-    print_frequence(system_timer_ms);
 }
 
 void sheduler_cpu_timer()

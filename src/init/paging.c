@@ -1,16 +1,12 @@
 #define TEST_H
 #define _TEST_
 #include <init/paging.h>
-#include <init/video.h>
-#include <test.h>
 
 uint32_t page_directory[PAGE_DIRECTORY_OFFSET]
     __attribute__((aligned(PAGE_DIRECTORY_SIZE)));
 
 __page_table_frame__ uint32_t first_page_table[PAGE_TABLE_OFFSET]
     __attribute__((aligned(PAGE_TABLE_SIZE)));
-
-extern test_case_result paging_test;
 
 extern uint32_t error_code;
 extern void _FlushPagingCache_();

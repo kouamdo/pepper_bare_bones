@@ -11,7 +11,8 @@
 #define sti __asm__ __volatile__("sti" ::)
 
 /*Crée une interruption*/
-#define interrupt(x) __asm__ __volatile__("int %0" ::"m"(x) : "memory")
+#define interrupt(x) __asm__ __volatile__("int %0" ::"m"(x) \
+                                          : "memory")
 
 /* ecrit un octet sur un port */
 #define outb(port, value) \
@@ -22,11 +23,13 @@
     asm volatile("outb %%al, %%dx; jmp 1f; 1:" ::"d"(port), "a"(value))
 
 /* lit un octet sur un port */
-#define inb(port)                                              \
-    ({                                                         \
-        unsigned char _v;                                      \
-        asm volatile("inb %%dx, %%al" : "=a"(_v) : "d"(port)); \
-        _v;                                                    \
+#define inb(port)                     \
+    ({                                \
+        unsigned char _v;             \
+        asm volatile("inb %%dx, %%al" \
+                     : "=a"(_v)       \
+                     : "d"(port));    \
+        _v;                           \
     })
 
 // Forcer le CPU à attendre une opération E/S
@@ -34,11 +37,13 @@
 
 /*Lit un octet avec temporiasation*/
 
-#define inbp(port)                                                             \
-    ({                                                                         \
-        unsigned char _v;                                                      \
-        asm volatile("inb %%dx , %%al ; jmp 1f ; 1: " : "=a"(_v) : "d"(port)); \
-        _v;                                                                    \
+#define inbp(port)                                    \
+    ({                                                \
+        unsigned char _v;                             \
+        asm volatile("inb %%dx , %%al ; jmp 1f ; 1: " \
+                     : "=a"(_v)                       \
+                     : "d"(port));                    \
+        _v;                                           \
     })
 
 #endif // !_IO_H

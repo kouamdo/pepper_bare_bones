@@ -13,9 +13,9 @@
 */
 
 //  I/O ports for PIT
-#define PIT_0 0x40
-#define PIT_1 0x41
-#define PIT_2 0x42
+#define PIT_0        0x40
+#define PIT_1        0x41
+#define PIT_2        0x42
 #define REGISTER_PIT 0x43
 
 // Read back command/mode
@@ -138,10 +138,10 @@ extern void irq_PIT(), calculate_frequency();
  * You must prevent other code from setting the PIT channel's
  * reload value or reading its current count once you've sent the lowest 8 bits.
  */
-#define set_pit_count(channel, data)        \
-    ({                                      \
-        outb(channel, (int8_t)(read_pit_count(PIT_0)));      \
-        outb(channel, (int8_t)(data >> 8)); \
+#define set_pit_count(channel, data)                    \
+    ({                                                  \
+        outb(channel, (int8_t)(read_pit_count(PIT_0))); \
+        outb(channel, (int8_t)(data >> 8));             \
     })
 
 // Envoyer une commande au PIT

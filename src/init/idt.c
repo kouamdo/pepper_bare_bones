@@ -1,10 +1,7 @@
 #define TEST_H
 #include <init/idt.h>
-#include <init/video.h>
 #include <lib.h>
-#include <test.h>
 
-extern test_case_result __idt_testing__;
 
 __idt_entry__ __idt__[IDTSIZE];
 

@@ -1,12 +1,7 @@
 #define TEST_H
 #include "../../include/init/gdt.h"
-#include "../../include/i386types.h"
-#include "../../include/init/video.h"
-#include "../../include/lib.h"
-#include "../../include/test.h"
 #include <stddef.h>
 
-extern test_case_result __gdt_testing__;
 static gdt_entry_desc* __gdt_entry__ = (gdt_entry_desc*)0x0;
 extern void load_gdt();
 /*

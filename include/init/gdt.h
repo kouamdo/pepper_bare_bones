@@ -59,22 +59,22 @@ Size bit. If 0 the selector defines 16 bit protected mode. If 1 it defines 32 bi
 
 // Conf ; Intel manual page 2882
 /* Definition of SEGMENT TYPE*/
-#define DATA_READ_ONLY 0X0
-#define DATA_READ_ONLY_ACCESSED 0X1
-#define DATA_READ_WRITE 0X2
-#define DATA_READ_WRITE_ACCESSED 0X3
-#define DATA_READ_ONLY_EXPAND_DOWN 0x4
-#define DATA_READ_ONLY_EXPAND_DOWN_ACCESSED 0x5
-#define DATA_READ_WRITE_EXPAND_DOWN 0X6
+#define DATA_READ_ONLY                       0X0
+#define DATA_READ_ONLY_ACCESSED              0X1
+#define DATA_READ_WRITE                      0X2
+#define DATA_READ_WRITE_ACCESSED             0X3
+#define DATA_READ_ONLY_EXPAND_DOWN           0x4
+#define DATA_READ_ONLY_EXPAND_DOWN_ACCESSED  0x5
+#define DATA_READ_WRITE_EXPAND_DOWN          0X6
 #define DATA_READ_WRITE_EXPAND_DOWN_ACCESSED 0X7
 
-#define CODE_EXECUTE_ONLY 0x8
-#define CODE_EXECUTE_ONLY_ACCESSED 0X9
-#define CODE_EXECUTE_READ 0XA
-#define CODE_EXECUTE_READ_ACCESSED 0XB
-#define CODE_EXECUTE_ONLY_CONFORMING 0XC
-#define CODE_EXECUTE_ONLY_CONFORING_ACCESSED 0XD
-#define CODE_EXECUTE_READ_CONFORMING 0XE
+#define CODE_EXECUTE_ONLY                     0x8
+#define CODE_EXECUTE_ONLY_ACCESSED            0X9
+#define CODE_EXECUTE_READ                     0XA
+#define CODE_EXECUTE_READ_ACCESSED            0XB
+#define CODE_EXECUTE_ONLY_CONFORMING          0XC
+#define CODE_EXECUTE_ONLY_CONFORING_ACCESSED  0XD
+#define CODE_EXECUTE_READ_CONFORMING          0XE
 #define CODE_EXECUTE_READ_CONFORMING_ACCESSED 0XF
 
 #define CODE_PRIVILEGE_0 \
@@ -92,28 +92,26 @@ Size bit. If 0 the selector defines 16 bit protected mode. If 1 it defines 32 bi
     up or expand-down type.
 */
 
-#define STACK_PRIVILEGE_0                                             \
-    DATA_READ_WRITE_EXPAND_DOWN | SEG_PRESENT(1) | SEG_PRIVILEGE(0) | \
-        SEG_DESCRIPTOR_TYPE(1)
+#define STACK_PRIVILEGE_0 \
+    DATA_READ_WRITE_EXPAND_DOWN | SEG_PRESENT(1) | SEG_PRIVILEGE(0) | SEG_DESCRIPTOR_TYPE(1)
 
 /*
     The base, limit, and DPL fields and the granularity and
     present flags have functions similar to their use in data-segment descriptors
 */
 
-#define TSS_PRIVILEGE_0                                              \
-    CODE_EXECUTE_ONLY_ACCESSED | SEG_PRIVILEGE(0) | SEG_PRESENT(1) | \
-        SEG_DESCRIPTOR_TYPE(0)
+#define TSS_PRIVILEGE_0 \
+    CODE_EXECUTE_ONLY_ACCESSED | SEG_PRIVILEGE(0) | SEG_PRESENT(1) | SEG_DESCRIPTOR_TYPE(0)
 
 /* Descripteur de segment */
 typedef struct gdtdesc {
     uint16_t lim0_15;
     uint16_t base0_15;
-    uint8_t base16_23;
-    uint8_t acces_byte;
-    uint8_t lim16_19 : 4;
-    uint8_t flags : 4;
-    uint8_t base24_31;
+    uint8_t  base16_23;
+    uint8_t  acces_byte;
+    uint8_t  lim16_19 : 4;
+    uint8_t  flags : 4;
+    uint8_t  base24_31;
 } __attribute__((packed)) gdt_entry_desc;
 
 void init_gdt(void);

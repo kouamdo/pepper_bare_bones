@@ -5,11 +5,13 @@
 
 #include "i386types.h"
 
-#define cpuid(code)                                            \
-    ({                                                         \
-        uint32_t edx;                                          \
-        __asm__ __volatile__("cpuid" : "=d"(edx) : "a"(code)); \
-        edx;                                                   \
+#define cpuid(code)                        \
+    ({                                     \
+        uint32_t edx;                      \
+        __asm__ __volatile__("cpuid"       \
+                             : "=d"(edx)   \
+                             : "a"(code)); \
+        edx;                               \
     })
 
 #define cpuid_string(code)                                             \

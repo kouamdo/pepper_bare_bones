@@ -6,15 +6,13 @@
 #define KERNEL__Vir_MM
 #define KERNEL__PAGE_MM
 #include <i386types.h>
-#include <init/video.h>
 #include <kernel/mm.h>
-#include <stddef.h>
 #include <kernel/task.h>
+#include <stddef.h>
 
 sheduler_t sheduler;
 
-static task_control_block_t main_task, task1, task2 , task3;
-
+static task_control_block_t main_task, task1, task2, task3;
 
 void __switch()
 {
@@ -43,8 +41,8 @@ void create_task(task_control_block_t* task, void (*task_func)(), uint32_t eflag
     task->regs.edi = 0;
 
     task->regs.eflags = eflags;
-    task->regs.eip = (uint32_t)task_func;
-    task->regs.cr3 = (uint32_t)cr3;
-    task->regs.esp = (uint32_t)kmalloc(200);
-    task->new_tasks = 0;
+    task->regs.eip    = (uint32_t)task_func;
+    task->regs.cr3    = (uint32_t)cr3;
+    task->regs.esp    = (uint32_t)kmalloc(200);
+    task->new_tasks   = 0;
 }

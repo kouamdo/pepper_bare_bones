@@ -1,6 +1,5 @@
 #include <init/apic/apic.h>
 #include <init/paging.h>
-#include <video.h>
 
 __page_table_frame__ uint32_t __3fb_index_page_directory__[PAGE_TABLE_OFFSET]
     __attribute__((aligned(PAGE_TABLE_SIZE)));
@@ -54,6 +53,4 @@ void enable_local_apic()
     cpu_SetLocalAPICReg(0xF0, cpu_ReadLocalAPICReg(0xF0) | 0x100);
 
     cpu_SetLocalAPICReg(0x20, 2);
-
-    kprintf(2, 15, "[K:CPU]\tEnabling and setting of local APIC\n");
 }

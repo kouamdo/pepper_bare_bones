@@ -1,6 +1,5 @@
 #include "../../include/init//pic.h"
 #include "../../include/init/io.h"
-#include "../../include/init/video.h"
 
 extern void spurious_IRQ(unsigned char irq);
 extern void keyboard_irq() ; 

@@ -1,11 +1,10 @@
 #define KERNEL__PAGE_MM
 #include <i386types.h>
 #include <stdint.h>
-#define TEST_H
+
 #define _TEST_
 
 #include <init/paging.h>
-#include <init/video.h>
 #include <mm.h>
 #include <string.h>
 #include <test.h>
@@ -14,7 +13,6 @@
   Memory space to put our nodes (pages)
 */
 static _address_order_track_ MEMORY_SPACES_PAGES[0x400]; // Able to take 0x400 pages
-extern test_case_result __phy_mem_manager__;
 
 _address_order_track_* _page_area_track_;
 uint32_t NMBER_PAGES_ALLOC;
