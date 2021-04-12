@@ -1,6 +1,5 @@
 #include <init/pic.h>
 #include <init/pit.h>
-#include <init/console.h>
 #include <task.h>
 
 extern int32_t system_timer_fractions, system_timer_ms, IRQ0_fractions, IRQ0_ms,
@@ -8,16 +7,15 @@ extern int32_t system_timer_fractions, system_timer_ms, IRQ0_fractions, IRQ0_ms,
 
 extern sheduler_t sheduler;
 
-uint32_t compteur = 0;
-uint8_t frequency = 0;
-uint8_t status_PIT = 0;
+uint32_t compteur   = 0;
+uint8_t  frequency  = 0;
+uint8_t  status_PIT = 0;
 
 void conserv_status_byte()
 {
-     set_pit_count(PIT_0, PIT_reload_value);
+    set_pit_count(PIT_0, PIT_reload_value);
 
     pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
-
 }
 
 void sheduler_cpu_timer()
@@ -26,8 +24,7 @@ void sheduler_cpu_timer()
         if (sheduler.task_timer == 0) {
             sheduler.task_timer = DELAY_PER_TASK;
             __switch();
-        }
-        else
+        } else
             sheduler.task_timer--;
     }
 }

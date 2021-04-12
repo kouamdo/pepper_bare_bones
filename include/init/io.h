@@ -25,7 +25,7 @@
 /* lit un octet sur un port */
 #define inb(port)                     \
     ({                                \
-        unsigned char _v;             \
+        int16_t _v;                   \
         asm volatile("inb %%dx, %%al" \
                      : "=a"(_v)       \
                      : "d"(port));    \
@@ -39,7 +39,7 @@
 
 #define inbp(port)                                    \
     ({                                                \
-        unsigned char _v;                             \
+        unsigned short _v;                            \
         asm volatile("inb %%dx , %%al ; jmp 1f ; 1: " \
                      : "=a"(_v)                       \
                      : "d"(port));                    \

@@ -103,7 +103,6 @@ debug_link_file: k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	rm $(OBJECTS_ASM)
 
 debug_kernel:
-	make debug_link_file
 	qemu-system-i386 -fda disk.img -S -s &
 	gdb bin/kernel.elf  \
         -ex 'target remote localhost:1234' \
