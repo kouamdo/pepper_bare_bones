@@ -4,10 +4,10 @@
 Kernel from scratch for intel core 32 bits
 My goal is to make OS that will use in networking and telecommunications research.
 
-For now the moment, we are still in an initialization phase, ... 
+For now, we are still at the initialisation steps, ... 
 
 Aptitudes: 
-- Simple boot sectors
+- Simples boot sectors (First stage and second stage)
 - Apic and IOAPIC
 - Pagination and segmentation functionnality
 - Memory Allocation
