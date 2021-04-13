@@ -17,7 +17,9 @@ For now, we are still at the initialisation steps, ... :
 
 
 
-* Why is OS kernel for telecommunications research design/implementation hard/interesting?
+
+
+**Why is OS kernel for telecommunications research design/implementation hard/interesting?
   * the environment is unforgiving: quirky h/w, weak debugger
   * it must be efficient (thus low-level?)
   ...but abstract/portable (thus high-level?)
