@@ -11,6 +11,6 @@
 #define VIDEO_MEM 0xb8000
 
 void volatile cclean();
-void volatile cputchar(unsigned char color, unsigned const char c);
+void volatile cputchar(unsigned char color, const char c);
 void init_console();
 #endif // !VIDEO_H
