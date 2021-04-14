@@ -1,6 +1,6 @@
 CC		:= gcc
 CFLAGS	:= -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Wstringop-overflow -Werror
-LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
+LDFLAGS := ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld
 
 BIN		:= bin
 SRC		:= src
@@ -62,7 +62,7 @@ disk:
 	dd if=/dev/zero of=disk.img bs=512 count=2880
 	dd if=bin/boot1.img of=disk.img bs=512 conv=notrunc
 	dd if=bin/boot2.img of=disk.img seek=1 bs=512 conv=notrunc
-	dd if=bin/kernel.bin of=disk.img bs=512 seek=4 conv=notrunc
+	dd if=bin/kernel.img of=disk.img bs=512 seek=4 conv=notrunc
 
 %.o : %.c
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES)
@@ -120,7 +120,8 @@ mixt: k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"
-	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.bin
+	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	objcopy -O binary bin/kernel.elf bin/kernel.img
 	
 
 clean:
