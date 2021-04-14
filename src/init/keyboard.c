@@ -127,15 +127,16 @@ void kbd_init()
 
 void keyboard_irq()
 {
+
+    int i;
+    void (*func)(void);
+
     do {
         keyboard_ctrl.code = _8042_get_status;
     } while ((keyboard_ctrl.code & 0x01) == _8042_BUFFER_OVERRUN);
 
     keyboard_ctrl.code = _8042_scan_code;
     keyboard_ctrl.code--;
-
-    int i;
-    void (*func)(void);
 
     for (i = 0; i < keyboard_ctrl.kbd_service_num; i++) {
         func = keyboard_ctrl.kbd_service[i];
@@ -171,33 +172,37 @@ int16_t get_code_kbd_control()
     return keyboard_ctrl.code;
 }
 
-int8_t get_ASCII_code_keyboard()
+static void handle_ASCII_code_keyboard()
 {
-    int16_t _code = get_code_kbd_control();
 
-    static int16_t lshift_enable = 0;
-    static int16_t rshift_enable = 0;
-    static int16_t alt_enable    = 0;
-    static int16_t ctrl_enable   = 0;
+    static int16_t lshift_enable;
+    static int16_t rshift_enable;
+    static int16_t alt_enable;
+    static int16_t ctrl_enable;
 
-    if (_code < 0x80) { /* touche enfoncee */
-        switch (_code) {
+    if (keyboard_ctrl.code < 0x80) { /* key held down */
+        switch (keyboard_ctrl.code) {
         case 0x29: lshift_enable = 1; break;
         case 0x35: rshift_enable = 1; break;
         case 0x1C: ctrl_enable = 1; break;
         case 0x37: alt_enable = 1; break;
         default:
+            keyboard_ctrl.ascii_code_keyboard = kbdmap[keyboard_ctrl.code * 4 + (lshift_enable || rshift_enable)];
             break;
         }
-    } else { /* touche relachee */
-        _code -= 0x80;
-        switch (_code) {
+    } else {
+        keyboard_ctrl.code -= 0x80;
+        switch (keyboard_ctrl.code) {
         case 0x29: lshift_enable = 0; break;
         case 0x35: rshift_enable = 0; break;
         case 0x1C: ctrl_enable = 0; break;
         case 0x37: alt_enable = 0; break;
         }
     }
+}
 
-    return kbdmap[_code * 4 + (lshift_enable || rshift_enable)];
+int8_t get_ASCII_code_keyboard()
+{
+    handle_ASCII_code_keyboard();
+    return keyboard_ctrl.ascii_code_keyboard;
 }
