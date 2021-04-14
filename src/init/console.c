@@ -46,7 +46,7 @@ void volatile cscrollup()
     CURSOR_Y++;
 }
 
-void volatile cputchar(unsigned char color, unsigned const char c)
+void volatile cputchar(unsigned char color, const char c)
 {
 
     if ((CURSOR_Y) <= (25)) {
