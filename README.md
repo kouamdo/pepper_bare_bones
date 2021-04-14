@@ -14,6 +14,7 @@ For now, we are still at the initialisation steps, ... :
 - Memory Allocation
 - Process management
 - I/O management
+- Kernel console and monitor for execute instruction
 
 
 
