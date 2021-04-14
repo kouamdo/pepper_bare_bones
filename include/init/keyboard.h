@@ -56,6 +56,7 @@ void keyboard_add_service(void (*func)()); //Add keyboard services
 
 #define KBD_BUFF_SIZE 0xFF //number services Max
 typedef struct kdb_8042_ {
+    int8_t  ascii_code_keyboard;        //GETTING CODE ascii
     int8_t  kbd_service_num;            // number of Service activated
     void*   kbd_service[KBD_BUFF_SIZE]; // List of service for keyword
     int16_t code;                       // Code input

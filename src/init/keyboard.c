@@ -136,7 +136,6 @@ void keyboard_irq()
     } while ((keyboard_ctrl.code & 0x01) == _8042_BUFFER_OVERRUN);
 
     keyboard_ctrl.code = _8042_scan_code;
-    keyboard_ctrl.code--;
 
     for (i = 0; i < keyboard_ctrl.kbd_service_num; i++) {
         func = keyboard_ctrl.kbd_service[i];
@@ -174,25 +173,25 @@ int16_t get_code_kbd_control()
 
 static void handle_ASCII_code_keyboard()
 {
-
+    int16_t        _code = keyboard_ctrl.code - 1;
     static int16_t lshift_enable;
     static int16_t rshift_enable;
     static int16_t alt_enable;
     static int16_t ctrl_enable;
 
-    if (keyboard_ctrl.code < 0x80) { /* key held down */
-        switch (keyboard_ctrl.code) {
+    if (_code < 0x80) { /* key held down */
+        switch (_code) {
         case 0x29: lshift_enable = 1; break;
         case 0x35: rshift_enable = 1; break;
         case 0x1C: ctrl_enable = 1; break;
         case 0x37: alt_enable = 1; break;
         default:
-            keyboard_ctrl.ascii_code_keyboard = kbdmap[keyboard_ctrl.code * 4 + (lshift_enable || rshift_enable)];
-            break;
+            keyboard_ctrl.ascii_code_keyboard = kbdmap[_code * 4 + (lshift_enable || rshift_enable)];
+            return;
         }
     } else {
-        keyboard_ctrl.code -= 0x80;
-        switch (keyboard_ctrl.code) {
+        _code -= 0x80;
+        switch (_code) {
         case 0x29: lshift_enable = 0; break;
         case 0x35: rshift_enable = 0; break;
         case 0x1C: ctrl_enable = 0; break;
