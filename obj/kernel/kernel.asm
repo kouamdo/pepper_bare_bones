@@ -20,13 +20,13 @@ void main()
     9006:	fa                   	cli    
 
     init_gdt();
-    9007:	e8 22 07 00 00       	call   972e <init_gdt>
+    9007:	e8 2b 07 00 00       	call   9737 <init_gdt>
 
     init_idt();
-    900c:	e8 56 08 00 00       	call   9867 <init_idt>
+    900c:	e8 5f 08 00 00       	call   9870 <init_idt>
 
     init_console();
-    9011:	e8 6d 06 00 00       	call   9683 <init_console>
+    9011:	e8 76 06 00 00       	call   968c <init_console>
 
     sti;
     9016:	fb                   	sti    
@@ -877,3882 +877,3889 @@ void console_service_keyboard()
     965f:	55                   	push   %ebp
     9660:	89 e5                	mov    %esp,%ebp
     9662:	83 ec 08             	sub    $0x8,%esp
-    cputchar(READY_COLOR, get_ASCII_code_keyboard());
-    9665:	e8 1f 0b 00 00       	call   a189 <get_ASCII_code_keyboard>
-    966a:	0f be c0             	movsbl %al,%eax
-    966d:	83 ec 08             	sub    $0x8,%esp
-    9670:	50                   	push   %eax
-    9671:	6a 07                	push   $0x7
-    9673:	e8 82 fe ff ff       	call   94fa <cputchar>
-    9678:	83 c4 10             	add    $0x10,%esp
-    show_cursor();
-    967b:	e8 bf ff ff ff       	call   963f <show_cursor>
+    if (get_ASCII_code_keyboard() != 0) {
+    9665:	e8 1e 0b 00 00       	call   a188 <get_ASCII_code_keyboard>
+    966a:	84 c0                	test   %al,%al
+    966c:	74 1b                	je     9689 <console_service_keyboard+0x2a>
+        cputchar(READY_COLOR, get_ASCII_code_keyboard());
+    966e:	e8 15 0b 00 00       	call   a188 <get_ASCII_code_keyboard>
+    9673:	0f be c0             	movsbl %al,%eax
+    9676:	83 ec 08             	sub    $0x8,%esp
+    9679:	50                   	push   %eax
+    967a:	6a 07                	push   $0x7
+    967c:	e8 79 fe ff ff       	call   94fa <cputchar>
+    9681:	83 c4 10             	add    $0x10,%esp
+        show_cursor();
+    9684:	e8 b6 ff ff ff       	call   963f <show_cursor>
+    }
 }
-    9680:	90                   	nop
-    9681:	c9                   	leave  
-    9682:	c3                   	ret    
+    9689:	90                   	nop
+    968a:	c9                   	leave  
+    968b:	c3                   	ret    
 
-00009683 <init_console>:
+0000968c <init_console>:
 
 void init_console()
 {
-    9683:	55                   	push   %ebp
-    9684:	89 e5                	mov    %esp,%ebp
-    9686:	83 ec 08             	sub    $0x8,%esp
+    968c:	55                   	push   %ebp
+    968d:	89 e5                	mov    %esp,%ebp
+    968f:	83 ec 08             	sub    $0x8,%esp
     cclean();
-    9689:	e8 64 fd ff ff       	call   93f2 <cclean>
+    9692:	e8 5b fd ff ff       	call   93f2 <cclean>
     kbd_init(); //Init keyboard
-    968e:	e8 cf 08 00 00       	call   9f62 <kbd_init>
+    9697:	e8 cf 08 00 00       	call   9f6b <kbd_init>
     //init Video graphics here
-    9693:	90                   	nop
-    9694:	c9                   	leave  
-    9695:	c3                   	ret    
+    969c:	90                   	nop
+    969d:	c9                   	leave  
+    969e:	c3                   	ret    
 
-00009696 <__exception__>:
+0000969f <__exception__>:
 extern unsigned int __error_code__;
 
 void __exception__(void) {}
-    9696:	55                   	push   %ebp
-    9697:	89 e5                	mov    %esp,%ebp
-    9699:	90                   	nop
-    969a:	5d                   	pop    %ebp
-    969b:	c3                   	ret    
+    969f:	55                   	push   %ebp
+    96a0:	89 e5                	mov    %esp,%ebp
+    96a2:	90                   	nop
+    96a3:	5d                   	pop    %ebp
+    96a4:	c3                   	ret    
 
-0000969c <__exception_no_ERRCODE__>:
+000096a5 <__exception_no_ERRCODE__>:
 void __exception_no_ERRCODE__(void) {}
-    969c:	55                   	push   %ebp
-    969d:	89 e5                	mov    %esp,%ebp
-    969f:	90                   	nop
-    96a0:	5d                   	pop    %ebp
-    96a1:	c3                   	ret    
+    96a5:	55                   	push   %ebp
+    96a6:	89 e5                	mov    %esp,%ebp
+    96a8:	90                   	nop
+    96a9:	5d                   	pop    %ebp
+    96aa:	c3                   	ret    
 
-000096a2 <init_gdt_entry>:
+000096ab <init_gdt_entry>:
 /*
  * init_desc initialise un descripteur de segment situe en gdt ou en ldt.
  * desc est l'adresse lineaire du descripteur a initialiser.
  */
 static void init_gdt_entry(uint32_t base, uint32_t limite, uint8_t access, uint8_t flags, gdt_entry_desc* desc)
 {
-    96a2:	55                   	push   %ebp
-    96a3:	89 e5                	mov    %esp,%ebp
-    96a5:	83 ec 08             	sub    $0x8,%esp
-    96a8:	8b 55 10             	mov    0x10(%ebp),%edx
-    96ab:	8b 45 14             	mov    0x14(%ebp),%eax
-    96ae:	88 55 fc             	mov    %dl,-0x4(%ebp)
-    96b1:	88 45 f8             	mov    %al,-0x8(%ebp)
+    96ab:	55                   	push   %ebp
+    96ac:	89 e5                	mov    %esp,%ebp
+    96ae:	83 ec 08             	sub    $0x8,%esp
+    96b1:	8b 55 10             	mov    0x10(%ebp),%edx
+    96b4:	8b 45 14             	mov    0x14(%ebp),%eax
+    96b7:	88 55 fc             	mov    %dl,-0x4(%ebp)
+    96ba:	88 45 f8             	mov    %al,-0x8(%ebp)
     desc->lim0_15 = (limite & 0xFFFF);
-    96b4:	8b 45 0c             	mov    0xc(%ebp),%eax
-    96b7:	89 c2                	mov    %eax,%edx
-    96b9:	8b 45 18             	mov    0x18(%ebp),%eax
-    96bc:	66 89 10             	mov    %dx,(%eax)
+    96bd:	8b 45 0c             	mov    0xc(%ebp),%eax
+    96c0:	89 c2                	mov    %eax,%edx
+    96c2:	8b 45 18             	mov    0x18(%ebp),%eax
+    96c5:	66 89 10             	mov    %dx,(%eax)
     desc->lim16_19 = (limite & 0xF0000) >> 16;
-    96bf:	8b 45 0c             	mov    0xc(%ebp),%eax
-    96c2:	c1 e8 10             	shr    $0x10,%eax
-    96c5:	83 e0 0f             	and    $0xf,%eax
-    96c8:	8b 55 18             	mov    0x18(%ebp),%edx
-    96cb:	83 e0 0f             	and    $0xf,%eax
-    96ce:	89 c1                	mov    %eax,%ecx
-    96d0:	0f b6 42 06          	movzbl 0x6(%edx),%eax
-    96d4:	83 e0 f0             	and    $0xfffffff0,%eax
-    96d7:	09 c8                	or     %ecx,%eax
-    96d9:	88 42 06             	mov    %al,0x6(%edx)
+    96c8:	8b 45 0c             	mov    0xc(%ebp),%eax
+    96cb:	c1 e8 10             	shr    $0x10,%eax
+    96ce:	83 e0 0f             	and    $0xf,%eax
+    96d1:	8b 55 18             	mov    0x18(%ebp),%edx
+    96d4:	83 e0 0f             	and    $0xf,%eax
+    96d7:	89 c1                	mov    %eax,%ecx
+    96d9:	0f b6 42 06          	movzbl 0x6(%edx),%eax
+    96dd:	83 e0 f0             	and    $0xfffffff0,%eax
+    96e0:	09 c8                	or     %ecx,%eax
+    96e2:	88 42 06             	mov    %al,0x6(%edx)
 
     desc->base0_15 = (base & 0xFFFF);
-    96dc:	8b 45 08             	mov    0x8(%ebp),%eax
-    96df:	89 c2                	mov    %eax,%edx
-    96e1:	8b 45 18             	mov    0x18(%ebp),%eax
-    96e4:	66 89 50 02          	mov    %dx,0x2(%eax)
+    96e5:	8b 45 08             	mov    0x8(%ebp),%eax
+    96e8:	89 c2                	mov    %eax,%edx
+    96ea:	8b 45 18             	mov    0x18(%ebp),%eax
+    96ed:	66 89 50 02          	mov    %dx,0x2(%eax)
     desc->base16_23 = (base & 0xFF0000) >> 16;
-    96e8:	8b 45 08             	mov    0x8(%ebp),%eax
-    96eb:	c1 e8 10             	shr    $0x10,%eax
-    96ee:	89 c2                	mov    %eax,%edx
-    96f0:	8b 45 18             	mov    0x18(%ebp),%eax
-    96f3:	88 50 04             	mov    %dl,0x4(%eax)
+    96f1:	8b 45 08             	mov    0x8(%ebp),%eax
+    96f4:	c1 e8 10             	shr    $0x10,%eax
+    96f7:	89 c2                	mov    %eax,%edx
+    96f9:	8b 45 18             	mov    0x18(%ebp),%eax
+    96fc:	88 50 04             	mov    %dl,0x4(%eax)
     desc->base24_31 = (base & 0xFF000000) >> 24;
-    96f6:	8b 45 08             	mov    0x8(%ebp),%eax
-    96f9:	c1 e8 18             	shr    $0x18,%eax
-    96fc:	89 c2                	mov    %eax,%edx
-    96fe:	8b 45 18             	mov    0x18(%ebp),%eax
-    9701:	88 50 07             	mov    %dl,0x7(%eax)
+    96ff:	8b 45 08             	mov    0x8(%ebp),%eax
+    9702:	c1 e8 18             	shr    $0x18,%eax
+    9705:	89 c2                	mov    %eax,%edx
+    9707:	8b 45 18             	mov    0x18(%ebp),%eax
+    970a:	88 50 07             	mov    %dl,0x7(%eax)
 
     desc->flags = flags;
-    9704:	0f b6 45 f8          	movzbl -0x8(%ebp),%eax
-    9708:	83 e0 0f             	and    $0xf,%eax
-    970b:	89 c2                	mov    %eax,%edx
-    970d:	8b 45 18             	mov    0x18(%ebp),%eax
-    9710:	89 d1                	mov    %edx,%ecx
-    9712:	c1 e1 04             	shl    $0x4,%ecx
-    9715:	0f b6 50 06          	movzbl 0x6(%eax),%edx
-    9719:	83 e2 0f             	and    $0xf,%edx
-    971c:	09 ca                	or     %ecx,%edx
-    971e:	88 50 06             	mov    %dl,0x6(%eax)
+    970d:	0f b6 45 f8          	movzbl -0x8(%ebp),%eax
+    9711:	83 e0 0f             	and    $0xf,%eax
+    9714:	89 c2                	mov    %eax,%edx
+    9716:	8b 45 18             	mov    0x18(%ebp),%eax
+    9719:	89 d1                	mov    %edx,%ecx
+    971b:	c1 e1 04             	shl    $0x4,%ecx
+    971e:	0f b6 50 06          	movzbl 0x6(%eax),%edx
+    9722:	83 e2 0f             	and    $0xf,%edx
+    9725:	09 ca                	or     %ecx,%edx
+    9727:	88 50 06             	mov    %dl,0x6(%eax)
     desc->acces_byte = access;
-    9721:	8b 45 18             	mov    0x18(%ebp),%eax
-    9724:	0f b6 55 fc          	movzbl -0x4(%ebp),%edx
-    9728:	88 50 05             	mov    %dl,0x5(%eax)
+    972a:	8b 45 18             	mov    0x18(%ebp),%eax
+    972d:	0f b6 55 fc          	movzbl -0x4(%ebp),%edx
+    9731:	88 50 05             	mov    %dl,0x5(%eax)
 }
-    972b:	90                   	nop
-    972c:	c9                   	leave  
-    972d:	c3                   	ret    
+    9734:	90                   	nop
+    9735:	c9                   	leave  
+    9736:	c3                   	ret    
 
-0000972e <init_gdt>:
+00009737 <init_gdt>:
  * en memoire. Une GDT est deja operationnelle, mais c'est celle qui
  * a ete initialisee par le secteur de boot et qui ne correspond
  * pas forcement a celle que l'on souhaite.
  */
 void init_gdt(void)
 {
-    972e:	55                   	push   %ebp
-    972f:	89 e5                	mov    %esp,%ebp
-    9731:	83 ec 08             	sub    $0x8,%esp
+    9737:	55                   	push   %ebp
+    9738:	89 e5                	mov    %esp,%ebp
+    973a:	83 ec 08             	sub    $0x8,%esp
     /* initialisation des descripteurs de segment */
     init_gdt_entry(0x0, 0x0, 0x0, 0x0, &__gdt_entry__[0]);
-    9734:	a1 08 00 01 00       	mov    0x10008,%eax
-    9739:	50                   	push   %eax
-    973a:	6a 00                	push   $0x0
-    973c:	6a 00                	push   $0x0
-    973e:	6a 00                	push   $0x0
-    9740:	6a 00                	push   $0x0
-    9742:	e8 5b ff ff ff       	call   96a2 <init_gdt_entry>
-    9747:	83 c4 14             	add    $0x14,%esp
+    973d:	a1 08 00 01 00       	mov    0x10008,%eax
+    9742:	50                   	push   %eax
+    9743:	6a 00                	push   $0x0
+    9745:	6a 00                	push   $0x0
+    9747:	6a 00                	push   $0x0
+    9749:	6a 00                	push   $0x0
+    974b:	e8 5b ff ff ff       	call   96ab <init_gdt_entry>
+    9750:	83 c4 14             	add    $0x14,%esp
 
     // Segment de code
     init_gdt_entry(0, 0xFFFFF, CODE_PRIVILEGE_0,
-    974a:	a1 08 00 01 00       	mov    0x10008,%eax
-    974f:	83 c0 08             	add    $0x8,%eax
-    9752:	50                   	push   %eax
-    9753:	6a 04                	push   $0x4
-    9755:	68 9a 00 00 00       	push   $0x9a
-    975a:	68 ff ff 0f 00       	push   $0xfffff
-    975f:	6a 00                	push   $0x0
-    9761:	e8 3c ff ff ff       	call   96a2 <init_gdt_entry>
-    9766:	83 c4 14             	add    $0x14,%esp
+    9753:	a1 08 00 01 00       	mov    0x10008,%eax
+    9758:	83 c0 08             	add    $0x8,%eax
+    975b:	50                   	push   %eax
+    975c:	6a 04                	push   $0x4
+    975e:	68 9a 00 00 00       	push   $0x9a
+    9763:	68 ff ff 0f 00       	push   $0xfffff
+    9768:	6a 00                	push   $0x0
+    976a:	e8 3c ff ff ff       	call   96ab <init_gdt_entry>
+    976f:	83 c4 14             	add    $0x14,%esp
                    SEG_GRANULARITY(0) | SEG_SIZE(1), &__gdt_entry__[1]);
 
     // Segment de donnée
     init_gdt_entry(0, 0xFFFFF, DATA_PRIVILEGE_0,
-    9769:	a1 08 00 01 00       	mov    0x10008,%eax
-    976e:	83 c0 10             	add    $0x10,%eax
-    9771:	50                   	push   %eax
-    9772:	6a 04                	push   $0x4
-    9774:	68 92 00 00 00       	push   $0x92
-    9779:	68 ff ff 0f 00       	push   $0xfffff
-    977e:	6a 00                	push   $0x0
-    9780:	e8 1d ff ff ff       	call   96a2 <init_gdt_entry>
-    9785:	83 c4 14             	add    $0x14,%esp
+    9772:	a1 08 00 01 00       	mov    0x10008,%eax
+    9777:	83 c0 10             	add    $0x10,%eax
+    977a:	50                   	push   %eax
+    977b:	6a 04                	push   $0x4
+    977d:	68 92 00 00 00       	push   $0x92
+    9782:	68 ff ff 0f 00       	push   $0xfffff
+    9787:	6a 00                	push   $0x0
+    9789:	e8 1d ff ff ff       	call   96ab <init_gdt_entry>
+    978e:	83 c4 14             	add    $0x14,%esp
                    SEG_GRANULARITY(0) | SEG_SIZE(1) | 0x0, &__gdt_entry__[2]);
 
     // Segment de pile
     init_gdt_entry(0, 0xFFFFF, STACK_PRIVILEGE_0,
-    9788:	a1 08 00 01 00       	mov    0x10008,%eax
-    978d:	83 c0 18             	add    $0x18,%eax
-    9790:	50                   	push   %eax
-    9791:	6a 04                	push   $0x4
-    9793:	68 96 00 00 00       	push   $0x96
-    9798:	68 ff ff 0f 00       	push   $0xfffff
-    979d:	6a 00                	push   $0x0
-    979f:	e8 fe fe ff ff       	call   96a2 <init_gdt_entry>
-    97a4:	83 c4 14             	add    $0x14,%esp
+    9791:	a1 08 00 01 00       	mov    0x10008,%eax
+    9796:	83 c0 18             	add    $0x18,%eax
+    9799:	50                   	push   %eax
+    979a:	6a 04                	push   $0x4
+    979c:	68 96 00 00 00       	push   $0x96
+    97a1:	68 ff ff 0f 00       	push   $0xfffff
+    97a6:	6a 00                	push   $0x0
+    97a8:	e8 fe fe ff ff       	call   96ab <init_gdt_entry>
+    97ad:	83 c4 14             	add    $0x14,%esp
                    SEG_GRANULARITY(0) | SEG_SIZE(1) | 0x0, &__gdt_entry__[3]);
 
     // Segment de tâches
     init_gdt_entry(0, 0xFFFFFF, TSS_PRIVILEGE_0,
-    97a7:	a1 08 00 01 00       	mov    0x10008,%eax
-    97ac:	83 c0 20             	add    $0x20,%eax
-    97af:	50                   	push   %eax
-    97b0:	6a 04                	push   $0x4
-    97b2:	68 89 00 00 00       	push   $0x89
-    97b7:	68 ff ff ff 00       	push   $0xffffff
-    97bc:	6a 00                	push   $0x0
-    97be:	e8 df fe ff ff       	call   96a2 <init_gdt_entry>
-    97c3:	83 c4 14             	add    $0x14,%esp
+    97b0:	a1 08 00 01 00       	mov    0x10008,%eax
+    97b5:	83 c0 20             	add    $0x20,%eax
+    97b8:	50                   	push   %eax
+    97b9:	6a 04                	push   $0x4
+    97bb:	68 89 00 00 00       	push   $0x89
+    97c0:	68 ff ff ff 00       	push   $0xffffff
+    97c5:	6a 00                	push   $0x0
+    97c7:	e8 df fe ff ff       	call   96ab <init_gdt_entry>
+    97cc:	83 c4 14             	add    $0x14,%esp
                    SEG_GRANULARITY(0) | SEG_SIZE(1) | 0x0, &__gdt_entry__[4]);
 
     // Chargement de la GDT
     load_gdt();
-    97c6:	e8 8b 1a 00 00       	call   b256 <load_gdt>
+    97cf:	e8 92 1a 00 00       	call   b266 <load_gdt>
     /*
         0x10(16) tout simplement parceque le data segment est à 16 + @base_gdt
         0x8 car code segment est à @base gdt + 8
         0x18 car stack segment est à @base gdt+24
     */
     __asm__ __volatile__(
-    97cb:	66 b8 10 00          	mov    $0x10,%ax
-    97cf:	8e d8                	mov    %eax,%ds
-    97d1:	8e c0                	mov    %eax,%es
-    97d3:	8e e0                	mov    %eax,%fs
-    97d5:	8e e8                	mov    %eax,%gs
-    97d7:	66 b8 18 00          	mov    $0x18,%ax
-    97db:	8e d0                	mov    %eax,%ss
-    97dd:	ea e4 97 00 00 08 00 	ljmp   $0x8,$0x97e4
+    97d4:	66 b8 10 00          	mov    $0x10,%ax
+    97d8:	8e d8                	mov    %eax,%ds
+    97da:	8e c0                	mov    %eax,%es
+    97dc:	8e e0                	mov    %eax,%fs
+    97de:	8e e8                	mov    %eax,%gs
+    97e0:	66 b8 18 00          	mov    $0x18,%ax
+    97e4:	8e d0                	mov    %eax,%ss
+    97e6:	ea ed 97 00 00 08 00 	ljmp   $0x8,$0x97ed
 
-000097e4 <next>:
+000097ed <next>:
             movw %ax, %gs	\n \
             movw $0x18, %ax \n \
             movw %ax, %ss \n \
             ljmp $0x08, $next	\n  \
             next:   \n"); // Long jump after reconfiguration of all segment
 }
-    97e4:	90                   	nop
-    97e5:	c9                   	leave  
-    97e6:	c3                   	ret    
+    97ed:	90                   	nop
+    97ee:	c9                   	leave  
+    97ef:	c3                   	ret    
 
-000097e7 <set_idt>:
+000097f0 <set_idt>:
 __idt_entry__ __idt__[IDTSIZE];
 
 extern void load_idt();
 
 static void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t vector)
 {
-    97e7:	55                   	push   %ebp
-    97e8:	89 e5                	mov    %esp,%ebp
-    97ea:	83 ec 18             	sub    $0x18,%esp
-    97ed:	8b 45 08             	mov    0x8(%ebp),%eax
-    97f0:	8b 4d 0c             	mov    0xc(%ebp),%ecx
-    97f3:	8b 55 18             	mov    0x18(%ebp),%edx
-    97f6:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
-    97fa:	89 c8                	mov    %ecx,%eax
-    97fc:	88 45 f8             	mov    %al,-0x8(%ebp)
-    97ff:	8b 45 10             	mov    0x10(%ebp),%eax
-    9802:	89 45 f0             	mov    %eax,-0x10(%ebp)
-    9805:	8b 45 14             	mov    0x14(%ebp),%eax
-    9808:	89 45 f4             	mov    %eax,-0xc(%ebp)
-    980b:	89 d0                	mov    %edx,%eax
-    980d:	66 89 45 ec          	mov    %ax,-0x14(%ebp)
+    97f0:	55                   	push   %ebp
+    97f1:	89 e5                	mov    %esp,%ebp
+    97f3:	83 ec 18             	sub    $0x18,%esp
+    97f6:	8b 45 08             	mov    0x8(%ebp),%eax
+    97f9:	8b 4d 0c             	mov    0xc(%ebp),%ecx
+    97fc:	8b 55 18             	mov    0x18(%ebp),%edx
+    97ff:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
+    9803:	89 c8                	mov    %ecx,%eax
+    9805:	88 45 f8             	mov    %al,-0x8(%ebp)
+    9808:	8b 45 10             	mov    0x10(%ebp),%eax
+    980b:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    980e:	8b 45 14             	mov    0x14(%ebp),%eax
+    9811:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    9814:	89 d0                	mov    %edx,%eax
+    9816:	66 89 45 ec          	mov    %ax,-0x14(%ebp)
     __idt__[vector].selector = selector; // Kernelcode segment offset
-    9811:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
-    9815:	0f b7 55 fc          	movzwl -0x4(%ebp),%edx
-    9819:	66 89 14 c5 22 00 01 	mov    %dx,0x10022(,%eax,8)
-    9820:	00 
+    981a:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
+    981e:	0f b7 55 fc          	movzwl -0x4(%ebp),%edx
+    9822:	66 89 14 c5 22 00 01 	mov    %dx,0x10022(,%eax,8)
+    9829:	00 
     __idt__[vector].type_attr = type;    // Interrupt gate
-    9821:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
-    9825:	0f b6 55 f8          	movzbl -0x8(%ebp),%edx
-    9829:	88 14 c5 25 00 01 00 	mov    %dl,0x10025(,%eax,8)
+    982a:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
+    982e:	0f b6 55 f8          	movzbl -0x8(%ebp),%edx
+    9832:	88 14 c5 25 00 01 00 	mov    %dl,0x10025(,%eax,8)
     __idt__[vector].zero = 0;            // Only zero
-    9830:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
-    9834:	c6 04 c5 24 00 01 00 	movb   $0x0,0x10024(,%eax,8)
-    983b:	00 
+    9839:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
+    983d:	c6 04 c5 24 00 01 00 	movb   $0x0,0x10024(,%eax,8)
+    9844:	00 
     __idt__[vector].offset_lowerbits = (offset & 0xFFFF);
-    983c:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
-    9840:	8b 55 f0             	mov    -0x10(%ebp),%edx
-    9843:	66 89 14 c5 20 00 01 	mov    %dx,0x10020(,%eax,8)
-    984a:	00 
+    9845:	0f b7 45 ec          	movzwl -0x14(%ebp),%eax
+    9849:	8b 55 f0             	mov    -0x10(%ebp),%edx
+    984c:	66 89 14 c5 20 00 01 	mov    %dx,0x10020(,%eax,8)
+    9853:	00 
     __idt__[vector].offset_higherbits = (offset & 0xFFFF0000) >> 16;
-    984b:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    984e:	8b 55 f4             	mov    -0xc(%ebp),%edx
-    9851:	0f ac d0 10          	shrd   $0x10,%edx,%eax
-    9855:	c1 ea 10             	shr    $0x10,%edx
-    9858:	0f b7 4d ec          	movzwl -0x14(%ebp),%ecx
-    985c:	66 89 04 cd 26 00 01 	mov    %ax,0x10026(,%ecx,8)
-    9863:	00 
+    9854:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    9857:	8b 55 f4             	mov    -0xc(%ebp),%edx
+    985a:	0f ac d0 10          	shrd   $0x10,%edx,%eax
+    985e:	c1 ea 10             	shr    $0x10,%edx
+    9861:	0f b7 4d ec          	movzwl -0x14(%ebp),%ecx
+    9865:	66 89 04 cd 26 00 01 	mov    %ax,0x10026(,%ecx,8)
+    986c:	00 
 }
-    9864:	90                   	nop
-    9865:	c9                   	leave  
-    9866:	c3                   	ret    
+    986d:	90                   	nop
+    986e:	c9                   	leave  
+    986f:	c3                   	ret    
 
-00009867 <init_idt>:
+00009870 <init_idt>:
 
 void init_idt()
 {
-    9867:	55                   	push   %ebp
-    9868:	89 e5                	mov    %esp,%ebp
-    986a:	83 ec 08             	sub    $0x8,%esp
+    9870:	55                   	push   %ebp
+    9871:	89 e5                	mov    %esp,%ebp
+    9873:	83 ec 08             	sub    $0x8,%esp
     Init_PIT((uint16_t)0xDAAD);
-    986d:	83 ec 0c             	sub    $0xc,%esp
-    9870:	68 ad da 00 00       	push   $0xdaad
-    9875:	e8 1c 0e 00 00       	call   a696 <Init_PIT>
-    987a:	83 c4 10             	add    $0x10,%esp
+    9876:	83 ec 0c             	sub    $0xc,%esp
+    9879:	68 ad da 00 00       	push   $0xdaad
+    987e:	e8 12 0e 00 00       	call   a695 <Init_PIT>
+    9883:	83 c4 10             	add    $0x10,%esp
 
     
     // On itiialise les intérruptions qu'on va utiliser
     PIC_remap(0x20, 0x28);
-    987d:	83 ec 08             	sub    $0x8,%esp
-    9880:	6a 28                	push   $0x28
-    9882:	6a 20                	push   $0x20
-    9884:	e8 20 0b 00 00       	call   a3a9 <PIC_remap>
-    9889:	83 c4 10             	add    $0x10,%esp
+    9886:	83 ec 08             	sub    $0x8,%esp
+    9889:	6a 28                	push   $0x28
+    988b:	6a 20                	push   $0x20
+    988d:	e8 16 0b 00 00       	call   a3a8 <PIC_remap>
+    9892:	83 c4 10             	add    $0x10,%esp
 
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)PIT_handler, 0x20); // IRQ_0
-    988c:	b8 70 b3 00 00       	mov    $0xb370,%eax
-    9891:	ba 00 00 00 00       	mov    $0x0,%edx
-    9896:	83 ec 0c             	sub    $0xc,%esp
-    9899:	6a 20                	push   $0x20
-    989b:	52                   	push   %edx
-    989c:	50                   	push   %eax
-    989d:	68 8e 00 00 00       	push   $0x8e
-    98a2:	6a 08                	push   $0x8
-    98a4:	e8 3e ff ff ff       	call   97e7 <set_idt>
-    98a9:	83 c4 20             	add    $0x20,%esp
+    9895:	b8 80 b3 00 00       	mov    $0xb380,%eax
+    989a:	ba 00 00 00 00       	mov    $0x0,%edx
+    989f:	83 ec 0c             	sub    $0xc,%esp
+    98a2:	6a 20                	push   $0x20
+    98a4:	52                   	push   %edx
+    98a5:	50                   	push   %eax
+    98a6:	68 8e 00 00 00       	push   $0x8e
+    98ab:	6a 08                	push   $0x8
+    98ad:	e8 3e ff ff ff       	call   97f0 <set_idt>
+    98b2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq1, 0x21);
-    98ac:	b8 c0 b2 00 00       	mov    $0xb2c0,%eax
-    98b1:	ba 00 00 00 00       	mov    $0x0,%edx
-    98b6:	83 ec 0c             	sub    $0xc,%esp
-    98b9:	6a 21                	push   $0x21
-    98bb:	52                   	push   %edx
-    98bc:	50                   	push   %eax
-    98bd:	68 8e 00 00 00       	push   $0x8e
-    98c2:	6a 08                	push   $0x8
-    98c4:	e8 1e ff ff ff       	call   97e7 <set_idt>
-    98c9:	83 c4 20             	add    $0x20,%esp
+    98b5:	b8 d0 b2 00 00       	mov    $0xb2d0,%eax
+    98ba:	ba 00 00 00 00       	mov    $0x0,%edx
+    98bf:	83 ec 0c             	sub    $0xc,%esp
+    98c2:	6a 21                	push   $0x21
+    98c4:	52                   	push   %edx
+    98c5:	50                   	push   %eax
+    98c6:	68 8e 00 00 00       	push   $0x8e
+    98cb:	6a 08                	push   $0x8
+    98cd:	e8 1e ff ff ff       	call   97f0 <set_idt>
+    98d2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq2, 0x22);
-    98cc:	b8 c8 b2 00 00       	mov    $0xb2c8,%eax
-    98d1:	ba 00 00 00 00       	mov    $0x0,%edx
-    98d6:	83 ec 0c             	sub    $0xc,%esp
-    98d9:	6a 22                	push   $0x22
-    98db:	52                   	push   %edx
-    98dc:	50                   	push   %eax
-    98dd:	68 8e 00 00 00       	push   $0x8e
-    98e2:	6a 08                	push   $0x8
-    98e4:	e8 fe fe ff ff       	call   97e7 <set_idt>
-    98e9:	83 c4 20             	add    $0x20,%esp
+    98d5:	b8 d8 b2 00 00       	mov    $0xb2d8,%eax
+    98da:	ba 00 00 00 00       	mov    $0x0,%edx
+    98df:	83 ec 0c             	sub    $0xc,%esp
+    98e2:	6a 22                	push   $0x22
+    98e4:	52                   	push   %edx
+    98e5:	50                   	push   %eax
+    98e6:	68 8e 00 00 00       	push   $0x8e
+    98eb:	6a 08                	push   $0x8
+    98ed:	e8 fe fe ff ff       	call   97f0 <set_idt>
+    98f2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq3, 0x23);
-    98ec:	b8 d0 b2 00 00       	mov    $0xb2d0,%eax
-    98f1:	ba 00 00 00 00       	mov    $0x0,%edx
-    98f6:	83 ec 0c             	sub    $0xc,%esp
-    98f9:	6a 23                	push   $0x23
-    98fb:	52                   	push   %edx
-    98fc:	50                   	push   %eax
-    98fd:	68 8e 00 00 00       	push   $0x8e
-    9902:	6a 08                	push   $0x8
-    9904:	e8 de fe ff ff       	call   97e7 <set_idt>
-    9909:	83 c4 20             	add    $0x20,%esp
+    98f5:	b8 e0 b2 00 00       	mov    $0xb2e0,%eax
+    98fa:	ba 00 00 00 00       	mov    $0x0,%edx
+    98ff:	83 ec 0c             	sub    $0xc,%esp
+    9902:	6a 23                	push   $0x23
+    9904:	52                   	push   %edx
+    9905:	50                   	push   %eax
+    9906:	68 8e 00 00 00       	push   $0x8e
+    990b:	6a 08                	push   $0x8
+    990d:	e8 de fe ff ff       	call   97f0 <set_idt>
+    9912:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq4, 0x24);
-    990c:	b8 d8 b2 00 00       	mov    $0xb2d8,%eax
-    9911:	ba 00 00 00 00       	mov    $0x0,%edx
-    9916:	83 ec 0c             	sub    $0xc,%esp
-    9919:	6a 24                	push   $0x24
-    991b:	52                   	push   %edx
-    991c:	50                   	push   %eax
-    991d:	68 8e 00 00 00       	push   $0x8e
-    9922:	6a 08                	push   $0x8
-    9924:	e8 be fe ff ff       	call   97e7 <set_idt>
-    9929:	83 c4 20             	add    $0x20,%esp
+    9915:	b8 e8 b2 00 00       	mov    $0xb2e8,%eax
+    991a:	ba 00 00 00 00       	mov    $0x0,%edx
+    991f:	83 ec 0c             	sub    $0xc,%esp
+    9922:	6a 24                	push   $0x24
+    9924:	52                   	push   %edx
+    9925:	50                   	push   %eax
+    9926:	68 8e 00 00 00       	push   $0x8e
+    992b:	6a 08                	push   $0x8
+    992d:	e8 be fe ff ff       	call   97f0 <set_idt>
+    9932:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq5, 0x25);
-    992c:	b8 e0 b2 00 00       	mov    $0xb2e0,%eax
-    9931:	ba 00 00 00 00       	mov    $0x0,%edx
-    9936:	83 ec 0c             	sub    $0xc,%esp
-    9939:	6a 25                	push   $0x25
-    993b:	52                   	push   %edx
-    993c:	50                   	push   %eax
-    993d:	68 8e 00 00 00       	push   $0x8e
-    9942:	6a 08                	push   $0x8
-    9944:	e8 9e fe ff ff       	call   97e7 <set_idt>
-    9949:	83 c4 20             	add    $0x20,%esp
+    9935:	b8 f0 b2 00 00       	mov    $0xb2f0,%eax
+    993a:	ba 00 00 00 00       	mov    $0x0,%edx
+    993f:	83 ec 0c             	sub    $0xc,%esp
+    9942:	6a 25                	push   $0x25
+    9944:	52                   	push   %edx
+    9945:	50                   	push   %eax
+    9946:	68 8e 00 00 00       	push   $0x8e
+    994b:	6a 08                	push   $0x8
+    994d:	e8 9e fe ff ff       	call   97f0 <set_idt>
+    9952:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq6, 0x26);
-    994c:	b8 e8 b2 00 00       	mov    $0xb2e8,%eax
-    9951:	ba 00 00 00 00       	mov    $0x0,%edx
-    9956:	83 ec 0c             	sub    $0xc,%esp
-    9959:	6a 26                	push   $0x26
-    995b:	52                   	push   %edx
-    995c:	50                   	push   %eax
-    995d:	68 8e 00 00 00       	push   $0x8e
-    9962:	6a 08                	push   $0x8
-    9964:	e8 7e fe ff ff       	call   97e7 <set_idt>
-    9969:	83 c4 20             	add    $0x20,%esp
+    9955:	b8 f8 b2 00 00       	mov    $0xb2f8,%eax
+    995a:	ba 00 00 00 00       	mov    $0x0,%edx
+    995f:	83 ec 0c             	sub    $0xc,%esp
+    9962:	6a 26                	push   $0x26
+    9964:	52                   	push   %edx
+    9965:	50                   	push   %eax
+    9966:	68 8e 00 00 00       	push   $0x8e
+    996b:	6a 08                	push   $0x8
+    996d:	e8 7e fe ff ff       	call   97f0 <set_idt>
+    9972:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq7, 0x27);
-    996c:	b8 f0 b2 00 00       	mov    $0xb2f0,%eax
-    9971:	ba 00 00 00 00       	mov    $0x0,%edx
-    9976:	83 ec 0c             	sub    $0xc,%esp
-    9979:	6a 27                	push   $0x27
-    997b:	52                   	push   %edx
-    997c:	50                   	push   %eax
-    997d:	68 8e 00 00 00       	push   $0x8e
-    9982:	6a 08                	push   $0x8
-    9984:	e8 5e fe ff ff       	call   97e7 <set_idt>
-    9989:	83 c4 20             	add    $0x20,%esp
+    9975:	b8 00 b3 00 00       	mov    $0xb300,%eax
+    997a:	ba 00 00 00 00       	mov    $0x0,%edx
+    997f:	83 ec 0c             	sub    $0xc,%esp
+    9982:	6a 27                	push   $0x27
+    9984:	52                   	push   %edx
+    9985:	50                   	push   %eax
+    9986:	68 8e 00 00 00       	push   $0x8e
+    998b:	6a 08                	push   $0x8
+    998d:	e8 5e fe ff ff       	call   97f0 <set_idt>
+    9992:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq8, 0x28);
-    998c:	b8 f8 b2 00 00       	mov    $0xb2f8,%eax
-    9991:	ba 00 00 00 00       	mov    $0x0,%edx
-    9996:	83 ec 0c             	sub    $0xc,%esp
-    9999:	6a 28                	push   $0x28
-    999b:	52                   	push   %edx
-    999c:	50                   	push   %eax
-    999d:	68 8e 00 00 00       	push   $0x8e
-    99a2:	6a 08                	push   $0x8
-    99a4:	e8 3e fe ff ff       	call   97e7 <set_idt>
-    99a9:	83 c4 20             	add    $0x20,%esp
+    9995:	b8 08 b3 00 00       	mov    $0xb308,%eax
+    999a:	ba 00 00 00 00       	mov    $0x0,%edx
+    999f:	83 ec 0c             	sub    $0xc,%esp
+    99a2:	6a 28                	push   $0x28
+    99a4:	52                   	push   %edx
+    99a5:	50                   	push   %eax
+    99a6:	68 8e 00 00 00       	push   $0x8e
+    99ab:	6a 08                	push   $0x8
+    99ad:	e8 3e fe ff ff       	call   97f0 <set_idt>
+    99b2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq9, 0x29);
-    99ac:	b8 00 b3 00 00       	mov    $0xb300,%eax
-    99b1:	ba 00 00 00 00       	mov    $0x0,%edx
-    99b6:	83 ec 0c             	sub    $0xc,%esp
-    99b9:	6a 29                	push   $0x29
-    99bb:	52                   	push   %edx
-    99bc:	50                   	push   %eax
-    99bd:	68 8e 00 00 00       	push   $0x8e
-    99c2:	6a 08                	push   $0x8
-    99c4:	e8 1e fe ff ff       	call   97e7 <set_idt>
-    99c9:	83 c4 20             	add    $0x20,%esp
+    99b5:	b8 10 b3 00 00       	mov    $0xb310,%eax
+    99ba:	ba 00 00 00 00       	mov    $0x0,%edx
+    99bf:	83 ec 0c             	sub    $0xc,%esp
+    99c2:	6a 29                	push   $0x29
+    99c4:	52                   	push   %edx
+    99c5:	50                   	push   %eax
+    99c6:	68 8e 00 00 00       	push   $0x8e
+    99cb:	6a 08                	push   $0x8
+    99cd:	e8 1e fe ff ff       	call   97f0 <set_idt>
+    99d2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq10, 0x2A);
-    99cc:	b8 08 b3 00 00       	mov    $0xb308,%eax
-    99d1:	ba 00 00 00 00       	mov    $0x0,%edx
-    99d6:	83 ec 0c             	sub    $0xc,%esp
-    99d9:	6a 2a                	push   $0x2a
-    99db:	52                   	push   %edx
-    99dc:	50                   	push   %eax
-    99dd:	68 8e 00 00 00       	push   $0x8e
-    99e2:	6a 08                	push   $0x8
-    99e4:	e8 fe fd ff ff       	call   97e7 <set_idt>
-    99e9:	83 c4 20             	add    $0x20,%esp
+    99d5:	b8 18 b3 00 00       	mov    $0xb318,%eax
+    99da:	ba 00 00 00 00       	mov    $0x0,%edx
+    99df:	83 ec 0c             	sub    $0xc,%esp
+    99e2:	6a 2a                	push   $0x2a
+    99e4:	52                   	push   %edx
+    99e5:	50                   	push   %eax
+    99e6:	68 8e 00 00 00       	push   $0x8e
+    99eb:	6a 08                	push   $0x8
+    99ed:	e8 fe fd ff ff       	call   97f0 <set_idt>
+    99f2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq11, 0x2B);
-    99ec:	b8 10 b3 00 00       	mov    $0xb310,%eax
-    99f1:	ba 00 00 00 00       	mov    $0x0,%edx
-    99f6:	83 ec 0c             	sub    $0xc,%esp
-    99f9:	6a 2b                	push   $0x2b
-    99fb:	52                   	push   %edx
-    99fc:	50                   	push   %eax
-    99fd:	68 8e 00 00 00       	push   $0x8e
-    9a02:	6a 08                	push   $0x8
-    9a04:	e8 de fd ff ff       	call   97e7 <set_idt>
-    9a09:	83 c4 20             	add    $0x20,%esp
+    99f5:	b8 20 b3 00 00       	mov    $0xb320,%eax
+    99fa:	ba 00 00 00 00       	mov    $0x0,%edx
+    99ff:	83 ec 0c             	sub    $0xc,%esp
+    9a02:	6a 2b                	push   $0x2b
+    9a04:	52                   	push   %edx
+    9a05:	50                   	push   %eax
+    9a06:	68 8e 00 00 00       	push   $0x8e
+    9a0b:	6a 08                	push   $0x8
+    9a0d:	e8 de fd ff ff       	call   97f0 <set_idt>
+    9a12:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq12, 0x2C);
-    9a0c:	b8 18 b3 00 00       	mov    $0xb318,%eax
-    9a11:	ba 00 00 00 00       	mov    $0x0,%edx
-    9a16:	83 ec 0c             	sub    $0xc,%esp
-    9a19:	6a 2c                	push   $0x2c
-    9a1b:	52                   	push   %edx
-    9a1c:	50                   	push   %eax
-    9a1d:	68 8e 00 00 00       	push   $0x8e
-    9a22:	6a 08                	push   $0x8
-    9a24:	e8 be fd ff ff       	call   97e7 <set_idt>
-    9a29:	83 c4 20             	add    $0x20,%esp
+    9a15:	b8 28 b3 00 00       	mov    $0xb328,%eax
+    9a1a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9a1f:	83 ec 0c             	sub    $0xc,%esp
+    9a22:	6a 2c                	push   $0x2c
+    9a24:	52                   	push   %edx
+    9a25:	50                   	push   %eax
+    9a26:	68 8e 00 00 00       	push   $0x8e
+    9a2b:	6a 08                	push   $0x8
+    9a2d:	e8 be fd ff ff       	call   97f0 <set_idt>
+    9a32:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq13, 0x2D);
-    9a2c:	b8 20 b3 00 00       	mov    $0xb320,%eax
-    9a31:	ba 00 00 00 00       	mov    $0x0,%edx
-    9a36:	83 ec 0c             	sub    $0xc,%esp
-    9a39:	6a 2d                	push   $0x2d
-    9a3b:	52                   	push   %edx
-    9a3c:	50                   	push   %eax
-    9a3d:	68 8e 00 00 00       	push   $0x8e
-    9a42:	6a 08                	push   $0x8
-    9a44:	e8 9e fd ff ff       	call   97e7 <set_idt>
-    9a49:	83 c4 20             	add    $0x20,%esp
+    9a35:	b8 30 b3 00 00       	mov    $0xb330,%eax
+    9a3a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9a3f:	83 ec 0c             	sub    $0xc,%esp
+    9a42:	6a 2d                	push   $0x2d
+    9a44:	52                   	push   %edx
+    9a45:	50                   	push   %eax
+    9a46:	68 8e 00 00 00       	push   $0x8e
+    9a4b:	6a 08                	push   $0x8
+    9a4d:	e8 9e fd ff ff       	call   97f0 <set_idt>
+    9a52:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq14, 0x2E);
-    9a4c:	b8 28 b3 00 00       	mov    $0xb328,%eax
-    9a51:	ba 00 00 00 00       	mov    $0x0,%edx
-    9a56:	83 ec 0c             	sub    $0xc,%esp
-    9a59:	6a 2e                	push   $0x2e
-    9a5b:	52                   	push   %edx
-    9a5c:	50                   	push   %eax
-    9a5d:	68 8e 00 00 00       	push   $0x8e
-    9a62:	6a 08                	push   $0x8
-    9a64:	e8 7e fd ff ff       	call   97e7 <set_idt>
-    9a69:	83 c4 20             	add    $0x20,%esp
+    9a55:	b8 38 b3 00 00       	mov    $0xb338,%eax
+    9a5a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9a5f:	83 ec 0c             	sub    $0xc,%esp
+    9a62:	6a 2e                	push   $0x2e
+    9a64:	52                   	push   %edx
+    9a65:	50                   	push   %eax
+    9a66:	68 8e 00 00 00       	push   $0x8e
+    9a6b:	6a 08                	push   $0x8
+    9a6d:	e8 7e fd ff ff       	call   97f0 <set_idt>
+    9a72:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)irq15, 0x2F);
-    9a6c:	b8 30 b3 00 00       	mov    $0xb330,%eax
-    9a71:	ba 00 00 00 00       	mov    $0x0,%edx
-    9a76:	83 ec 0c             	sub    $0xc,%esp
-    9a79:	6a 2f                	push   $0x2f
-    9a7b:	52                   	push   %edx
-    9a7c:	50                   	push   %eax
-    9a7d:	68 8e 00 00 00       	push   $0x8e
-    9a82:	6a 08                	push   $0x8
-    9a84:	e8 5e fd ff ff       	call   97e7 <set_idt>
-    9a89:	83 c4 20             	add    $0x20,%esp
+    9a75:	b8 40 b3 00 00       	mov    $0xb340,%eax
+    9a7a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9a7f:	83 ec 0c             	sub    $0xc,%esp
+    9a82:	6a 2f                	push   $0x2f
+    9a84:	52                   	push   %edx
+    9a85:	50                   	push   %eax
+    9a86:	68 8e 00 00 00       	push   $0x8e
+    9a8b:	6a 08                	push   $0x8
+    9a8d:	e8 5e fd ff ff       	call   97f0 <set_idt>
+    9a92:	83 c4 20             	add    $0x20,%esp
 
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0x8);
-    9a8c:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9a91:	ba 00 00 00 00       	mov    $0x0,%edx
-    9a96:	83 ec 0c             	sub    $0xc,%esp
-    9a99:	6a 08                	push   $0x8
-    9a9b:	52                   	push   %edx
-    9a9c:	50                   	push   %eax
-    9a9d:	68 8e 00 00 00       	push   $0x8e
+    9a95:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9a9a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9a9f:	83 ec 0c             	sub    $0xc,%esp
     9aa2:	6a 08                	push   $0x8
-    9aa4:	e8 3e fd ff ff       	call   97e7 <set_idt>
-    9aa9:	83 c4 20             	add    $0x20,%esp
+    9aa4:	52                   	push   %edx
+    9aa5:	50                   	push   %eax
+    9aa6:	68 8e 00 00 00       	push   $0x8e
+    9aab:	6a 08                	push   $0x8
+    9aad:	e8 3e fd ff ff       	call   97f0 <set_idt>
+    9ab2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0xA);
-    9aac:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9ab1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9ab6:	83 ec 0c             	sub    $0xc,%esp
-    9ab9:	6a 0a                	push   $0xa
-    9abb:	52                   	push   %edx
-    9abc:	50                   	push   %eax
-    9abd:	68 8e 00 00 00       	push   $0x8e
-    9ac2:	6a 08                	push   $0x8
-    9ac4:	e8 1e fd ff ff       	call   97e7 <set_idt>
-    9ac9:	83 c4 20             	add    $0x20,%esp
+    9ab5:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9aba:	ba 00 00 00 00       	mov    $0x0,%edx
+    9abf:	83 ec 0c             	sub    $0xc,%esp
+    9ac2:	6a 0a                	push   $0xa
+    9ac4:	52                   	push   %edx
+    9ac5:	50                   	push   %eax
+    9ac6:	68 8e 00 00 00       	push   $0x8e
+    9acb:	6a 08                	push   $0x8
+    9acd:	e8 1e fd ff ff       	call   97f0 <set_idt>
+    9ad2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0xB);
-    9acc:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9ad1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9ad6:	83 ec 0c             	sub    $0xc,%esp
-    9ad9:	6a 0b                	push   $0xb
-    9adb:	52                   	push   %edx
-    9adc:	50                   	push   %eax
-    9add:	68 8e 00 00 00       	push   $0x8e
-    9ae2:	6a 08                	push   $0x8
-    9ae4:	e8 fe fc ff ff       	call   97e7 <set_idt>
-    9ae9:	83 c4 20             	add    $0x20,%esp
+    9ad5:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9ada:	ba 00 00 00 00       	mov    $0x0,%edx
+    9adf:	83 ec 0c             	sub    $0xc,%esp
+    9ae2:	6a 0b                	push   $0xb
+    9ae4:	52                   	push   %edx
+    9ae5:	50                   	push   %eax
+    9ae6:	68 8e 00 00 00       	push   $0x8e
+    9aeb:	6a 08                	push   $0x8
+    9aed:	e8 fe fc ff ff       	call   97f0 <set_idt>
+    9af2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0xC);
-    9aec:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9af1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9af6:	83 ec 0c             	sub    $0xc,%esp
-    9af9:	6a 0c                	push   $0xc
-    9afb:	52                   	push   %edx
-    9afc:	50                   	push   %eax
-    9afd:	68 8e 00 00 00       	push   $0x8e
-    9b02:	6a 08                	push   $0x8
-    9b04:	e8 de fc ff ff       	call   97e7 <set_idt>
-    9b09:	83 c4 20             	add    $0x20,%esp
+    9af5:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9afa:	ba 00 00 00 00       	mov    $0x0,%edx
+    9aff:	83 ec 0c             	sub    $0xc,%esp
+    9b02:	6a 0c                	push   $0xc
+    9b04:	52                   	push   %edx
+    9b05:	50                   	push   %eax
+    9b06:	68 8e 00 00 00       	push   $0x8e
+    9b0b:	6a 08                	push   $0x8
+    9b0d:	e8 de fc ff ff       	call   97f0 <set_idt>
+    9b12:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0xD);
-    9b0c:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9b11:	ba 00 00 00 00       	mov    $0x0,%edx
-    9b16:	83 ec 0c             	sub    $0xc,%esp
-    9b19:	6a 0d                	push   $0xd
-    9b1b:	52                   	push   %edx
-    9b1c:	50                   	push   %eax
-    9b1d:	68 8e 00 00 00       	push   $0x8e
-    9b22:	6a 08                	push   $0x8
-    9b24:	e8 be fc ff ff       	call   97e7 <set_idt>
-    9b29:	83 c4 20             	add    $0x20,%esp
+    9b15:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9b1a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9b1f:	83 ec 0c             	sub    $0xc,%esp
+    9b22:	6a 0d                	push   $0xd
+    9b24:	52                   	push   %edx
+    9b25:	50                   	push   %eax
+    9b26:	68 8e 00 00 00       	push   $0x8e
+    9b2b:	6a 08                	push   $0x8
+    9b2d:	e8 be fc ff ff       	call   97f0 <set_idt>
+    9b32:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)Paging_fault, 0xE);
-    9b2c:	b8 78 a3 00 00       	mov    $0xa378,%eax
-    9b31:	ba 00 00 00 00       	mov    $0x0,%edx
-    9b36:	83 ec 0c             	sub    $0xc,%esp
-    9b39:	6a 0e                	push   $0xe
-    9b3b:	52                   	push   %edx
-    9b3c:	50                   	push   %eax
-    9b3d:	68 8e 00 00 00       	push   $0x8e
-    9b42:	6a 08                	push   $0x8
-    9b44:	e8 9e fc ff ff       	call   97e7 <set_idt>
-    9b49:	83 c4 20             	add    $0x20,%esp
+    9b35:	b8 77 a3 00 00       	mov    $0xa377,%eax
+    9b3a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9b3f:	83 ec 0c             	sub    $0xc,%esp
+    9b42:	6a 0e                	push   $0xe
+    9b44:	52                   	push   %edx
+    9b45:	50                   	push   %eax
+    9b46:	68 8e 00 00 00       	push   $0x8e
+    9b4b:	6a 08                	push   $0x8
+    9b4d:	e8 9e fc ff ff       	call   97f0 <set_idt>
+    9b52:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0x11);
-    9b4c:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9b51:	ba 00 00 00 00       	mov    $0x0,%edx
-    9b56:	83 ec 0c             	sub    $0xc,%esp
-    9b59:	6a 11                	push   $0x11
-    9b5b:	52                   	push   %edx
-    9b5c:	50                   	push   %eax
-    9b5d:	68 8e 00 00 00       	push   $0x8e
-    9b62:	6a 08                	push   $0x8
-    9b64:	e8 7e fc ff ff       	call   97e7 <set_idt>
-    9b69:	83 c4 20             	add    $0x20,%esp
+    9b55:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9b5a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9b5f:	83 ec 0c             	sub    $0xc,%esp
+    9b62:	6a 11                	push   $0x11
+    9b64:	52                   	push   %edx
+    9b65:	50                   	push   %eax
+    9b66:	68 8e 00 00 00       	push   $0x8e
+    9b6b:	6a 08                	push   $0x8
+    9b6d:	e8 7e fc ff ff       	call   97f0 <set_idt>
+    9b72:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_handler__, 0x1E);
-    9b6c:	b8 30 b2 00 00       	mov    $0xb230,%eax
-    9b71:	ba 00 00 00 00       	mov    $0x0,%edx
-    9b76:	83 ec 0c             	sub    $0xc,%esp
-    9b79:	6a 1e                	push   $0x1e
-    9b7b:	52                   	push   %edx
-    9b7c:	50                   	push   %eax
-    9b7d:	68 8e 00 00 00       	push   $0x8e
-    9b82:	6a 08                	push   $0x8
-    9b84:	e8 5e fc ff ff       	call   97e7 <set_idt>
-    9b89:	83 c4 20             	add    $0x20,%esp
+    9b75:	b8 40 b2 00 00       	mov    $0xb240,%eax
+    9b7a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9b7f:	83 ec 0c             	sub    $0xc,%esp
+    9b82:	6a 1e                	push   $0x1e
+    9b84:	52                   	push   %edx
+    9b85:	50                   	push   %eax
+    9b86:	68 8e 00 00 00       	push   $0x8e
+    9b8b:	6a 08                	push   $0x8
+    9b8d:	e8 5e fc ff ff       	call   97f0 <set_idt>
+    9b92:	83 c4 20             	add    $0x20,%esp
 
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x0);
-    9b8c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9b91:	ba 00 00 00 00       	mov    $0x0,%edx
-    9b96:	83 ec 0c             	sub    $0xc,%esp
-    9b99:	6a 00                	push   $0x0
-    9b9b:	52                   	push   %edx
-    9b9c:	50                   	push   %eax
-    9b9d:	68 8e 00 00 00       	push   $0x8e
-    9ba2:	6a 08                	push   $0x8
-    9ba4:	e8 3e fc ff ff       	call   97e7 <set_idt>
-    9ba9:	83 c4 20             	add    $0x20,%esp
+    9b95:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9b9a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9b9f:	83 ec 0c             	sub    $0xc,%esp
+    9ba2:	6a 00                	push   $0x0
+    9ba4:	52                   	push   %edx
+    9ba5:	50                   	push   %eax
+    9ba6:	68 8e 00 00 00       	push   $0x8e
+    9bab:	6a 08                	push   $0x8
+    9bad:	e8 3e fc ff ff       	call   97f0 <set_idt>
+    9bb2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x1);
-    9bac:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9bb1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9bb6:	83 ec 0c             	sub    $0xc,%esp
-    9bb9:	6a 01                	push   $0x1
-    9bbb:	52                   	push   %edx
-    9bbc:	50                   	push   %eax
-    9bbd:	68 8e 00 00 00       	push   $0x8e
-    9bc2:	6a 08                	push   $0x8
-    9bc4:	e8 1e fc ff ff       	call   97e7 <set_idt>
-    9bc9:	83 c4 20             	add    $0x20,%esp
+    9bb5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9bba:	ba 00 00 00 00       	mov    $0x0,%edx
+    9bbf:	83 ec 0c             	sub    $0xc,%esp
+    9bc2:	6a 01                	push   $0x1
+    9bc4:	52                   	push   %edx
+    9bc5:	50                   	push   %eax
+    9bc6:	68 8e 00 00 00       	push   $0x8e
+    9bcb:	6a 08                	push   $0x8
+    9bcd:	e8 1e fc ff ff       	call   97f0 <set_idt>
+    9bd2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x2);
-    9bcc:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9bd1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9bd6:	83 ec 0c             	sub    $0xc,%esp
-    9bd9:	6a 02                	push   $0x2
-    9bdb:	52                   	push   %edx
-    9bdc:	50                   	push   %eax
-    9bdd:	68 8e 00 00 00       	push   $0x8e
-    9be2:	6a 08                	push   $0x8
-    9be4:	e8 fe fb ff ff       	call   97e7 <set_idt>
-    9be9:	83 c4 20             	add    $0x20,%esp
+    9bd5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9bda:	ba 00 00 00 00       	mov    $0x0,%edx
+    9bdf:	83 ec 0c             	sub    $0xc,%esp
+    9be2:	6a 02                	push   $0x2
+    9be4:	52                   	push   %edx
+    9be5:	50                   	push   %eax
+    9be6:	68 8e 00 00 00       	push   $0x8e
+    9beb:	6a 08                	push   $0x8
+    9bed:	e8 fe fb ff ff       	call   97f0 <set_idt>
+    9bf2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x3);
-    9bec:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9bf1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9bf6:	83 ec 0c             	sub    $0xc,%esp
-    9bf9:	6a 03                	push   $0x3
-    9bfb:	52                   	push   %edx
-    9bfc:	50                   	push   %eax
-    9bfd:	68 8e 00 00 00       	push   $0x8e
-    9c02:	6a 08                	push   $0x8
-    9c04:	e8 de fb ff ff       	call   97e7 <set_idt>
-    9c09:	83 c4 20             	add    $0x20,%esp
+    9bf5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9bfa:	ba 00 00 00 00       	mov    $0x0,%edx
+    9bff:	83 ec 0c             	sub    $0xc,%esp
+    9c02:	6a 03                	push   $0x3
+    9c04:	52                   	push   %edx
+    9c05:	50                   	push   %eax
+    9c06:	68 8e 00 00 00       	push   $0x8e
+    9c0b:	6a 08                	push   $0x8
+    9c0d:	e8 de fb ff ff       	call   97f0 <set_idt>
+    9c12:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x4);
-    9c0c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9c11:	ba 00 00 00 00       	mov    $0x0,%edx
-    9c16:	83 ec 0c             	sub    $0xc,%esp
-    9c19:	6a 04                	push   $0x4
-    9c1b:	52                   	push   %edx
-    9c1c:	50                   	push   %eax
-    9c1d:	68 8e 00 00 00       	push   $0x8e
-    9c22:	6a 08                	push   $0x8
-    9c24:	e8 be fb ff ff       	call   97e7 <set_idt>
-    9c29:	83 c4 20             	add    $0x20,%esp
+    9c15:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9c1a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9c1f:	83 ec 0c             	sub    $0xc,%esp
+    9c22:	6a 04                	push   $0x4
+    9c24:	52                   	push   %edx
+    9c25:	50                   	push   %eax
+    9c26:	68 8e 00 00 00       	push   $0x8e
+    9c2b:	6a 08                	push   $0x8
+    9c2d:	e8 be fb ff ff       	call   97f0 <set_idt>
+    9c32:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x5);
-    9c2c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9c31:	ba 00 00 00 00       	mov    $0x0,%edx
-    9c36:	83 ec 0c             	sub    $0xc,%esp
-    9c39:	6a 05                	push   $0x5
-    9c3b:	52                   	push   %edx
-    9c3c:	50                   	push   %eax
-    9c3d:	68 8e 00 00 00       	push   $0x8e
-    9c42:	6a 08                	push   $0x8
-    9c44:	e8 9e fb ff ff       	call   97e7 <set_idt>
-    9c49:	83 c4 20             	add    $0x20,%esp
+    9c35:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9c3a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9c3f:	83 ec 0c             	sub    $0xc,%esp
+    9c42:	6a 05                	push   $0x5
+    9c44:	52                   	push   %edx
+    9c45:	50                   	push   %eax
+    9c46:	68 8e 00 00 00       	push   $0x8e
+    9c4b:	6a 08                	push   $0x8
+    9c4d:	e8 9e fb ff ff       	call   97f0 <set_idt>
+    9c52:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x6);
-    9c4c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9c51:	ba 00 00 00 00       	mov    $0x0,%edx
-    9c56:	83 ec 0c             	sub    $0xc,%esp
-    9c59:	6a 06                	push   $0x6
-    9c5b:	52                   	push   %edx
-    9c5c:	50                   	push   %eax
-    9c5d:	68 8e 00 00 00       	push   $0x8e
-    9c62:	6a 08                	push   $0x8
-    9c64:	e8 7e fb ff ff       	call   97e7 <set_idt>
-    9c69:	83 c4 20             	add    $0x20,%esp
+    9c55:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9c5a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9c5f:	83 ec 0c             	sub    $0xc,%esp
+    9c62:	6a 06                	push   $0x6
+    9c64:	52                   	push   %edx
+    9c65:	50                   	push   %eax
+    9c66:	68 8e 00 00 00       	push   $0x8e
+    9c6b:	6a 08                	push   $0x8
+    9c6d:	e8 7e fb ff ff       	call   97f0 <set_idt>
+    9c72:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x7);
-    9c6c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9c71:	ba 00 00 00 00       	mov    $0x0,%edx
-    9c76:	83 ec 0c             	sub    $0xc,%esp
-    9c79:	6a 07                	push   $0x7
-    9c7b:	52                   	push   %edx
-    9c7c:	50                   	push   %eax
-    9c7d:	68 8e 00 00 00       	push   $0x8e
-    9c82:	6a 08                	push   $0x8
-    9c84:	e8 5e fb ff ff       	call   97e7 <set_idt>
-    9c89:	83 c4 20             	add    $0x20,%esp
+    9c75:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9c7a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9c7f:	83 ec 0c             	sub    $0xc,%esp
+    9c82:	6a 07                	push   $0x7
+    9c84:	52                   	push   %edx
+    9c85:	50                   	push   %eax
+    9c86:	68 8e 00 00 00       	push   $0x8e
+    9c8b:	6a 08                	push   $0x8
+    9c8d:	e8 5e fb ff ff       	call   97f0 <set_idt>
+    9c92:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x9);
-    9c8c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9c91:	ba 00 00 00 00       	mov    $0x0,%edx
-    9c96:	83 ec 0c             	sub    $0xc,%esp
-    9c99:	6a 09                	push   $0x9
-    9c9b:	52                   	push   %edx
-    9c9c:	50                   	push   %eax
-    9c9d:	68 8e 00 00 00       	push   $0x8e
-    9ca2:	6a 08                	push   $0x8
-    9ca4:	e8 3e fb ff ff       	call   97e7 <set_idt>
-    9ca9:	83 c4 20             	add    $0x20,%esp
+    9c95:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9c9a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9c9f:	83 ec 0c             	sub    $0xc,%esp
+    9ca2:	6a 09                	push   $0x9
+    9ca4:	52                   	push   %edx
+    9ca5:	50                   	push   %eax
+    9ca6:	68 8e 00 00 00       	push   $0x8e
+    9cab:	6a 08                	push   $0x8
+    9cad:	e8 3e fb ff ff       	call   97f0 <set_idt>
+    9cb2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x10);
-    9cac:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9cb1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9cb6:	83 ec 0c             	sub    $0xc,%esp
-    9cb9:	6a 10                	push   $0x10
-    9cbb:	52                   	push   %edx
-    9cbc:	50                   	push   %eax
-    9cbd:	68 8e 00 00 00       	push   $0x8e
-    9cc2:	6a 08                	push   $0x8
-    9cc4:	e8 1e fb ff ff       	call   97e7 <set_idt>
-    9cc9:	83 c4 20             	add    $0x20,%esp
+    9cb5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9cba:	ba 00 00 00 00       	mov    $0x0,%edx
+    9cbf:	83 ec 0c             	sub    $0xc,%esp
+    9cc2:	6a 10                	push   $0x10
+    9cc4:	52                   	push   %edx
+    9cc5:	50                   	push   %eax
+    9cc6:	68 8e 00 00 00       	push   $0x8e
+    9ccb:	6a 08                	push   $0x8
+    9ccd:	e8 1e fb ff ff       	call   97f0 <set_idt>
+    9cd2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x12);
-    9ccc:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9cd1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9cd6:	83 ec 0c             	sub    $0xc,%esp
-    9cd9:	6a 12                	push   $0x12
-    9cdb:	52                   	push   %edx
-    9cdc:	50                   	push   %eax
-    9cdd:	68 8e 00 00 00       	push   $0x8e
-    9ce2:	6a 08                	push   $0x8
-    9ce4:	e8 fe fa ff ff       	call   97e7 <set_idt>
-    9ce9:	83 c4 20             	add    $0x20,%esp
+    9cd5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9cda:	ba 00 00 00 00       	mov    $0x0,%edx
+    9cdf:	83 ec 0c             	sub    $0xc,%esp
+    9ce2:	6a 12                	push   $0x12
+    9ce4:	52                   	push   %edx
+    9ce5:	50                   	push   %eax
+    9ce6:	68 8e 00 00 00       	push   $0x8e
+    9ceb:	6a 08                	push   $0x8
+    9ced:	e8 fe fa ff ff       	call   97f0 <set_idt>
+    9cf2:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x13);
-    9cec:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9cf1:	ba 00 00 00 00       	mov    $0x0,%edx
-    9cf6:	83 ec 0c             	sub    $0xc,%esp
-    9cf9:	6a 13                	push   $0x13
-    9cfb:	52                   	push   %edx
-    9cfc:	50                   	push   %eax
-    9cfd:	68 8e 00 00 00       	push   $0x8e
-    9d02:	6a 08                	push   $0x8
-    9d04:	e8 de fa ff ff       	call   97e7 <set_idt>
-    9d09:	83 c4 20             	add    $0x20,%esp
+    9cf5:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9cfa:	ba 00 00 00 00       	mov    $0x0,%edx
+    9cff:	83 ec 0c             	sub    $0xc,%esp
+    9d02:	6a 13                	push   $0x13
+    9d04:	52                   	push   %edx
+    9d05:	50                   	push   %eax
+    9d06:	68 8e 00 00 00       	push   $0x8e
+    9d0b:	6a 08                	push   $0x8
+    9d0d:	e8 de fa ff ff       	call   97f0 <set_idt>
+    9d12:	83 c4 20             	add    $0x20,%esp
     set_idt(0x08, INTGATE_PRIVILEGE_0, (unsigned long)__exception_no_ERRCODE__, 0x14);
-    9d0c:	b8 9c 96 00 00       	mov    $0x969c,%eax
-    9d11:	ba 00 00 00 00       	mov    $0x0,%edx
-    9d16:	83 ec 0c             	sub    $0xc,%esp
-    9d19:	6a 14                	push   $0x14
-    9d1b:	52                   	push   %edx
-    9d1c:	50                   	push   %eax
-    9d1d:	68 8e 00 00 00       	push   $0x8e
-    9d22:	6a 08                	push   $0x8
-    9d24:	e8 be fa ff ff       	call   97e7 <set_idt>
-    9d29:	83 c4 20             	add    $0x20,%esp
+    9d15:	b8 a5 96 00 00       	mov    $0x96a5,%eax
+    9d1a:	ba 00 00 00 00       	mov    $0x0,%edx
+    9d1f:	83 ec 0c             	sub    $0xc,%esp
+    9d22:	6a 14                	push   $0x14
+    9d24:	52                   	push   %edx
+    9d25:	50                   	push   %eax
+    9d26:	68 8e 00 00 00       	push   $0x8e
+    9d2b:	6a 08                	push   $0x8
+    9d2d:	e8 be fa ff ff       	call   97f0 <set_idt>
+    9d32:	83 c4 20             	add    $0x20,%esp
 
     /* initialisation de la structure pour IDTR */
     load_idt();
-    9d2c:	e8 5e 15 00 00       	call   b28f <load_idt>
+    9d35:	e8 65 15 00 00       	call   b29f <load_idt>
 }
-    9d31:	90                   	nop
-    9d32:	c9                   	leave  
-    9d33:	c3                   	ret    
+    9d3a:	90                   	nop
+    9d3b:	c9                   	leave  
+    9d3c:	c3                   	ret    
 
-00009d34 <irq1_handler>:
+00009d3d <irq1_handler>:
 
 extern void spurious_IRQ(unsigned char irq);
 extern void keyboard_irq() ; 
 
 void irq1_handler(void)
 {
-    9d34:	55                   	push   %ebp
-    9d35:	89 e5                	mov    %esp,%ebp
-    9d37:	83 ec 08             	sub    $0x8,%esp
+    9d3d:	55                   	push   %ebp
+    9d3e:	89 e5                	mov    %esp,%ebp
+    9d40:	83 ec 08             	sub    $0x8,%esp
     keyboard_irq() ; 
-    9d3a:	e8 4a 02 00 00       	call   9f89 <keyboard_irq>
+    9d43:	e8 4a 02 00 00       	call   9f92 <keyboard_irq>
     PIC_sendEOI(1);
-    9d3f:	83 ec 0c             	sub    $0xc,%esp
-    9d42:	6a 01                	push   $0x1
-    9d44:	e8 35 06 00 00       	call   a37e <PIC_sendEOI>
-    9d49:	83 c4 10             	add    $0x10,%esp
+    9d48:	83 ec 0c             	sub    $0xc,%esp
+    9d4b:	6a 01                	push   $0x1
+    9d4d:	e8 2b 06 00 00       	call   a37d <PIC_sendEOI>
+    9d52:	83 c4 10             	add    $0x10,%esp
 }
-    9d4c:	90                   	nop
-    9d4d:	c9                   	leave  
-    9d4e:	c3                   	ret    
+    9d55:	90                   	nop
+    9d56:	c9                   	leave  
+    9d57:	c3                   	ret    
 
-00009d4f <irq2_handler>:
+00009d58 <irq2_handler>:
 
 void irq2_handler(void)
 {
-    9d4f:	55                   	push   %ebp
-    9d50:	89 e5                	mov    %esp,%ebp
-    9d52:	83 ec 08             	sub    $0x8,%esp
+    9d58:	55                   	push   %ebp
+    9d59:	89 e5                	mov    %esp,%ebp
+    9d5b:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(2);
-    9d55:	83 ec 0c             	sub    $0xc,%esp
-    9d58:	6a 02                	push   $0x2
-    9d5a:	e8 2b 08 00 00       	call   a58a <spurious_IRQ>
-    9d5f:	83 c4 10             	add    $0x10,%esp
+    9d5e:	83 ec 0c             	sub    $0xc,%esp
+    9d61:	6a 02                	push   $0x2
+    9d63:	e8 21 08 00 00       	call   a589 <spurious_IRQ>
+    9d68:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(2);
-    9d62:	83 ec 0c             	sub    $0xc,%esp
-    9d65:	6a 02                	push   $0x2
-    9d67:	e8 12 06 00 00       	call   a37e <PIC_sendEOI>
-    9d6c:	83 c4 10             	add    $0x10,%esp
+    9d6b:	83 ec 0c             	sub    $0xc,%esp
+    9d6e:	6a 02                	push   $0x2
+    9d70:	e8 08 06 00 00       	call   a37d <PIC_sendEOI>
+    9d75:	83 c4 10             	add    $0x10,%esp
 }
-    9d6f:	90                   	nop
-    9d70:	c9                   	leave  
-    9d71:	c3                   	ret    
+    9d78:	90                   	nop
+    9d79:	c9                   	leave  
+    9d7a:	c3                   	ret    
 
-00009d72 <irq3_handler>:
+00009d7b <irq3_handler>:
 
 void irq3_handler(void)
 {
-    9d72:	55                   	push   %ebp
-    9d73:	89 e5                	mov    %esp,%ebp
-    9d75:	83 ec 08             	sub    $0x8,%esp
+    9d7b:	55                   	push   %ebp
+    9d7c:	89 e5                	mov    %esp,%ebp
+    9d7e:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(3);
-    9d78:	83 ec 0c             	sub    $0xc,%esp
-    9d7b:	6a 03                	push   $0x3
-    9d7d:	e8 08 08 00 00       	call   a58a <spurious_IRQ>
-    9d82:	83 c4 10             	add    $0x10,%esp
+    9d81:	83 ec 0c             	sub    $0xc,%esp
+    9d84:	6a 03                	push   $0x3
+    9d86:	e8 fe 07 00 00       	call   a589 <spurious_IRQ>
+    9d8b:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(3);
-    9d85:	83 ec 0c             	sub    $0xc,%esp
-    9d88:	6a 03                	push   $0x3
-    9d8a:	e8 ef 05 00 00       	call   a37e <PIC_sendEOI>
-    9d8f:	83 c4 10             	add    $0x10,%esp
+    9d8e:	83 ec 0c             	sub    $0xc,%esp
+    9d91:	6a 03                	push   $0x3
+    9d93:	e8 e5 05 00 00       	call   a37d <PIC_sendEOI>
+    9d98:	83 c4 10             	add    $0x10,%esp
 }
-    9d92:	90                   	nop
-    9d93:	c9                   	leave  
-    9d94:	c3                   	ret    
+    9d9b:	90                   	nop
+    9d9c:	c9                   	leave  
+    9d9d:	c3                   	ret    
 
-00009d95 <irq4_handler>:
+00009d9e <irq4_handler>:
 
 void irq4_handler(void)
 {
-    9d95:	55                   	push   %ebp
-    9d96:	89 e5                	mov    %esp,%ebp
-    9d98:	83 ec 08             	sub    $0x8,%esp
+    9d9e:	55                   	push   %ebp
+    9d9f:	89 e5                	mov    %esp,%ebp
+    9da1:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(4);
-    9d9b:	83 ec 0c             	sub    $0xc,%esp
-    9d9e:	6a 04                	push   $0x4
-    9da0:	e8 e5 07 00 00       	call   a58a <spurious_IRQ>
-    9da5:	83 c4 10             	add    $0x10,%esp
+    9da4:	83 ec 0c             	sub    $0xc,%esp
+    9da7:	6a 04                	push   $0x4
+    9da9:	e8 db 07 00 00       	call   a589 <spurious_IRQ>
+    9dae:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(4);
-    9da8:	83 ec 0c             	sub    $0xc,%esp
-    9dab:	6a 04                	push   $0x4
-    9dad:	e8 cc 05 00 00       	call   a37e <PIC_sendEOI>
-    9db2:	83 c4 10             	add    $0x10,%esp
+    9db1:	83 ec 0c             	sub    $0xc,%esp
+    9db4:	6a 04                	push   $0x4
+    9db6:	e8 c2 05 00 00       	call   a37d <PIC_sendEOI>
+    9dbb:	83 c4 10             	add    $0x10,%esp
 }
-    9db5:	90                   	nop
-    9db6:	c9                   	leave  
-    9db7:	c3                   	ret    
+    9dbe:	90                   	nop
+    9dbf:	c9                   	leave  
+    9dc0:	c3                   	ret    
 
-00009db8 <irq5_handler>:
+00009dc1 <irq5_handler>:
 
 void irq5_handler(void)
 {
-    9db8:	55                   	push   %ebp
-    9db9:	89 e5                	mov    %esp,%ebp
-    9dbb:	83 ec 08             	sub    $0x8,%esp
+    9dc1:	55                   	push   %ebp
+    9dc2:	89 e5                	mov    %esp,%ebp
+    9dc4:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(5);
-    9dbe:	83 ec 0c             	sub    $0xc,%esp
-    9dc1:	6a 05                	push   $0x5
-    9dc3:	e8 c2 07 00 00       	call   a58a <spurious_IRQ>
-    9dc8:	83 c4 10             	add    $0x10,%esp
+    9dc7:	83 ec 0c             	sub    $0xc,%esp
+    9dca:	6a 05                	push   $0x5
+    9dcc:	e8 b8 07 00 00       	call   a589 <spurious_IRQ>
+    9dd1:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(5);
-    9dcb:	83 ec 0c             	sub    $0xc,%esp
-    9dce:	6a 05                	push   $0x5
-    9dd0:	e8 a9 05 00 00       	call   a37e <PIC_sendEOI>
-    9dd5:	83 c4 10             	add    $0x10,%esp
+    9dd4:	83 ec 0c             	sub    $0xc,%esp
+    9dd7:	6a 05                	push   $0x5
+    9dd9:	e8 9f 05 00 00       	call   a37d <PIC_sendEOI>
+    9dde:	83 c4 10             	add    $0x10,%esp
 }
-    9dd8:	90                   	nop
-    9dd9:	c9                   	leave  
-    9dda:	c3                   	ret    
+    9de1:	90                   	nop
+    9de2:	c9                   	leave  
+    9de3:	c3                   	ret    
 
-00009ddb <irq6_handler>:
+00009de4 <irq6_handler>:
 
 void irq6_handler(void)
 {
-    9ddb:	55                   	push   %ebp
-    9ddc:	89 e5                	mov    %esp,%ebp
-    9dde:	83 ec 08             	sub    $0x8,%esp
+    9de4:	55                   	push   %ebp
+    9de5:	89 e5                	mov    %esp,%ebp
+    9de7:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(6);
-    9de1:	83 ec 0c             	sub    $0xc,%esp
-    9de4:	6a 06                	push   $0x6
-    9de6:	e8 9f 07 00 00       	call   a58a <spurious_IRQ>
-    9deb:	83 c4 10             	add    $0x10,%esp
+    9dea:	83 ec 0c             	sub    $0xc,%esp
+    9ded:	6a 06                	push   $0x6
+    9def:	e8 95 07 00 00       	call   a589 <spurious_IRQ>
+    9df4:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(6);
-    9dee:	83 ec 0c             	sub    $0xc,%esp
-    9df1:	6a 06                	push   $0x6
-    9df3:	e8 86 05 00 00       	call   a37e <PIC_sendEOI>
-    9df8:	83 c4 10             	add    $0x10,%esp
+    9df7:	83 ec 0c             	sub    $0xc,%esp
+    9dfa:	6a 06                	push   $0x6
+    9dfc:	e8 7c 05 00 00       	call   a37d <PIC_sendEOI>
+    9e01:	83 c4 10             	add    $0x10,%esp
 }
-    9dfb:	90                   	nop
-    9dfc:	c9                   	leave  
-    9dfd:	c3                   	ret    
+    9e04:	90                   	nop
+    9e05:	c9                   	leave  
+    9e06:	c3                   	ret    
 
-00009dfe <irq7_handler>:
+00009e07 <irq7_handler>:
 
 void irq7_handler(void)
 {
-    9dfe:	55                   	push   %ebp
-    9dff:	89 e5                	mov    %esp,%ebp
-    9e01:	83 ec 08             	sub    $0x8,%esp
+    9e07:	55                   	push   %ebp
+    9e08:	89 e5                	mov    %esp,%ebp
+    9e0a:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(7);
-    9e04:	83 ec 0c             	sub    $0xc,%esp
-    9e07:	6a 07                	push   $0x7
-    9e09:	e8 7c 07 00 00       	call   a58a <spurious_IRQ>
-    9e0e:	83 c4 10             	add    $0x10,%esp
+    9e0d:	83 ec 0c             	sub    $0xc,%esp
+    9e10:	6a 07                	push   $0x7
+    9e12:	e8 72 07 00 00       	call   a589 <spurious_IRQ>
+    9e17:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(7);
-    9e11:	83 ec 0c             	sub    $0xc,%esp
-    9e14:	6a 07                	push   $0x7
-    9e16:	e8 63 05 00 00       	call   a37e <PIC_sendEOI>
-    9e1b:	83 c4 10             	add    $0x10,%esp
+    9e1a:	83 ec 0c             	sub    $0xc,%esp
+    9e1d:	6a 07                	push   $0x7
+    9e1f:	e8 59 05 00 00       	call   a37d <PIC_sendEOI>
+    9e24:	83 c4 10             	add    $0x10,%esp
 }
-    9e1e:	90                   	nop
-    9e1f:	c9                   	leave  
-    9e20:	c3                   	ret    
+    9e27:	90                   	nop
+    9e28:	c9                   	leave  
+    9e29:	c3                   	ret    
 
-00009e21 <irq8_handler>:
+00009e2a <irq8_handler>:
 
 void irq8_handler(void)
 {
-    9e21:	55                   	push   %ebp
-    9e22:	89 e5                	mov    %esp,%ebp
-    9e24:	83 ec 08             	sub    $0x8,%esp
+    9e2a:	55                   	push   %ebp
+    9e2b:	89 e5                	mov    %esp,%ebp
+    9e2d:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(8);
-    9e27:	83 ec 0c             	sub    $0xc,%esp
-    9e2a:	6a 08                	push   $0x8
-    9e2c:	e8 59 07 00 00       	call   a58a <spurious_IRQ>
-    9e31:	83 c4 10             	add    $0x10,%esp
+    9e30:	83 ec 0c             	sub    $0xc,%esp
+    9e33:	6a 08                	push   $0x8
+    9e35:	e8 4f 07 00 00       	call   a589 <spurious_IRQ>
+    9e3a:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(8);
-    9e34:	83 ec 0c             	sub    $0xc,%esp
-    9e37:	6a 08                	push   $0x8
-    9e39:	e8 40 05 00 00       	call   a37e <PIC_sendEOI>
-    9e3e:	83 c4 10             	add    $0x10,%esp
+    9e3d:	83 ec 0c             	sub    $0xc,%esp
+    9e40:	6a 08                	push   $0x8
+    9e42:	e8 36 05 00 00       	call   a37d <PIC_sendEOI>
+    9e47:	83 c4 10             	add    $0x10,%esp
 }
-    9e41:	90                   	nop
-    9e42:	c9                   	leave  
-    9e43:	c3                   	ret    
+    9e4a:	90                   	nop
+    9e4b:	c9                   	leave  
+    9e4c:	c3                   	ret    
 
-00009e44 <irq9_handler>:
+00009e4d <irq9_handler>:
 
 void irq9_handler(void)
 {
-    9e44:	55                   	push   %ebp
-    9e45:	89 e5                	mov    %esp,%ebp
-    9e47:	83 ec 08             	sub    $0x8,%esp
+    9e4d:	55                   	push   %ebp
+    9e4e:	89 e5                	mov    %esp,%ebp
+    9e50:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(9);
-    9e4a:	83 ec 0c             	sub    $0xc,%esp
-    9e4d:	6a 09                	push   $0x9
-    9e4f:	e8 36 07 00 00       	call   a58a <spurious_IRQ>
-    9e54:	83 c4 10             	add    $0x10,%esp
+    9e53:	83 ec 0c             	sub    $0xc,%esp
+    9e56:	6a 09                	push   $0x9
+    9e58:	e8 2c 07 00 00       	call   a589 <spurious_IRQ>
+    9e5d:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(9);
-    9e57:	83 ec 0c             	sub    $0xc,%esp
-    9e5a:	6a 09                	push   $0x9
-    9e5c:	e8 1d 05 00 00       	call   a37e <PIC_sendEOI>
-    9e61:	83 c4 10             	add    $0x10,%esp
+    9e60:	83 ec 0c             	sub    $0xc,%esp
+    9e63:	6a 09                	push   $0x9
+    9e65:	e8 13 05 00 00       	call   a37d <PIC_sendEOI>
+    9e6a:	83 c4 10             	add    $0x10,%esp
 }
-    9e64:	90                   	nop
-    9e65:	c9                   	leave  
-    9e66:	c3                   	ret    
+    9e6d:	90                   	nop
+    9e6e:	c9                   	leave  
+    9e6f:	c3                   	ret    
 
-00009e67 <irq10_handler>:
+00009e70 <irq10_handler>:
 
 void irq10_handler(void)
 {
-    9e67:	55                   	push   %ebp
-    9e68:	89 e5                	mov    %esp,%ebp
-    9e6a:	83 ec 08             	sub    $0x8,%esp
+    9e70:	55                   	push   %ebp
+    9e71:	89 e5                	mov    %esp,%ebp
+    9e73:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(10);
-    9e6d:	83 ec 0c             	sub    $0xc,%esp
-    9e70:	6a 0a                	push   $0xa
-    9e72:	e8 13 07 00 00       	call   a58a <spurious_IRQ>
-    9e77:	83 c4 10             	add    $0x10,%esp
+    9e76:	83 ec 0c             	sub    $0xc,%esp
+    9e79:	6a 0a                	push   $0xa
+    9e7b:	e8 09 07 00 00       	call   a589 <spurious_IRQ>
+    9e80:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(10);
-    9e7a:	83 ec 0c             	sub    $0xc,%esp
-    9e7d:	6a 0a                	push   $0xa
-    9e7f:	e8 fa 04 00 00       	call   a37e <PIC_sendEOI>
-    9e84:	83 c4 10             	add    $0x10,%esp
+    9e83:	83 ec 0c             	sub    $0xc,%esp
+    9e86:	6a 0a                	push   $0xa
+    9e88:	e8 f0 04 00 00       	call   a37d <PIC_sendEOI>
+    9e8d:	83 c4 10             	add    $0x10,%esp
 }
-    9e87:	90                   	nop
-    9e88:	c9                   	leave  
-    9e89:	c3                   	ret    
+    9e90:	90                   	nop
+    9e91:	c9                   	leave  
+    9e92:	c3                   	ret    
 
-00009e8a <irq11_handler>:
+00009e93 <irq11_handler>:
 
 void irq11_handler(void)
 {
-    9e8a:	55                   	push   %ebp
-    9e8b:	89 e5                	mov    %esp,%ebp
-    9e8d:	83 ec 08             	sub    $0x8,%esp
+    9e93:	55                   	push   %ebp
+    9e94:	89 e5                	mov    %esp,%ebp
+    9e96:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(11);
-    9e90:	83 ec 0c             	sub    $0xc,%esp
-    9e93:	6a 0b                	push   $0xb
-    9e95:	e8 f0 06 00 00       	call   a58a <spurious_IRQ>
-    9e9a:	83 c4 10             	add    $0x10,%esp
+    9e99:	83 ec 0c             	sub    $0xc,%esp
+    9e9c:	6a 0b                	push   $0xb
+    9e9e:	e8 e6 06 00 00       	call   a589 <spurious_IRQ>
+    9ea3:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(11);
-    9e9d:	83 ec 0c             	sub    $0xc,%esp
-    9ea0:	6a 0b                	push   $0xb
-    9ea2:	e8 d7 04 00 00       	call   a37e <PIC_sendEOI>
-    9ea7:	83 c4 10             	add    $0x10,%esp
+    9ea6:	83 ec 0c             	sub    $0xc,%esp
+    9ea9:	6a 0b                	push   $0xb
+    9eab:	e8 cd 04 00 00       	call   a37d <PIC_sendEOI>
+    9eb0:	83 c4 10             	add    $0x10,%esp
 }
-    9eaa:	90                   	nop
-    9eab:	c9                   	leave  
-    9eac:	c3                   	ret    
+    9eb3:	90                   	nop
+    9eb4:	c9                   	leave  
+    9eb5:	c3                   	ret    
 
-00009ead <irq12_handler>:
+00009eb6 <irq12_handler>:
 
 void irq12_handler(void)
 {
-    9ead:	55                   	push   %ebp
-    9eae:	89 e5                	mov    %esp,%ebp
-    9eb0:	83 ec 08             	sub    $0x8,%esp
+    9eb6:	55                   	push   %ebp
+    9eb7:	89 e5                	mov    %esp,%ebp
+    9eb9:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(12);
-    9eb3:	83 ec 0c             	sub    $0xc,%esp
-    9eb6:	6a 0c                	push   $0xc
-    9eb8:	e8 cd 06 00 00       	call   a58a <spurious_IRQ>
-    9ebd:	83 c4 10             	add    $0x10,%esp
+    9ebc:	83 ec 0c             	sub    $0xc,%esp
+    9ebf:	6a 0c                	push   $0xc
+    9ec1:	e8 c3 06 00 00       	call   a589 <spurious_IRQ>
+    9ec6:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(12);
-    9ec0:	83 ec 0c             	sub    $0xc,%esp
-    9ec3:	6a 0c                	push   $0xc
-    9ec5:	e8 b4 04 00 00       	call   a37e <PIC_sendEOI>
-    9eca:	83 c4 10             	add    $0x10,%esp
+    9ec9:	83 ec 0c             	sub    $0xc,%esp
+    9ecc:	6a 0c                	push   $0xc
+    9ece:	e8 aa 04 00 00       	call   a37d <PIC_sendEOI>
+    9ed3:	83 c4 10             	add    $0x10,%esp
 }
-    9ecd:	90                   	nop
-    9ece:	c9                   	leave  
-    9ecf:	c3                   	ret    
+    9ed6:	90                   	nop
+    9ed7:	c9                   	leave  
+    9ed8:	c3                   	ret    
 
-00009ed0 <irq13_handler>:
+00009ed9 <irq13_handler>:
 
 void irq13_handler(void)
 {
-    9ed0:	55                   	push   %ebp
-    9ed1:	89 e5                	mov    %esp,%ebp
-    9ed3:	83 ec 08             	sub    $0x8,%esp
+    9ed9:	55                   	push   %ebp
+    9eda:	89 e5                	mov    %esp,%ebp
+    9edc:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(13);
-    9ed6:	83 ec 0c             	sub    $0xc,%esp
-    9ed9:	6a 0d                	push   $0xd
-    9edb:	e8 aa 06 00 00       	call   a58a <spurious_IRQ>
-    9ee0:	83 c4 10             	add    $0x10,%esp
+    9edf:	83 ec 0c             	sub    $0xc,%esp
+    9ee2:	6a 0d                	push   $0xd
+    9ee4:	e8 a0 06 00 00       	call   a589 <spurious_IRQ>
+    9ee9:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(13);
-    9ee3:	83 ec 0c             	sub    $0xc,%esp
-    9ee6:	6a 0d                	push   $0xd
-    9ee8:	e8 91 04 00 00       	call   a37e <PIC_sendEOI>
-    9eed:	83 c4 10             	add    $0x10,%esp
+    9eec:	83 ec 0c             	sub    $0xc,%esp
+    9eef:	6a 0d                	push   $0xd
+    9ef1:	e8 87 04 00 00       	call   a37d <PIC_sendEOI>
+    9ef6:	83 c4 10             	add    $0x10,%esp
 }
-    9ef0:	90                   	nop
-    9ef1:	c9                   	leave  
-    9ef2:	c3                   	ret    
+    9ef9:	90                   	nop
+    9efa:	c9                   	leave  
+    9efb:	c3                   	ret    
 
-00009ef3 <irq14_handler>:
+00009efc <irq14_handler>:
 
 void irq14_handler(void)
 {
-    9ef3:	55                   	push   %ebp
-    9ef4:	89 e5                	mov    %esp,%ebp
-    9ef6:	83 ec 08             	sub    $0x8,%esp
+    9efc:	55                   	push   %ebp
+    9efd:	89 e5                	mov    %esp,%ebp
+    9eff:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(14);
-    9ef9:	83 ec 0c             	sub    $0xc,%esp
-    9efc:	6a 0e                	push   $0xe
-    9efe:	e8 87 06 00 00       	call   a58a <spurious_IRQ>
-    9f03:	83 c4 10             	add    $0x10,%esp
+    9f02:	83 ec 0c             	sub    $0xc,%esp
+    9f05:	6a 0e                	push   $0xe
+    9f07:	e8 7d 06 00 00       	call   a589 <spurious_IRQ>
+    9f0c:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(14);
-    9f06:	83 ec 0c             	sub    $0xc,%esp
-    9f09:	6a 0e                	push   $0xe
-    9f0b:	e8 6e 04 00 00       	call   a37e <PIC_sendEOI>
-    9f10:	83 c4 10             	add    $0x10,%esp
+    9f0f:	83 ec 0c             	sub    $0xc,%esp
+    9f12:	6a 0e                	push   $0xe
+    9f14:	e8 64 04 00 00       	call   a37d <PIC_sendEOI>
+    9f19:	83 c4 10             	add    $0x10,%esp
 }
-    9f13:	90                   	nop
-    9f14:	c9                   	leave  
-    9f15:	c3                   	ret    
+    9f1c:	90                   	nop
+    9f1d:	c9                   	leave  
+    9f1e:	c3                   	ret    
 
-00009f16 <irq15_handler>:
+00009f1f <irq15_handler>:
 
 void irq15_handler(void)
 {
-    9f16:	55                   	push   %ebp
-    9f17:	89 e5                	mov    %esp,%ebp
-    9f19:	83 ec 08             	sub    $0x8,%esp
+    9f1f:	55                   	push   %ebp
+    9f20:	89 e5                	mov    %esp,%ebp
+    9f22:	83 ec 08             	sub    $0x8,%esp
     spurious_IRQ(15);
-    9f1c:	83 ec 0c             	sub    $0xc,%esp
-    9f1f:	6a 0f                	push   $0xf
-    9f21:	e8 64 06 00 00       	call   a58a <spurious_IRQ>
-    9f26:	83 c4 10             	add    $0x10,%esp
+    9f25:	83 ec 0c             	sub    $0xc,%esp
+    9f28:	6a 0f                	push   $0xf
+    9f2a:	e8 5a 06 00 00       	call   a589 <spurious_IRQ>
+    9f2f:	83 c4 10             	add    $0x10,%esp
     PIC_sendEOI(15);
-    9f29:	83 ec 0c             	sub    $0xc,%esp
-    9f2c:	6a 0f                	push   $0xf
-    9f2e:	e8 4b 04 00 00       	call   a37e <PIC_sendEOI>
-    9f33:	83 c4 10             	add    $0x10,%esp
-    9f36:	90                   	nop
-    9f37:	c9                   	leave  
-    9f38:	c3                   	ret    
+    9f32:	83 ec 0c             	sub    $0xc,%esp
+    9f35:	6a 0f                	push   $0xf
+    9f37:	e8 41 04 00 00       	call   a37d <PIC_sendEOI>
+    9f3c:	83 c4 10             	add    $0x10,%esp
+    9f3f:	90                   	nop
+    9f40:	c9                   	leave  
+    9f41:	c3                   	ret    
 
-00009f39 <keyboard_add_service>:
+00009f42 <keyboard_add_service>:
           0xFF, 0xFF, 0xFF, 0xFF, /*      (0x60)  */
           0xFF, 0xFF, 0xFF, 0xFF  /*      (0x61)  */
       };
 
 void keyboard_add_service(void (*func)())
 {
-    9f39:	55                   	push   %ebp
-    9f3a:	89 e5                	mov    %esp,%ebp
+    9f42:	55                   	push   %ebp
+    9f43:	89 e5                	mov    %esp,%ebp
     keyboard_ctrl.kbd_service[keyboard_ctrl.kbd_service_num] = func;
-    9f3c:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
-    9f43:	0f be c0             	movsbl %al,%eax
-    9f46:	8b 55 08             	mov    0x8(%ebp),%edx
-    9f49:	89 14 85 22 08 01 00 	mov    %edx,0x10822(,%eax,4)
+    9f45:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
+    9f4c:	0f be c0             	movsbl %al,%eax
+    9f4f:	8b 55 08             	mov    0x8(%ebp),%edx
+    9f52:	89 14 85 22 08 01 00 	mov    %edx,0x10822(,%eax,4)
     keyboard_ctrl.kbd_service_num++;
-    9f50:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
-    9f57:	83 c0 01             	add    $0x1,%eax
-    9f5a:	a2 21 08 01 00       	mov    %al,0x10821
+    9f59:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
+    9f60:	83 c0 01             	add    $0x1,%eax
+    9f63:	a2 21 08 01 00       	mov    %al,0x10821
 }
-    9f5f:	90                   	nop
-    9f60:	5d                   	pop    %ebp
-    9f61:	c3                   	ret    
+    9f68:	90                   	nop
+    9f69:	5d                   	pop    %ebp
+    9f6a:	c3                   	ret    
 
-00009f62 <kbd_init>:
+00009f6b <kbd_init>:
 
 void kbd_init()
 {
-    9f62:	55                   	push   %ebp
-    9f63:	89 e5                	mov    %esp,%ebp
+    9f6b:	55                   	push   %ebp
+    9f6c:	89 e5                	mov    %esp,%ebp
     keyboard_ctrl.kbd_service_num = 0;
-    9f65:	c6 05 21 08 01 00 00 	movb   $0x0,0x10821
+    9f6e:	c6 05 21 08 01 00 00 	movb   $0x0,0x10821
     keyboard_add_service(console_service_keyboard);
-    9f6c:	68 5f 96 00 00       	push   $0x965f
-    9f71:	e8 c3 ff ff ff       	call   9f39 <keyboard_add_service>
-    9f76:	83 c4 04             	add    $0x4,%esp
+    9f75:	68 5f 96 00 00       	push   $0x965f
+    9f7a:	e8 c3 ff ff ff       	call   9f42 <keyboard_add_service>
+    9f7f:	83 c4 04             	add    $0x4,%esp
     keyboard_add_service(monitor_service_keyboard);
-    9f79:	68 c9 a8 00 00       	push   $0xa8c9
-    9f7e:	e8 b6 ff ff ff       	call   9f39 <keyboard_add_service>
-    9f83:	83 c4 04             	add    $0x4,%esp
+    9f82:	68 c8 a8 00 00       	push   $0xa8c8
+    9f87:	e8 b6 ff ff ff       	call   9f42 <keyboard_add_service>
+    9f8c:	83 c4 04             	add    $0x4,%esp
 }
-    9f86:	90                   	nop
-    9f87:	c9                   	leave  
-    9f88:	c3                   	ret    
+    9f8f:	90                   	nop
+    9f90:	c9                   	leave  
+    9f91:	c3                   	ret    
 
-00009f89 <keyboard_irq>:
+00009f92 <keyboard_irq>:
 
 void keyboard_irq()
 {
-    9f89:	55                   	push   %ebp
-    9f8a:	89 e5                	mov    %esp,%ebp
-    9f8c:	83 ec 18             	sub    $0x18,%esp
+    9f92:	55                   	push   %ebp
+    9f93:	89 e5                	mov    %esp,%ebp
+    9f95:	83 ec 18             	sub    $0x18,%esp
 
     int i;
     void (*func)(void);
 
     do {
         keyboard_ctrl.code = _8042_get_status;
-    9f8f:	b8 64 00 00 00       	mov    $0x64,%eax
-    9f94:	89 c2                	mov    %eax,%edx
-    9f96:	ec                   	in     (%dx),%al
-    9f97:	66 89 45 f2          	mov    %ax,-0xe(%ebp)
-    9f9b:	0f b7 45 f2          	movzwl -0xe(%ebp),%eax
-    9f9f:	66 a3 1e 0c 01 00    	mov    %ax,0x10c1e
+    9f98:	b8 64 00 00 00       	mov    $0x64,%eax
+    9f9d:	89 c2                	mov    %eax,%edx
+    9f9f:	ec                   	in     (%dx),%al
+    9fa0:	66 89 45 f2          	mov    %ax,-0xe(%ebp)
+    9fa4:	0f b7 45 f2          	movzwl -0xe(%ebp),%eax
+    9fa8:	66 a3 1e 0c 01 00    	mov    %ax,0x10c1e
     } while ((keyboard_ctrl.code & 0x01) == _8042_BUFFER_OVERRUN);
-    9fa5:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
-    9fac:	98                   	cwtl   
-    9fad:	83 e0 01             	and    $0x1,%eax
-    9fb0:	85 c0                	test   %eax,%eax
-    9fb2:	74 db                	je     9f8f <keyboard_irq+0x6>
+    9fae:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
+    9fb5:	98                   	cwtl   
+    9fb6:	83 e0 01             	and    $0x1,%eax
+    9fb9:	85 c0                	test   %eax,%eax
+    9fbb:	74 db                	je     9f98 <keyboard_irq+0x6>
 
     keyboard_ctrl.code = _8042_scan_code;
-    9fb4:	b8 60 00 00 00       	mov    $0x60,%eax
-    9fb9:	89 c2                	mov    %eax,%edx
-    9fbb:	ec                   	in     (%dx),%al
-    9fbc:	66 89 45 f0          	mov    %ax,-0x10(%ebp)
-    9fc0:	0f b7 45 f0          	movzwl -0x10(%ebp),%eax
-    9fc4:	66 a3 1e 0c 01 00    	mov    %ax,0x10c1e
+    9fbd:	b8 60 00 00 00       	mov    $0x60,%eax
+    9fc2:	89 c2                	mov    %eax,%edx
+    9fc4:	ec                   	in     (%dx),%al
+    9fc5:	66 89 45 f0          	mov    %ax,-0x10(%ebp)
+    9fc9:	0f b7 45 f0          	movzwl -0x10(%ebp),%eax
+    9fcd:	66 a3 1e 0c 01 00    	mov    %ax,0x10c1e
 
     for (i = 0; i < keyboard_ctrl.kbd_service_num; i++) {
-    9fca:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-    9fd1:	eb 16                	jmp    9fe9 <keyboard_irq+0x60>
+    9fd3:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    9fda:	eb 16                	jmp    9ff2 <keyboard_irq+0x60>
         func = keyboard_ctrl.kbd_service[i];
-    9fd3:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    9fd6:	8b 04 85 22 08 01 00 	mov    0x10822(,%eax,4),%eax
-    9fdd:	89 45 ec             	mov    %eax,-0x14(%ebp)
+    9fdc:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    9fdf:	8b 04 85 22 08 01 00 	mov    0x10822(,%eax,4),%eax
+    9fe6:	89 45 ec             	mov    %eax,-0x14(%ebp)
         func();
-    9fe0:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    9fe3:	ff d0                	call   *%eax
+    9fe9:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    9fec:	ff d0                	call   *%eax
     for (i = 0; i < keyboard_ctrl.kbd_service_num; i++) {
-    9fe5:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
-    9fe9:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
-    9ff0:	0f be c0             	movsbl %al,%eax
-    9ff3:	39 45 f4             	cmp    %eax,-0xc(%ebp)
-    9ff6:	7c db                	jl     9fd3 <keyboard_irq+0x4a>
+    9fee:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    9ff2:	0f b6 05 21 08 01 00 	movzbl 0x10821,%eax
+    9ff9:	0f be c0             	movsbl %al,%eax
+    9ffc:	39 45 f4             	cmp    %eax,-0xc(%ebp)
+    9fff:	7c db                	jl     9fdc <keyboard_irq+0x4a>
     }
 }
-    9ff8:	90                   	nop
-    9ff9:	90                   	nop
-    9ffa:	c9                   	leave  
-    9ffb:	c3                   	ret    
+    a001:	90                   	nop
+    a002:	90                   	nop
+    a003:	c9                   	leave  
+    a004:	c3                   	ret    
 
-00009ffc <reinitialise_kbd>:
+0000a005 <reinitialise_kbd>:
 
 void reinitialise_kbd()
 {
-    9ffc:	55                   	push   %ebp
-    9ffd:	89 e5                	mov    %esp,%ebp
-    9fff:	83 ec 08             	sub    $0x8,%esp
+    a005:	55                   	push   %ebp
+    a006:	89 e5                	mov    %esp,%ebp
+    a008:	83 ec 08             	sub    $0x8,%esp
     wait_8042_ACK();
-    a002:	e8 43 00 00 00       	call   a04a <wait_8042_ACK>
+    a00b:	e8 43 00 00 00       	call   a053 <wait_8042_ACK>
     _8042_send_get_current_scan_code;
-    a007:	ba 64 00 00 00       	mov    $0x64,%edx
-    a00c:	b8 f0 00 00 00       	mov    $0xf0,%eax
-    a011:	ee                   	out    %al,(%dx)
+    a010:	ba 64 00 00 00       	mov    $0x64,%edx
+    a015:	b8 f0 00 00 00       	mov    $0xf0,%eax
+    a01a:	ee                   	out    %al,(%dx)
     wait_8042_ACK();
-    a012:	e8 33 00 00 00       	call   a04a <wait_8042_ACK>
+    a01b:	e8 33 00 00 00       	call   a053 <wait_8042_ACK>
 
     _8042_set_typematic_rate;
-    a017:	ba 64 00 00 00       	mov    $0x64,%edx
-    a01c:	b8 f3 00 00 00       	mov    $0xf3,%eax
-    a021:	ee                   	out    %al,(%dx)
+    a020:	ba 64 00 00 00       	mov    $0x64,%edx
+    a025:	b8 f3 00 00 00       	mov    $0xf3,%eax
+    a02a:	ee                   	out    %al,(%dx)
     wait_8042_ACK();
-    a022:	e8 23 00 00 00       	call   a04a <wait_8042_ACK>
+    a02b:	e8 23 00 00 00       	call   a053 <wait_8042_ACK>
 
     _8042_set_leds;
-    a027:	ba 64 00 00 00       	mov    $0x64,%edx
-    a02c:	b8 ed 00 00 00       	mov    $0xed,%eax
-    a031:	ee                   	out    %al,(%dx)
+    a030:	ba 64 00 00 00       	mov    $0x64,%edx
+    a035:	b8 ed 00 00 00       	mov    $0xed,%eax
+    a03a:	ee                   	out    %al,(%dx)
     wait_8042_ACK();
-    a032:	e8 13 00 00 00       	call   a04a <wait_8042_ACK>
+    a03b:	e8 13 00 00 00       	call   a053 <wait_8042_ACK>
 
     _8042_enable_scanning;
-    a037:	ba 64 00 00 00       	mov    $0x64,%edx
-    a03c:	b8 f4 00 00 00       	mov    $0xf4,%eax
-    a041:	ee                   	out    %al,(%dx)
+    a040:	ba 64 00 00 00       	mov    $0x64,%edx
+    a045:	b8 f4 00 00 00       	mov    $0xf4,%eax
+    a04a:	ee                   	out    %al,(%dx)
     wait_8042_ACK();
-    a042:	e8 03 00 00 00       	call   a04a <wait_8042_ACK>
+    a04b:	e8 03 00 00 00       	call   a053 <wait_8042_ACK>
 }
-    a047:	90                   	nop
-    a048:	c9                   	leave  
-    a049:	c3                   	ret    
+    a050:	90                   	nop
+    a051:	c9                   	leave  
+    a052:	c3                   	ret    
 
-0000a04a <wait_8042_ACK>:
+0000a053 <wait_8042_ACK>:
 
 static void
 wait_8042_ACK()
 {
-    a04a:	55                   	push   %ebp
-    a04b:	89 e5                	mov    %esp,%ebp
-    a04d:	83 ec 10             	sub    $0x10,%esp
+    a053:	55                   	push   %ebp
+    a054:	89 e5                	mov    %esp,%ebp
+    a056:	83 ec 10             	sub    $0x10,%esp
     while (_8042_get_status != _8042_ACK)
-    a050:	90                   	nop
-    a051:	b8 64 00 00 00       	mov    $0x64,%eax
-    a056:	89 c2                	mov    %eax,%edx
-    a058:	ec                   	in     (%dx),%al
-    a059:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-    a05d:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a061:	66 3d fa 00          	cmp    $0xfa,%ax
-    a065:	75 ea                	jne    a051 <wait_8042_ACK+0x7>
+    a059:	90                   	nop
+    a05a:	b8 64 00 00 00       	mov    $0x64,%eax
+    a05f:	89 c2                	mov    %eax,%edx
+    a061:	ec                   	in     (%dx),%al
+    a062:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+    a066:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a06a:	66 3d fa 00          	cmp    $0xfa,%ax
+    a06e:	75 ea                	jne    a05a <wait_8042_ACK+0x7>
         ;
 }
-    a067:	90                   	nop
-    a068:	90                   	nop
-    a069:	c9                   	leave  
-    a06a:	c3                   	ret    
+    a070:	90                   	nop
+    a071:	90                   	nop
+    a072:	c9                   	leave  
+    a073:	c3                   	ret    
 
-0000a06b <get_code_kbd_control>:
+0000a074 <get_code_kbd_control>:
 
 int16_t get_code_kbd_control()
 {
-    a06b:	55                   	push   %ebp
-    a06c:	89 e5                	mov    %esp,%ebp
+    a074:	55                   	push   %ebp
+    a075:	89 e5                	mov    %esp,%ebp
     return keyboard_ctrl.code;
-    a06e:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
+    a077:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
 }
-    a075:	5d                   	pop    %ebp
-    a076:	c3                   	ret    
+    a07e:	5d                   	pop    %ebp
+    a07f:	c3                   	ret    
 
-0000a077 <handle_ASCII_code_keyboard>:
+0000a080 <handle_ASCII_code_keyboard>:
 
 static void handle_ASCII_code_keyboard()
 {
-    a077:	55                   	push   %ebp
-    a078:	89 e5                	mov    %esp,%ebp
-    a07a:	83 ec 10             	sub    $0x10,%esp
-    int16_t        _code = keyboard_ctrl.code - 1;
-    a07d:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
-    a084:	83 e8 01             	sub    $0x1,%eax
-    a087:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-    static int16_t lshift_enable;
-    static int16_t rshift_enable;
-    static int16_t alt_enable;
-    static int16_t ctrl_enable;
+    a080:	55                   	push   %ebp
+    a081:	89 e5                	mov    %esp,%ebp
+    a083:	83 ec 10             	sub    $0x10,%esp
+    int16_t _code = keyboard_ctrl.code - 1;
+    a086:	0f b7 05 1e 0c 01 00 	movzwl 0x10c1e,%eax
+    a08d:	83 e8 01             	sub    $0x1,%eax
+    a090:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
 
     if (_code < 0x80) { /* key held down */
-    a08b:	66 83 7d fe 7f       	cmpw   $0x7f,-0x2(%ebp)
-    a090:	0f 8f 99 00 00 00    	jg     a12f <handle_ASCII_code_keyboard+0xb8>
+    a094:	66 83 7d fe 7f       	cmpw   $0x7f,-0x2(%ebp)
+    a099:	0f 8f 8f 00 00 00    	jg     a12e <handle_ASCII_code_keyboard+0xae>
         switch (_code) {
-    a096:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
-    a09a:	83 f8 37             	cmp    $0x37,%eax
-    a09d:	74 43                	je     a0e2 <handle_ASCII_code_keyboard+0x6b>
-    a09f:	83 f8 37             	cmp    $0x37,%eax
-    a0a2:	7f 4c                	jg     a0f0 <handle_ASCII_code_keyboard+0x79>
-    a0a4:	83 f8 35             	cmp    $0x35,%eax
-    a0a7:	74 1d                	je     a0c6 <handle_ASCII_code_keyboard+0x4f>
-    a0a9:	83 f8 35             	cmp    $0x35,%eax
-    a0ac:	7f 42                	jg     a0f0 <handle_ASCII_code_keyboard+0x79>
-    a0ae:	83 f8 1c             	cmp    $0x1c,%eax
-    a0b1:	74 21                	je     a0d4 <handle_ASCII_code_keyboard+0x5d>
-    a0b3:	83 f8 29             	cmp    $0x29,%eax
-    a0b6:	75 38                	jne    a0f0 <handle_ASCII_code_keyboard+0x79>
+    a09f:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
+    a0a3:	83 f8 37             	cmp    $0x37,%eax
+    a0a6:	74 3d                	je     a0e5 <handle_ASCII_code_keyboard+0x65>
+    a0a8:	83 f8 37             	cmp    $0x37,%eax
+    a0ab:	7f 44                	jg     a0f1 <handle_ASCII_code_keyboard+0x71>
+    a0ad:	83 f8 35             	cmp    $0x35,%eax
+    a0b0:	74 1b                	je     a0cd <handle_ASCII_code_keyboard+0x4d>
+    a0b2:	83 f8 35             	cmp    $0x35,%eax
+    a0b5:	7f 3a                	jg     a0f1 <handle_ASCII_code_keyboard+0x71>
+    a0b7:	83 f8 1c             	cmp    $0x1c,%eax
+    a0ba:	74 1d                	je     a0d9 <handle_ASCII_code_keyboard+0x59>
+    a0bc:	83 f8 29             	cmp    $0x29,%eax
+    a0bf:	75 30                	jne    a0f1 <handle_ASCII_code_keyboard+0x71>
         case 0x29: lshift_enable = 1; break;
-    a0b8:	66 c7 05 20 0c 01 00 	movw   $0x1,0x10c20
-    a0bf:	01 00 
-    a0c1:	e9 c1 00 00 00       	jmp    a187 <handle_ASCII_code_keyboard+0x110>
+    a0c1:	c6 05 20 0c 01 00 01 	movb   $0x1,0x10c20
+    a0c8:	e9 b8 00 00 00       	jmp    a185 <handle_ASCII_code_keyboard+0x105>
         case 0x35: rshift_enable = 1; break;
-    a0c6:	66 c7 05 22 0c 01 00 	movw   $0x1,0x10c22
-    a0cd:	01 00 
-    a0cf:	e9 b3 00 00 00       	jmp    a187 <handle_ASCII_code_keyboard+0x110>
+    a0cd:	c6 05 21 0c 01 00 01 	movb   $0x1,0x10c21
+    a0d4:	e9 ac 00 00 00       	jmp    a185 <handle_ASCII_code_keyboard+0x105>
         case 0x1C: ctrl_enable = 1; break;
-    a0d4:	66 c7 05 24 0c 01 00 	movw   $0x1,0x10c24
-    a0db:	01 00 
-    a0dd:	e9 a5 00 00 00       	jmp    a187 <handle_ASCII_code_keyboard+0x110>
+    a0d9:	c6 05 23 0c 01 00 01 	movb   $0x1,0x10c23
+    a0e0:	e9 a0 00 00 00       	jmp    a185 <handle_ASCII_code_keyboard+0x105>
         case 0x37: alt_enable = 1; break;
-    a0e2:	66 c7 05 26 0c 01 00 	movw   $0x1,0x10c26
-    a0e9:	01 00 
-    a0eb:	e9 97 00 00 00       	jmp    a187 <handle_ASCII_code_keyboard+0x110>
+    a0e5:	c6 05 22 0c 01 00 01 	movb   $0x1,0x10c22
+    a0ec:	e9 94 00 00 00       	jmp    a185 <handle_ASCII_code_keyboard+0x105>
         default:
             keyboard_ctrl.ascii_code_keyboard = kbdmap[_code * 4 + (lshift_enable || rshift_enable)];
-    a0f0:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
-    a0f4:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
-    a0fb:	0f b7 05 20 0c 01 00 	movzwl 0x10c20,%eax
-    a102:	66 85 c0             	test   %ax,%ax
-    a105:	75 0c                	jne    a113 <handle_ASCII_code_keyboard+0x9c>
-    a107:	0f b7 05 22 0c 01 00 	movzwl 0x10c22,%eax
-    a10e:	66 85 c0             	test   %ax,%ax
-    a111:	74 07                	je     a11a <handle_ASCII_code_keyboard+0xa3>
-    a113:	b8 01 00 00 00       	mov    $0x1,%eax
-    a118:	eb 05                	jmp    a11f <handle_ASCII_code_keyboard+0xa8>
-    a11a:	b8 00 00 00 00       	mov    $0x0,%eax
-    a11f:	01 d0                	add    %edx,%eax
-    a121:	0f b6 80 e0 b4 00 00 	movzbl 0xb4e0(%eax),%eax
-    a128:	a2 20 08 01 00       	mov    %al,0x10820
-            return;
-    a12d:	eb 58                	jmp    a187 <handle_ASCII_code_keyboard+0x110>
-        }
-    } else {
-        _code -= 0x80;
-    a12f:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a133:	83 c0 80             	add    $0xffffff80,%eax
-    a136:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-        switch (_code) {
-    a13a:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
-    a13e:	83 f8 37             	cmp    $0x37,%eax
-    a141:	74 3a                	je     a17d <handle_ASCII_code_keyboard+0x106>
-    a143:	83 f8 37             	cmp    $0x37,%eax
-    a146:	7f 3f                	jg     a187 <handle_ASCII_code_keyboard+0x110>
-    a148:	83 f8 35             	cmp    $0x35,%eax
-    a14b:	74 1a                	je     a167 <handle_ASCII_code_keyboard+0xf0>
-    a14d:	83 f8 35             	cmp    $0x35,%eax
-    a150:	7f 35                	jg     a187 <handle_ASCII_code_keyboard+0x110>
-    a152:	83 f8 1c             	cmp    $0x1c,%eax
-    a155:	74 1b                	je     a172 <handle_ASCII_code_keyboard+0xfb>
-    a157:	83 f8 29             	cmp    $0x29,%eax
-    a15a:	75 2b                	jne    a187 <handle_ASCII_code_keyboard+0x110>
-        case 0x29: lshift_enable = 0; break;
-    a15c:	66 c7 05 20 0c 01 00 	movw   $0x0,0x10c20
-    a163:	00 00 
-    a165:	eb 20                	jmp    a187 <handle_ASCII_code_keyboard+0x110>
+    a0f1:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
+    a0f5:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
+    a0fc:	0f b6 05 20 0c 01 00 	movzbl 0x10c20,%eax
+    a103:	84 c0                	test   %al,%al
+    a105:	75 0b                	jne    a112 <handle_ASCII_code_keyboard+0x92>
+    a107:	0f b6 05 21 0c 01 00 	movzbl 0x10c21,%eax
+    a10e:	84 c0                	test   %al,%al
+    a110:	74 07                	je     a119 <handle_ASCII_code_keyboard+0x99>
+    a112:	b8 01 00 00 00       	mov    $0x1,%eax
+    a117:	eb 05                	jmp    a11e <handle_ASCII_code_keyboard+0x9e>
+    a119:	b8 00 00 00 00       	mov    $0x0,%eax
+    a11e:	01 d0                	add    %edx,%eax
+    a120:	0f b6 80 e0 b4 00 00 	movzbl 0xb4e0(%eax),%eax
+    a127:	a2 20 08 01 00       	mov    %al,0x10820
         case 0x35: rshift_enable = 0; break;
-    a167:	66 c7 05 22 0c 01 00 	movw   $0x0,0x10c22
-    a16e:	00 00 
-    a170:	eb 15                	jmp    a187 <handle_ASCII_code_keyboard+0x110>
         case 0x1C: ctrl_enable = 0; break;
-    a172:	66 c7 05 24 0c 01 00 	movw   $0x0,0x10c24
-    a179:	00 00 
-    a17b:	eb 0a                	jmp    a187 <handle_ASCII_code_keyboard+0x110>
         case 0x37: alt_enable = 0; break;
-    a17d:	66 c7 05 26 0c 01 00 	movw   $0x0,0x10c26
-    a184:	00 00 
-    a186:	90                   	nop
         }
     }
 }
-    a187:	c9                   	leave  
-    a188:	c3                   	ret    
+    a12c:	eb 57                	jmp    a185 <handle_ASCII_code_keyboard+0x105>
+        _code -= 0x80;
+    a12e:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a132:	83 c0 80             	add    $0xffffff80,%eax
+    a135:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+        keyboard_ctrl.ascii_code_keyboard = '\0'; //Free it when release the key
+    a139:	c6 05 20 08 01 00 00 	movb   $0x0,0x10820
+        switch (_code) {
+    a140:	0f bf 45 fe          	movswl -0x2(%ebp),%eax
+    a144:	83 f8 37             	cmp    $0x37,%eax
+    a147:	74 34                	je     a17d <handle_ASCII_code_keyboard+0xfd>
+    a149:	83 f8 37             	cmp    $0x37,%eax
+    a14c:	7f 37                	jg     a185 <handle_ASCII_code_keyboard+0x105>
+    a14e:	83 f8 35             	cmp    $0x35,%eax
+    a151:	74 18                	je     a16b <handle_ASCII_code_keyboard+0xeb>
+    a153:	83 f8 35             	cmp    $0x35,%eax
+    a156:	7f 2d                	jg     a185 <handle_ASCII_code_keyboard+0x105>
+    a158:	83 f8 1c             	cmp    $0x1c,%eax
+    a15b:	74 17                	je     a174 <handle_ASCII_code_keyboard+0xf4>
+    a15d:	83 f8 29             	cmp    $0x29,%eax
+    a160:	75 23                	jne    a185 <handle_ASCII_code_keyboard+0x105>
+        case 0x29: lshift_enable = 0; break;
+    a162:	c6 05 20 0c 01 00 00 	movb   $0x0,0x10c20
+    a169:	eb 1a                	jmp    a185 <handle_ASCII_code_keyboard+0x105>
+        case 0x35: rshift_enable = 0; break;
+    a16b:	c6 05 21 0c 01 00 00 	movb   $0x0,0x10c21
+    a172:	eb 11                	jmp    a185 <handle_ASCII_code_keyboard+0x105>
+        case 0x1C: ctrl_enable = 0; break;
+    a174:	c6 05 23 0c 01 00 00 	movb   $0x0,0x10c23
+    a17b:	eb 08                	jmp    a185 <handle_ASCII_code_keyboard+0x105>
+        case 0x37: alt_enable = 0; break;
+    a17d:	c6 05 22 0c 01 00 00 	movb   $0x0,0x10c22
+    a184:	90                   	nop
+}
+    a185:	90                   	nop
+    a186:	c9                   	leave  
+    a187:	c3                   	ret    
 
-0000a189 <get_ASCII_code_keyboard>:
+0000a188 <get_ASCII_code_keyboard>:
 
 int8_t get_ASCII_code_keyboard()
 {
-    a189:	55                   	push   %ebp
-    a18a:	89 e5                	mov    %esp,%ebp
-    handle_ASCII_code_keyboard();
-    a18c:	e8 e6 fe ff ff       	call   a077 <handle_ASCII_code_keyboard>
-    return keyboard_ctrl.ascii_code_keyboard;
-    a191:	0f b6 05 20 08 01 00 	movzbl 0x10820,%eax
-    a198:	5d                   	pop    %ebp
-    a199:	c3                   	ret    
+    a188:	55                   	push   %ebp
+    a189:	89 e5                	mov    %esp,%ebp
 
-0000a19a <create_page_table>:
+    handle_ASCII_code_keyboard();
+    a18b:	e8 f0 fe ff ff       	call   a080 <handle_ASCII_code_keyboard>
+
+    return keyboard_ctrl.ascii_code_keyboard;
+    a190:	0f b6 05 20 08 01 00 	movzbl 0x10820,%eax
+    a197:	5d                   	pop    %ebp
+    a198:	c3                   	ret    
+
+0000a199 <create_page_table>:
 /*
  *   create page table , after that we can map linear address
  * page_table will be pinted by the pagedirectore[index]
  */
 void create_page_table(uint32_t* page_table, uint32_t index)
 {
-    a19a:	55                   	push   %ebp
-    a19b:	89 e5                	mov    %esp,%ebp
-    a19d:	83 ec 18             	sub    $0x18,%esp
+    a199:	55                   	push   %ebp
+    a19a:	89 e5                	mov    %esp,%ebp
+    a19c:	83 ec 18             	sub    $0x18,%esp
     uint32_t i;
 
     for (i = 0; i < PAGE_TABLE_OFFSET; i++)
-    a1a0:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-    a1a7:	eb 20                	jmp    a1c9 <create_page_table+0x2f>
+    a19f:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    a1a6:	eb 20                	jmp    a1c8 <create_page_table+0x2f>
         page_table[i] = (i << 12) | (PAGE_PRESENT(1) | PAGE_READ_WRITE |
-    a1a9:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a1ac:	c1 e0 0c             	shl    $0xc,%eax
-    a1af:	89 c2                	mov    %eax,%edx
-    a1b1:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a1b4:	8d 0c 85 00 00 00 00 	lea    0x0(,%eax,4),%ecx
-    a1bb:	8b 45 08             	mov    0x8(%ebp),%eax
-    a1be:	01 c8                	add    %ecx,%eax
-    a1c0:	83 ca 23             	or     $0x23,%edx
-    a1c3:	89 10                	mov    %edx,(%eax)
+    a1a8:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a1ab:	c1 e0 0c             	shl    $0xc,%eax
+    a1ae:	89 c2                	mov    %eax,%edx
+    a1b0:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a1b3:	8d 0c 85 00 00 00 00 	lea    0x0(,%eax,4),%ecx
+    a1ba:	8b 45 08             	mov    0x8(%ebp),%eax
+    a1bd:	01 c8                	add    %ecx,%eax
+    a1bf:	83 ca 23             	or     $0x23,%edx
+    a1c2:	89 10                	mov    %edx,(%eax)
     for (i = 0; i < PAGE_TABLE_OFFSET; i++)
-    a1c5:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
-    a1c9:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
-    a1d0:	76 d7                	jbe    a1a9 <create_page_table+0xf>
+    a1c4:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    a1c8:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
+    a1cf:	76 d7                	jbe    a1a8 <create_page_table+0xf>
                                      PAGE_ACCESSED(1) | PAGE_SUPERVISOR);
 
     page_directory[index] =
         ((uint32_t)page_table) |
-    a1d2:	8b 45 08             	mov    0x8(%ebp),%eax
-    a1d5:	83 c8 23             	or     $0x23,%eax
-    a1d8:	89 c2                	mov    %eax,%edx
+    a1d1:	8b 45 08             	mov    0x8(%ebp),%eax
+    a1d4:	83 c8 23             	or     $0x23,%eax
+    a1d7:	89 c2                	mov    %eax,%edx
     page_directory[index] =
-    a1da:	8b 45 0c             	mov    0xc(%ebp),%eax
-    a1dd:	89 14 85 00 10 01 00 	mov    %edx,0x11000(,%eax,4)
+    a1d9:	8b 45 0c             	mov    0xc(%ebp),%eax
+    a1dc:	89 14 85 00 10 01 00 	mov    %edx,0x11000(,%eax,4)
         (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR);
 
     _FlushPagingCache_();
-    a1e4:	e8 57 11 00 00       	call   b340 <_FlushPagingCache_>
+    a1e3:	e8 68 11 00 00       	call   b350 <_FlushPagingCache_>
 }
-    a1e9:	90                   	nop
-    a1ea:	c9                   	leave  
-    a1eb:	c3                   	ret    
+    a1e8:	90                   	nop
+    a1e9:	c9                   	leave  
+    a1ea:	c3                   	ret    
 
-0000a1ec <init_paging>:
+0000a1eb <init_paging>:
 
 void init_paging()
 {
-    a1ec:	55                   	push   %ebp
-    a1ed:	89 e5                	mov    %esp,%ebp
-    a1ef:	83 ec 18             	sub    $0x18,%esp
+    a1eb:	55                   	push   %ebp
+    a1ec:	89 e5                	mov    %esp,%ebp
+    a1ee:	83 ec 18             	sub    $0x18,%esp
     uint16_t i = 0;
-    a1f2:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
+    a1f1:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
 
     for (i = 1; i < PAGE_DIRECTORY_OFFSET; i++)
-    a1f8:	66 c7 45 f6 01 00    	movw   $0x1,-0xa(%ebp)
-    a1fe:	eb 1a                	jmp    a21a <init_paging+0x2e>
+    a1f7:	66 c7 45 f6 01 00    	movw   $0x1,-0xa(%ebp)
+    a1fd:	eb 1a                	jmp    a219 <init_paging+0x2e>
         page_directory[i] =
-    a200:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a204:	c7 04 85 00 10 01 00 	movl   $0x2,0x11000(,%eax,4)
-    a20b:	02 00 00 00 
+    a1ff:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a203:	c7 04 85 00 10 01 00 	movl   $0x2,0x11000(,%eax,4)
+    a20a:	02 00 00 00 
     for (i = 1; i < PAGE_DIRECTORY_OFFSET; i++)
-    a20f:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a213:	83 c0 01             	add    $0x1,%eax
-    a216:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-    a21a:	66 81 7d f6 ff 03    	cmpw   $0x3ff,-0xa(%ebp)
-    a220:	76 de                	jbe    a200 <init_paging+0x14>
+    a20e:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a212:	83 c0 01             	add    $0x1,%eax
+    a215:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+    a219:	66 81 7d f6 ff 03    	cmpw   $0x3ff,-0xa(%ebp)
+    a21f:	76 de                	jbe    a1ff <init_paging+0x14>
             (PAGE_PRESENT(0) | PAGE_READ_WRITE | PAGE_ACCESSED(0) | PAGE_SUPERVISOR);
 
     for (i = 0; i < PAGE_TABLE_OFFSET; i++)
-    a222:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
-    a228:	eb 22                	jmp    a24c <init_paging+0x60>
+    a221:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
+    a227:	eb 22                	jmp    a24b <init_paging+0x60>
         first_page_table[i] = (i << 12) | (PAGE_PRESENT(1) | PAGE_READ_WRITE |
-    a22a:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a22e:	c1 e0 0c             	shl    $0xc,%eax
-    a231:	83 c8 23             	or     $0x23,%eax
-    a234:	89 c2                	mov    %eax,%edx
-    a236:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a23a:	89 14 85 00 c0 00 00 	mov    %edx,0xc000(,%eax,4)
+    a229:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a22d:	c1 e0 0c             	shl    $0xc,%eax
+    a230:	83 c8 23             	or     $0x23,%eax
+    a233:	89 c2                	mov    %eax,%edx
+    a235:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a239:	89 14 85 00 c0 00 00 	mov    %edx,0xc000(,%eax,4)
     for (i = 0; i < PAGE_TABLE_OFFSET; i++)
-    a241:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a245:	83 c0 01             	add    $0x1,%eax
-    a248:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-    a24c:	66 81 7d f6 ff 03    	cmpw   $0x3ff,-0xa(%ebp)
-    a252:	76 d6                	jbe    a22a <init_paging+0x3e>
+    a240:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a244:	83 c0 01             	add    $0x1,%eax
+    a247:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+    a24b:	66 81 7d f6 ff 03    	cmpw   $0x3ff,-0xa(%ebp)
+    a251:	76 d6                	jbe    a229 <init_paging+0x3e>
                                            PAGE_ACCESSED(1) | PAGE_SUPERVISOR);
 
     page_directory[0] =
         ((uint32_t)first_page_table) |
-    a254:	b8 00 c0 00 00       	mov    $0xc000,%eax
-    a259:	83 c8 23             	or     $0x23,%eax
+    a253:	b8 00 c0 00 00       	mov    $0xc000,%eax
+    a258:	83 c8 23             	or     $0x23,%eax
     page_directory[0] =
-    a25c:	a3 00 10 01 00       	mov    %eax,0x11000
+    a25b:	a3 00 10 01 00       	mov    %eax,0x11000
         (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR);
 
     _EnablingPaging_();
-    a261:	e8 e3 10 00 00       	call   b349 <_EnablingPaging_>
+    a260:	e8 f4 10 00 00       	call   b359 <_EnablingPaging_>
     // __RUN_TEST__(paging_test);
 }
-    a266:	90                   	nop
-    a267:	c9                   	leave  
-    a268:	c3                   	ret    
+    a265:	90                   	nop
+    a266:	c9                   	leave  
+    a267:	c3                   	ret    
 
-0000a269 <get_phyaddr>:
+0000a268 <get_phyaddr>:
 
 // Conf :Intel Manual page 2897
 physaddr_t get_phyaddr(virtaddr_t virtualaddr)
 {
-    a269:	55                   	push   %ebp
-    a26a:	89 e5                	mov    %esp,%ebp
-    a26c:	83 ec 10             	sub    $0x10,%esp
+    a268:	55                   	push   %ebp
+    a269:	89 e5                	mov    %esp,%ebp
+    a26b:	83 ec 10             	sub    $0x10,%esp
     uint32_t pdindex = (uint32_t)virtualaddr >> 22;
-    a26f:	8b 45 08             	mov    0x8(%ebp),%eax
-    a272:	c1 e8 16             	shr    $0x16,%eax
-    a275:	89 45 fc             	mov    %eax,-0x4(%ebp)
+    a26e:	8b 45 08             	mov    0x8(%ebp),%eax
+    a271:	c1 e8 16             	shr    $0x16,%eax
+    a274:	89 45 fc             	mov    %eax,-0x4(%ebp)
     uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
-    a278:	8b 45 08             	mov    0x8(%ebp),%eax
-    a27b:	c1 e8 0c             	shr    $0xc,%eax
-    a27e:	25 ff 03 00 00       	and    $0x3ff,%eax
-    a283:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    a277:	8b 45 08             	mov    0x8(%ebp),%eax
+    a27a:	c1 e8 0c             	shr    $0xc,%eax
+    a27d:	25 ff 03 00 00       	and    $0x3ff,%eax
+    a282:	89 45 f8             	mov    %eax,-0x8(%ebp)
     /*
       A 4-KByte naturally aligned page directory is located at the physical
        address specified in bits 31:12 of CR3
   */
 
     if ((page_directory[pdindex] & PAGE_VALID) == PAGE_VALID) {
-    a286:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    a289:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
-    a290:	83 e0 23             	and    $0x23,%eax
-    a293:	83 f8 23             	cmp    $0x23,%eax
-    a296:	75 56                	jne    a2ee <get_phyaddr+0x85>
+    a285:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    a288:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
+    a28f:	83 e0 23             	and    $0x23,%eax
+    a292:	83 f8 23             	cmp    $0x23,%eax
+    a295:	75 56                	jne    a2ed <get_phyaddr+0x85>
         uint32_t* pt = (uint32_t*)(page_directory[pdindex] & 0xFFFFF000);
-    a298:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    a29b:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
-    a2a2:	25 00 f0 ff ff       	and    $0xfffff000,%eax
-    a2a7:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    a297:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    a29a:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
+    a2a1:	25 00 f0 ff ff       	and    $0xfffff000,%eax
+    a2a6:	89 45 f4             	mov    %eax,-0xc(%ebp)
 
         if ((pt[ptindex] & PAGE_VALID) == PAGE_VALID)
-    a2aa:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    a2ad:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
-    a2b4:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a2b7:	01 d0                	add    %edx,%eax
-    a2b9:	8b 00                	mov    (%eax),%eax
-    a2bb:	83 e0 23             	and    $0x23,%eax
-    a2be:	83 f8 23             	cmp    $0x23,%eax
-    a2c1:	75 24                	jne    a2e7 <get_phyaddr+0x7e>
+    a2a9:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    a2ac:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
+    a2b3:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a2b6:	01 d0                	add    %edx,%eax
+    a2b8:	8b 00                	mov    (%eax),%eax
+    a2ba:	83 e0 23             	and    $0x23,%eax
+    a2bd:	83 f8 23             	cmp    $0x23,%eax
+    a2c0:	75 24                	jne    a2e6 <get_phyaddr+0x7e>
 
             return (physaddr_t)((pt[ptindex] & 0xFFFFF000) +
-    a2c3:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    a2c6:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
-    a2cd:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a2d0:	01 d0                	add    %edx,%eax
-    a2d2:	8b 00                	mov    (%eax),%eax
-    a2d4:	25 00 f0 ff ff       	and    $0xfffff000,%eax
-    a2d9:	89 c2                	mov    %eax,%edx
+    a2c2:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    a2c5:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
+    a2cc:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a2cf:	01 d0                	add    %edx,%eax
+    a2d1:	8b 00                	mov    (%eax),%eax
+    a2d3:	25 00 f0 ff ff       	and    $0xfffff000,%eax
+    a2d8:	89 c2                	mov    %eax,%edx
                                 (((uint32_t)virtualaddr) & 0xFFF));
-    a2db:	8b 45 08             	mov    0x8(%ebp),%eax
-    a2de:	25 ff 0f 00 00       	and    $0xfff,%eax
+    a2da:	8b 45 08             	mov    0x8(%ebp),%eax
+    a2dd:	25 ff 0f 00 00       	and    $0xfff,%eax
             return (physaddr_t)((pt[ptindex] & 0xFFFFF000) +
-    a2e3:	09 d0                	or     %edx,%eax
-    a2e5:	eb 0c                	jmp    a2f3 <get_phyaddr+0x8a>
+    a2e2:	09 d0                	or     %edx,%eax
+    a2e4:	eb 0c                	jmp    a2f2 <get_phyaddr+0x8a>
 
         else
             return NO_PHYSICAL_ADDRESS;
-    a2e7:	b8 70 f0 00 00       	mov    $0xf070,%eax
-    a2ec:	eb 05                	jmp    a2f3 <get_phyaddr+0x8a>
+    a2e6:	b8 70 f0 00 00       	mov    $0xf070,%eax
+    a2eb:	eb 05                	jmp    a2f2 <get_phyaddr+0x8a>
     }
     else
         return NO_PHYSICAL_ADDRESS;
-    a2ee:	b8 70 f0 00 00       	mov    $0xf070,%eax
+    a2ed:	b8 70 f0 00 00       	mov    $0xf070,%eax
 }
-    a2f3:	c9                   	leave  
-    a2f4:	c3                   	ret    
+    a2f2:	c9                   	leave  
+    a2f3:	c3                   	ret    
 
-0000a2f5 <map_linear_address>:
+0000a2f4 <map_linear_address>:
  *   We wll create one page directory to map that liear address
  * If the page directory doesn't exist , we will not mapp it just .So we should create one page table before and map it with create_page_table() function
  */
 
 void map_linear_address(virtaddr_t virtual_address)
 {
-    a2f5:	55                   	push   %ebp
-    a2f6:	89 e5                	mov    %esp,%ebp
-    a2f8:	83 ec 18             	sub    $0x18,%esp
+    a2f4:	55                   	push   %ebp
+    a2f5:	89 e5                	mov    %esp,%ebp
+    a2f7:	83 ec 18             	sub    $0x18,%esp
     uint32_t pdindex = (uint32_t)virtual_address >> 22;
-    a2fb:	8b 45 08             	mov    0x8(%ebp),%eax
-    a2fe:	c1 e8 16             	shr    $0x16,%eax
-    a301:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    a2fa:	8b 45 08             	mov    0x8(%ebp),%eax
+    a2fd:	c1 e8 16             	shr    $0x16,%eax
+    a300:	89 45 f4             	mov    %eax,-0xc(%ebp)
     uint32_t ptindex = (uint32_t)virtual_address >> 12 & 0x03FF;
-    a304:	8b 45 08             	mov    0x8(%ebp),%eax
-    a307:	c1 e8 0c             	shr    $0xc,%eax
-    a30a:	25 ff 03 00 00       	and    $0x3ff,%eax
-    a30f:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    a303:	8b 45 08             	mov    0x8(%ebp),%eax
+    a306:	c1 e8 0c             	shr    $0xc,%eax
+    a309:	25 ff 03 00 00       	and    $0x3ff,%eax
+    a30e:	89 45 f0             	mov    %eax,-0x10(%ebp)
 
     if ((page_directory[pdindex] & PAGE_VALID) == PAGE_VALID) {
-    a312:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a315:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
-    a31c:	83 e0 23             	and    $0x23,%eax
-    a31f:	83 f8 23             	cmp    $0x23,%eax
-    a322:	75 4e                	jne    a372 <map_linear_address+0x7d>
+    a311:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a314:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
+    a31b:	83 e0 23             	and    $0x23,%eax
+    a31e:	83 f8 23             	cmp    $0x23,%eax
+    a321:	75 4e                	jne    a371 <map_linear_address+0x7d>
         uint32_t* pt = (uint32_t*)(page_directory[pdindex] & 0xFFFFF000);
-    a324:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a327:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
-    a32e:	25 00 f0 ff ff       	and    $0xfffff000,%eax
-    a333:	89 45 ec             	mov    %eax,-0x14(%ebp)
+    a323:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a326:	8b 04 85 00 10 01 00 	mov    0x11000(,%eax,4),%eax
+    a32d:	25 00 f0 ff ff       	and    $0xfffff000,%eax
+    a332:	89 45 ec             	mov    %eax,-0x14(%ebp)
 
         if ((pt[ptindex] & PAGE_VALID) == PAGE_VALID)
-    a336:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    a339:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
-    a340:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    a343:	01 d0                	add    %edx,%eax
-    a345:	8b 00                	mov    (%eax),%eax
-    a347:	83 e0 23             	and    $0x23,%eax
-    a34a:	83 f8 23             	cmp    $0x23,%eax
-    a34d:	74 26                	je     a375 <map_linear_address+0x80>
+    a335:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    a338:	8d 14 85 00 00 00 00 	lea    0x0(,%eax,4),%edx
+    a33f:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    a342:	01 d0                	add    %edx,%eax
+    a344:	8b 00                	mov    (%eax),%eax
+    a346:	83 e0 23             	and    $0x23,%eax
+    a349:	83 f8 23             	cmp    $0x23,%eax
+    a34c:	74 26                	je     a374 <map_linear_address+0x80>
             return; // the linear address was already mapped
 
         else // we create the page table
             pt[ptindex] = (ptindex << 12) | (PAGE_PRESENT(1) | PAGE_READ_WRITE |
-    a34f:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    a352:	c1 e0 0c             	shl    $0xc,%eax
-    a355:	89 c2                	mov    %eax,%edx
-    a357:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    a35a:	8d 0c 85 00 00 00 00 	lea    0x0(,%eax,4),%ecx
-    a361:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    a364:	01 c8                	add    %ecx,%eax
-    a366:	83 ca 23             	or     $0x23,%edx
-    a369:	89 10                	mov    %edx,(%eax)
+    a34e:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    a351:	c1 e0 0c             	shl    $0xc,%eax
+    a354:	89 c2                	mov    %eax,%edx
+    a356:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    a359:	8d 0c 85 00 00 00 00 	lea    0x0(,%eax,4),%ecx
+    a360:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    a363:	01 c8                	add    %ecx,%eax
+    a365:	83 ca 23             	or     $0x23,%edx
+    a368:	89 10                	mov    %edx,(%eax)
     }
 
     else
         return; // Wa can't not create one page just for it
 
     _FlushPagingCache_();
-    a36b:	e8 d0 0f 00 00       	call   b340 <_FlushPagingCache_>
-    a370:	eb 04                	jmp    a376 <map_linear_address+0x81>
+    a36a:	e8 e1 0f 00 00       	call   b350 <_FlushPagingCache_>
+    a36f:	eb 04                	jmp    a375 <map_linear_address+0x81>
         return; // Wa can't not create one page just for it
-    a372:	90                   	nop
-    a373:	eb 01                	jmp    a376 <map_linear_address+0x81>
+    a371:	90                   	nop
+    a372:	eb 01                	jmp    a375 <map_linear_address+0x81>
             return; // the linear address was already mapped
-    a375:	90                   	nop
+    a374:	90                   	nop
 }
-    a376:	c9                   	leave  
-    a377:	c3                   	ret    
+    a375:	c9                   	leave  
+    a376:	c3                   	ret    
 
-0000a378 <Paging_fault>:
+0000a377 <Paging_fault>:
 
 void Paging_fault()
 {
-    a378:	55                   	push   %ebp
-    a379:	89 e5                	mov    %esp,%ebp
+    a377:	55                   	push   %ebp
+    a378:	89 e5                	mov    %esp,%ebp
 }
-    a37b:	90                   	nop
-    a37c:	5d                   	pop    %ebp
-    a37d:	c3                   	ret    
+    a37a:	90                   	nop
+    a37b:	5d                   	pop    %ebp
+    a37c:	c3                   	ret    
 
-0000a37e <PIC_sendEOI>:
+0000a37d <PIC_sendEOI>:
  *	Les EOI s'applique par le maitre sur les IRQ0-IRQ7
  *	Les EOI s'applique par le maitre sur les IRQ8-IRQ15
  */
 
 void PIC_sendEOI(uint8_t irq)
 {
-    a37e:	55                   	push   %ebp
-    a37f:	89 e5                	mov    %esp,%ebp
-    a381:	83 ec 04             	sub    $0x4,%esp
-    a384:	8b 45 08             	mov    0x8(%ebp),%eax
-    a387:	88 45 fc             	mov    %al,-0x4(%ebp)
+    a37d:	55                   	push   %ebp
+    a37e:	89 e5                	mov    %esp,%ebp
+    a380:	83 ec 04             	sub    $0x4,%esp
+    a383:	8b 45 08             	mov    0x8(%ebp),%eax
+    a386:	88 45 fc             	mov    %al,-0x4(%ebp)
     // IRQ for Slaves PIC
     if (irq >= 0x8)
-    a38a:	80 7d fc 07          	cmpb   $0x7,-0x4(%ebp)
-    a38e:	76 0b                	jbe    a39b <PIC_sendEOI+0x1d>
+    a389:	80 7d fc 07          	cmpb   $0x7,-0x4(%ebp)
+    a38d:	76 0b                	jbe    a39a <PIC_sendEOI+0x1d>
         outb(PIC2_COMMAND, PIC_EOI);
-    a390:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a395:	b8 20 00 00 00       	mov    $0x20,%eax
-    a39a:	ee                   	out    %al,(%dx)
+    a38f:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a394:	b8 20 00 00 00       	mov    $0x20,%eax
+    a399:	ee                   	out    %al,(%dx)
 
     // IRQ for Master PIC
     outb(PIC1_COMMAND, PIC_EOI);
-    a39b:	ba 20 00 00 00       	mov    $0x20,%edx
-    a3a0:	b8 20 00 00 00       	mov    $0x20,%eax
-    a3a5:	ee                   	out    %al,(%dx)
+    a39a:	ba 20 00 00 00       	mov    $0x20,%edx
+    a39f:	b8 20 00 00 00       	mov    $0x20,%eax
+    a3a4:	ee                   	out    %al,(%dx)
 }
-    a3a6:	90                   	nop
-    a3a7:	c9                   	leave  
-    a3a8:	c3                   	ret    
+    a3a5:	90                   	nop
+    a3a6:	c9                   	leave  
+    a3a7:	c3                   	ret    
 
-0000a3a9 <PIC_remap>:
+0000a3a8 <PIC_remap>:
 
 void PIC_remap(uint8_t offset1, uint8_t offset2)
 {
-    a3a9:	55                   	push   %ebp
-    a3aa:	89 e5                	mov    %esp,%ebp
-    a3ac:	83 ec 18             	sub    $0x18,%esp
-    a3af:	8b 55 08             	mov    0x8(%ebp),%edx
-    a3b2:	8b 45 0c             	mov    0xc(%ebp),%eax
-    a3b5:	88 55 ec             	mov    %dl,-0x14(%ebp)
-    a3b8:	88 45 e8             	mov    %al,-0x18(%ebp)
+    a3a8:	55                   	push   %ebp
+    a3a9:	89 e5                	mov    %esp,%ebp
+    a3ab:	83 ec 18             	sub    $0x18,%esp
+    a3ae:	8b 55 08             	mov    0x8(%ebp),%edx
+    a3b1:	8b 45 0c             	mov    0xc(%ebp),%eax
+    a3b4:	88 55 ec             	mov    %dl,-0x14(%ebp)
+    a3b7:	88 45 e8             	mov    %al,-0x18(%ebp)
        Word), qui permettent de paramétrer certaines opérations du contrôleur
        une fois que celui-ci a été réinitialisé.
         */
 
     /* Conservation des données dans les intérrupteurs */
     a1 = inb(PIC1_DATA);
-    a3bb:	b8 21 00 00 00       	mov    $0x21,%eax
-    a3c0:	89 c2                	mov    %eax,%edx
-    a3c2:	ec                   	in     (%dx),%al
-    a3c3:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-    a3c7:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a3cb:	88 45 fd             	mov    %al,-0x3(%ebp)
+    a3ba:	b8 21 00 00 00       	mov    $0x21,%eax
+    a3bf:	89 c2                	mov    %eax,%edx
+    a3c1:	ec                   	in     (%dx),%al
+    a3c2:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+    a3c6:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a3ca:	88 45 fd             	mov    %al,-0x3(%ebp)
     a2 = inb(PIC2_DATA);
-    a3ce:	b8 a1 00 00 00       	mov    $0xa1,%eax
-    a3d3:	89 c2                	mov    %eax,%edx
-    a3d5:	ec                   	in     (%dx),%al
-    a3d6:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-    a3da:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
-    a3de:	88 45 f9             	mov    %al,-0x7(%ebp)
+    a3cd:	b8 a1 00 00 00       	mov    $0xa1,%eax
+    a3d2:	89 c2                	mov    %eax,%edx
+    a3d4:	ec                   	in     (%dx),%al
+    a3d5:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
+    a3d9:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
+    a3dd:	88 45 f9             	mov    %al,-0x7(%ebp)
 
     /* Initialisation ICW1*/
     /* Initialisation obligatoire ------------------*/
     outb(PIC1_COMMAND, ICW1_ICW4 | ICW1_INIT); //
-    a3e1:	ba 20 00 00 00       	mov    $0x20,%edx
-    a3e6:	b8 11 00 00 00       	mov    $0x11,%eax
-    a3eb:	ee                   	out    %al,(%dx)
+    a3e0:	ba 20 00 00 00       	mov    $0x20,%edx
+    a3e5:	b8 11 00 00 00       	mov    $0x11,%eax
+    a3ea:	ee                   	out    %al,(%dx)
     io_wait;                                   //
-    a3ec:	eb 00                	jmp    a3ee <PIC_remap+0x45>
-    a3ee:	eb 00                	jmp    a3f0 <PIC_remap+0x47>
+    a3eb:	eb 00                	jmp    a3ed <PIC_remap+0x45>
+    a3ed:	eb 00                	jmp    a3ef <PIC_remap+0x47>
     outb(PIC2_COMMAND, ICW1_ICW4 | ICW1_INIT); //
-    a3f0:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a3f5:	b8 11 00 00 00       	mov    $0x11,%eax
-    a3fa:	ee                   	out    %al,(%dx)
+    a3ef:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a3f4:	b8 11 00 00 00       	mov    $0x11,%eax
+    a3f9:	ee                   	out    %al,(%dx)
     io_wait;                                   //
-    a3fb:	eb 00                	jmp    a3fd <PIC_remap+0x54>
-    a3fd:	eb 00                	jmp    a3ff <PIC_remap+0x56>
+    a3fa:	eb 00                	jmp    a3fc <PIC_remap+0x54>
+    a3fc:	eb 00                	jmp    a3fe <PIC_remap+0x56>
     /* Fin de l'initialisation -------------------*/
 
     /*Initialisation ICW2 ---------------------*/
     // ICW2 : Deplacement du vecteur du maitre
     outb(PIC1_DATA, offset1);
-    a3ff:	ba 21 00 00 00       	mov    $0x21,%edx
-    a404:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
-    a408:	ee                   	out    %al,(%dx)
+    a3fe:	ba 21 00 00 00       	mov    $0x21,%edx
+    a403:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
+    a407:	ee                   	out    %al,(%dx)
     io_wait;
-    a409:	eb 00                	jmp    a40b <PIC_remap+0x62>
-    a40b:	eb 00                	jmp    a40d <PIC_remap+0x64>
+    a408:	eb 00                	jmp    a40a <PIC_remap+0x62>
+    a40a:	eb 00                	jmp    a40c <PIC_remap+0x64>
     // ICW2 : deplacement du vecteur d'escalve
     outb(PIC2_DATA, offset2);
-    a40d:	ba a1 00 00 00       	mov    $0xa1,%edx
-    a412:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
-    a416:	ee                   	out    %al,(%dx)
+    a40c:	ba a1 00 00 00       	mov    $0xa1,%edx
+    a411:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
+    a415:	ee                   	out    %al,(%dx)
     io_wait;
-    a417:	eb 00                	jmp    a419 <PIC_remap+0x70>
-    a419:	eb 00                	jmp    a41b <PIC_remap+0x72>
+    a416:	eb 00                	jmp    a418 <PIC_remap+0x70>
+    a418:	eb 00                	jmp    a41a <PIC_remap+0x72>
     /* Fin Initialisation ICW2 ----------------*/
 
     /*Initialisation ICW3 ----------------------*/
     // ICW3 : Dire au PIC maitre qu'il y'a un PIC esclave à IRQ2
     outb(PIC1_DATA, 4);
-    a41b:	ba 21 00 00 00       	mov    $0x21,%edx
-    a420:	b8 04 00 00 00       	mov    $0x4,%eax
-    a425:	ee                   	out    %al,(%dx)
+    a41a:	ba 21 00 00 00       	mov    $0x21,%edx
+    a41f:	b8 04 00 00 00       	mov    $0x4,%eax
+    a424:	ee                   	out    %al,(%dx)
     io_wait;
-    a426:	eb 00                	jmp    a428 <PIC_remap+0x7f>
-    a428:	eb 00                	jmp    a42a <PIC_remap+0x81>
+    a425:	eb 00                	jmp    a427 <PIC_remap+0x7f>
+    a427:	eb 00                	jmp    a429 <PIC_remap+0x81>
     // ICW3 : Dire au PIC esclave qu'il a une configuration en cascade
     outb(PIC2_DATA, 2);
-    a42a:	ba a1 00 00 00       	mov    $0xa1,%edx
-    a42f:	b8 02 00 00 00       	mov    $0x2,%eax
-    a434:	ee                   	out    %al,(%dx)
+    a429:	ba a1 00 00 00       	mov    $0xa1,%edx
+    a42e:	b8 02 00 00 00       	mov    $0x2,%eax
+    a433:	ee                   	out    %al,(%dx)
     io_wait;
-    a435:	eb 00                	jmp    a437 <PIC_remap+0x8e>
-    a437:	eb 00                	jmp    a439 <PIC_remap+0x90>
+    a434:	eb 00                	jmp    a436 <PIC_remap+0x8e>
+    a436:	eb 00                	jmp    a438 <PIC_remap+0x90>
     /* Fin Initialisation ICW3 ----------------*/
 
     /*Initialisation ICW4 ----------------------*/
     outb(PIC1_DATA, ICW4_8086);
-    a439:	ba 21 00 00 00       	mov    $0x21,%edx
-    a43e:	b8 01 00 00 00       	mov    $0x1,%eax
-    a443:	ee                   	out    %al,(%dx)
+    a438:	ba 21 00 00 00       	mov    $0x21,%edx
+    a43d:	b8 01 00 00 00       	mov    $0x1,%eax
+    a442:	ee                   	out    %al,(%dx)
     io_wait;
-    a444:	eb 00                	jmp    a446 <PIC_remap+0x9d>
-    a446:	eb 00                	jmp    a448 <PIC_remap+0x9f>
+    a443:	eb 00                	jmp    a445 <PIC_remap+0x9d>
+    a445:	eb 00                	jmp    a447 <PIC_remap+0x9f>
 
     outb(PIC2_DATA, ICW4_8086);
-    a448:	ba a1 00 00 00       	mov    $0xa1,%edx
-    a44d:	b8 01 00 00 00       	mov    $0x1,%eax
-    a452:	ee                   	out    %al,(%dx)
+    a447:	ba a1 00 00 00       	mov    $0xa1,%edx
+    a44c:	b8 01 00 00 00       	mov    $0x1,%eax
+    a451:	ee                   	out    %al,(%dx)
     io_wait;
-    a453:	eb 00                	jmp    a455 <PIC_remap+0xac>
-    a455:	eb 00                	jmp    a457 <PIC_remap+0xae>
+    a452:	eb 00                	jmp    a454 <PIC_remap+0xac>
+    a454:	eb 00                	jmp    a456 <PIC_remap+0xae>
     /* Fin Initialisation ICW4 ----------------*/
 
     // Restoration
     outb(PIC1_DATA, a1);
-    a457:	ba 21 00 00 00       	mov    $0x21,%edx
-    a45c:	0f b6 45 fd          	movzbl -0x3(%ebp),%eax
-    a460:	ee                   	out    %al,(%dx)
+    a456:	ba 21 00 00 00       	mov    $0x21,%edx
+    a45b:	0f b6 45 fd          	movzbl -0x3(%ebp),%eax
+    a45f:	ee                   	out    %al,(%dx)
     outb(PIC2_DATA, a2);
-    a461:	ba a1 00 00 00       	mov    $0xa1,%edx
-    a466:	0f b6 45 f9          	movzbl -0x7(%ebp),%eax
-    a46a:	ee                   	out    %al,(%dx)
+    a460:	ba a1 00 00 00       	mov    $0xa1,%edx
+    a465:	0f b6 45 f9          	movzbl -0x7(%ebp),%eax
+    a469:	ee                   	out    %al,(%dx)
 }
-    a46b:	90                   	nop
-    a46c:	c9                   	leave  
-    a46d:	c3                   	ret    
+    a46a:	90                   	nop
+    a46b:	c9                   	leave  
+    a46c:	c3                   	ret    
 
-0000a46e <IRQ_set_mask>:
+0000a46d <IRQ_set_mask>:
 
 void IRQ_set_mask(uint8_t irqline)
 {
-    a46e:	55                   	push   %ebp
-    a46f:	89 e5                	mov    %esp,%ebp
-    a471:	53                   	push   %ebx
-    a472:	83 ec 14             	sub    $0x14,%esp
-    a475:	8b 45 08             	mov    0x8(%ebp),%eax
-    a478:	88 45 e8             	mov    %al,-0x18(%ebp)
+    a46d:	55                   	push   %ebp
+    a46e:	89 e5                	mov    %esp,%ebp
+    a470:	53                   	push   %ebx
+    a471:	83 ec 14             	sub    $0x14,%esp
+    a474:	8b 45 08             	mov    0x8(%ebp),%eax
+    a477:	88 45 e8             	mov    %al,-0x18(%ebp)
     uint16_t port;
     uint8_t value;
 
     if (irqline < 8)
-    a47b:	80 7d e8 07          	cmpb   $0x7,-0x18(%ebp)
-    a47f:	77 08                	ja     a489 <IRQ_set_mask+0x1b>
+    a47a:	80 7d e8 07          	cmpb   $0x7,-0x18(%ebp)
+    a47e:	77 08                	ja     a488 <IRQ_set_mask+0x1b>
         port = PIC1_DATA;
-    a481:	66 c7 45 fa 21 00    	movw   $0x21,-0x6(%ebp)
-    a487:	eb 0a                	jmp    a493 <IRQ_set_mask+0x25>
+    a480:	66 c7 45 fa 21 00    	movw   $0x21,-0x6(%ebp)
+    a486:	eb 0a                	jmp    a492 <IRQ_set_mask+0x25>
 
     else {
         port = PIC2_DATA;
-    a489:	66 c7 45 fa a1 00    	movw   $0xa1,-0x6(%ebp)
+    a488:	66 c7 45 fa a1 00    	movw   $0xa1,-0x6(%ebp)
         irqline -= 8;
-    a48f:	80 6d e8 08          	subb   $0x8,-0x18(%ebp)
+    a48e:	80 6d e8 08          	subb   $0x8,-0x18(%ebp)
     /*
      *	This register is a bitmap of the request
      *	lines going into the PIC. When a bit is set,
      *	the PIC ignores the request and continues normal operation.
      */
     value = inb(port) | (1 << irqline);
-    a493:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
-    a497:	89 c2                	mov    %eax,%edx
-    a499:	ec                   	in     (%dx),%al
-    a49a:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
-    a49e:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
-    a4a2:	89 c3                	mov    %eax,%ebx
-    a4a4:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
-    a4a8:	ba 01 00 00 00       	mov    $0x1,%edx
-    a4ad:	89 c1                	mov    %eax,%ecx
-    a4af:	d3 e2                	shl    %cl,%edx
-    a4b1:	89 d0                	mov    %edx,%eax
-    a4b3:	09 d8                	or     %ebx,%eax
-    a4b5:	88 45 f7             	mov    %al,-0x9(%ebp)
+    a492:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
+    a496:	89 c2                	mov    %eax,%edx
+    a498:	ec                   	in     (%dx),%al
+    a499:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
+    a49d:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
+    a4a1:	89 c3                	mov    %eax,%ebx
+    a4a3:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
+    a4a7:	ba 01 00 00 00       	mov    $0x1,%edx
+    a4ac:	89 c1                	mov    %eax,%ecx
+    a4ae:	d3 e2                	shl    %cl,%edx
+    a4b0:	89 d0                	mov    %edx,%eax
+    a4b2:	09 d8                	or     %ebx,%eax
+    a4b4:	88 45 f7             	mov    %al,-0x9(%ebp)
 
     outb(port, value);
-    a4b8:	0f b7 55 fa          	movzwl -0x6(%ebp),%edx
-    a4bc:	0f b6 45 f7          	movzbl -0x9(%ebp),%eax
-    a4c0:	ee                   	out    %al,(%dx)
+    a4b7:	0f b7 55 fa          	movzwl -0x6(%ebp),%edx
+    a4bb:	0f b6 45 f7          	movzbl -0x9(%ebp),%eax
+    a4bf:	ee                   	out    %al,(%dx)
 }
-    a4c1:	90                   	nop
-    a4c2:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-    a4c5:	c9                   	leave  
-    a4c6:	c3                   	ret    
+    a4c0:	90                   	nop
+    a4c1:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+    a4c4:	c9                   	leave  
+    a4c5:	c3                   	ret    
 
-0000a4c7 <IRQ_clear_mask>:
+0000a4c6 <IRQ_clear_mask>:
 
 void IRQ_clear_mask(uint8_t irqline)
 {
-    a4c7:	55                   	push   %ebp
-    a4c8:	89 e5                	mov    %esp,%ebp
-    a4ca:	53                   	push   %ebx
-    a4cb:	83 ec 14             	sub    $0x14,%esp
-    a4ce:	8b 45 08             	mov    0x8(%ebp),%eax
-    a4d1:	88 45 e8             	mov    %al,-0x18(%ebp)
+    a4c6:	55                   	push   %ebp
+    a4c7:	89 e5                	mov    %esp,%ebp
+    a4c9:	53                   	push   %ebx
+    a4ca:	83 ec 14             	sub    $0x14,%esp
+    a4cd:	8b 45 08             	mov    0x8(%ebp),%eax
+    a4d0:	88 45 e8             	mov    %al,-0x18(%ebp)
     uint8_t value;
     uint32_t port;
 
     if (irqline < 8)
-    a4d4:	80 7d e8 07          	cmpb   $0x7,-0x18(%ebp)
-    a4d8:	77 09                	ja     a4e3 <IRQ_clear_mask+0x1c>
+    a4d3:	80 7d e8 07          	cmpb   $0x7,-0x18(%ebp)
+    a4d7:	77 09                	ja     a4e2 <IRQ_clear_mask+0x1c>
         port = PIC1_DATA;
-    a4da:	c7 45 f8 21 00 00 00 	movl   $0x21,-0x8(%ebp)
-    a4e1:	eb 0b                	jmp    a4ee <IRQ_clear_mask+0x27>
+    a4d9:	c7 45 f8 21 00 00 00 	movl   $0x21,-0x8(%ebp)
+    a4e0:	eb 0b                	jmp    a4ed <IRQ_clear_mask+0x27>
     else {
         port = PIC2_DATA;
-    a4e3:	c7 45 f8 a1 00 00 00 	movl   $0xa1,-0x8(%ebp)
+    a4e2:	c7 45 f8 a1 00 00 00 	movl   $0xa1,-0x8(%ebp)
         irqline -= 8;
-    a4ea:	80 6d e8 08          	subb   $0x8,-0x18(%ebp)
+    a4e9:	80 6d e8 08          	subb   $0x8,-0x18(%ebp)
     }
     value = inb(port) & (~(1 << irqline));
-    a4ee:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    a4f1:	89 c2                	mov    %eax,%edx
-    a4f3:	ec                   	in     (%dx),%al
-    a4f4:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-    a4f8:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a4fc:	89 c3                	mov    %eax,%ebx
-    a4fe:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
-    a502:	ba 01 00 00 00       	mov    $0x1,%edx
-    a507:	89 c1                	mov    %eax,%ecx
-    a509:	d3 e2                	shl    %cl,%edx
-    a50b:	89 d0                	mov    %edx,%eax
-    a50d:	f7 d0                	not    %eax
-    a50f:	21 d8                	and    %ebx,%eax
-    a511:	88 45 f5             	mov    %al,-0xb(%ebp)
+    a4ed:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    a4f0:	89 c2                	mov    %eax,%edx
+    a4f2:	ec                   	in     (%dx),%al
+    a4f3:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+    a4f7:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a4fb:	89 c3                	mov    %eax,%ebx
+    a4fd:	0f b6 45 e8          	movzbl -0x18(%ebp),%eax
+    a501:	ba 01 00 00 00       	mov    $0x1,%edx
+    a506:	89 c1                	mov    %eax,%ecx
+    a508:	d3 e2                	shl    %cl,%edx
+    a50a:	89 d0                	mov    %edx,%eax
+    a50c:	f7 d0                	not    %eax
+    a50e:	21 d8                	and    %ebx,%eax
+    a510:	88 45 f5             	mov    %al,-0xb(%ebp)
 
     outb(port, value);
-    a514:	8b 55 f8             	mov    -0x8(%ebp),%edx
-    a517:	0f b6 45 f5          	movzbl -0xb(%ebp),%eax
-    a51b:	ee                   	out    %al,(%dx)
+    a513:	8b 55 f8             	mov    -0x8(%ebp),%edx
+    a516:	0f b6 45 f5          	movzbl -0xb(%ebp),%eax
+    a51a:	ee                   	out    %al,(%dx)
 }
-    a51c:	90                   	nop
-    a51d:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-    a520:	c9                   	leave  
-    a521:	c3                   	ret    
+    a51b:	90                   	nop
+    a51c:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+    a51f:	c9                   	leave  
+    a520:	c3                   	ret    
 
-0000a522 <__pic_get_irq_reg>:
+0000a521 <__pic_get_irq_reg>:
 
 static uint16_t  __pic_get_irq_reg(uint8_t ocw3)
 {
-    a522:	55                   	push   %ebp
-    a523:	89 e5                	mov    %esp,%ebp
-    a525:	83 ec 14             	sub    $0x14,%esp
-    a528:	8b 45 08             	mov    0x8(%ebp),%eax
-    a52b:	88 45 ec             	mov    %al,-0x14(%ebp)
+    a521:	55                   	push   %ebp
+    a522:	89 e5                	mov    %esp,%ebp
+    a524:	83 ec 14             	sub    $0x14,%esp
+    a527:	8b 45 08             	mov    0x8(%ebp),%eax
+    a52a:	88 45 ec             	mov    %al,-0x14(%ebp)
     /*
      * OCW3 to PIC CMD to get the register value . PIC2 is chained
      *	, and represent IRQ 8-15 .
      */
 
     outb(PIC1_COMMAND, ocw3);
-    a52e:	ba 20 00 00 00       	mov    $0x20,%edx
-    a533:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
-    a537:	ee                   	out    %al,(%dx)
+    a52d:	ba 20 00 00 00       	mov    $0x20,%edx
+    a532:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
+    a536:	ee                   	out    %al,(%dx)
     outb(PIC2_COMMAND, ocw3);
-    a538:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a53d:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
-    a541:	ee                   	out    %al,(%dx)
+    a537:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a53c:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
+    a540:	ee                   	out    %al,(%dx)
 
     return ((inb(PIC2_COMMAND) << 8) | inb(PIC1_COMMAND));
-    a542:	b8 a0 00 00 00       	mov    $0xa0,%eax
-    a547:	89 c2                	mov    %eax,%edx
-    a549:	ec                   	in     (%dx),%al
-    a54a:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-    a54e:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a552:	98                   	cwtl   
-    a553:	c1 e0 08             	shl    $0x8,%eax
-    a556:	89 c1                	mov    %eax,%ecx
-    a558:	b8 20 00 00 00       	mov    $0x20,%eax
-    a55d:	89 c2                	mov    %eax,%edx
-    a55f:	ec                   	in     (%dx),%al
-    a560:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
-    a564:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
-    a568:	09 c8                	or     %ecx,%eax
+    a541:	b8 a0 00 00 00       	mov    $0xa0,%eax
+    a546:	89 c2                	mov    %eax,%edx
+    a548:	ec                   	in     (%dx),%al
+    a549:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+    a54d:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a551:	98                   	cwtl   
+    a552:	c1 e0 08             	shl    $0x8,%eax
+    a555:	89 c1                	mov    %eax,%ecx
+    a557:	b8 20 00 00 00       	mov    $0x20,%eax
+    a55c:	89 c2                	mov    %eax,%edx
+    a55e:	ec                   	in     (%dx),%al
+    a55f:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
+    a563:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
+    a567:	09 c8                	or     %ecx,%eax
 }
-    a56a:	c9                   	leave  
-    a56b:	c3                   	ret    
+    a569:	c9                   	leave  
+    a56a:	c3                   	ret    
 
-0000a56c <pic_get_isr>:
+0000a56b <pic_get_isr>:
 /*
  * the PIC will send interrupts from the IRR to the CPU, at which point they are marked in the ISR.
  */
 
 uint16_t (pic_get_isr)()
 {
-    a56c:	55                   	push   %ebp
-    a56d:	89 e5                	mov    %esp,%ebp
+    a56b:	55                   	push   %ebp
+    a56c:	89 e5                	mov    %esp,%ebp
     return __pic_get_irq_reg(PIC_READ_ISR);
-    a56f:	6a 0b                	push   $0xb
-    a571:	e8 ac ff ff ff       	call   a522 <__pic_get_irq_reg>
-    a576:	83 c4 04             	add    $0x4,%esp
+    a56e:	6a 0b                	push   $0xb
+    a570:	e8 ac ff ff ff       	call   a521 <__pic_get_irq_reg>
+    a575:	83 c4 04             	add    $0x4,%esp
 }
-    a579:	c9                   	leave  
-    a57a:	c3                   	ret    
+    a578:	c9                   	leave  
+    a579:	c3                   	ret    
 
-0000a57b <__pic_get_irr>:
+0000a57a <__pic_get_irr>:
 
 uint16_t (__pic_get_irr)()
 {
-    a57b:	55                   	push   %ebp
-    a57c:	89 e5                	mov    %esp,%ebp
+    a57a:	55                   	push   %ebp
+    a57b:	89 e5                	mov    %esp,%ebp
     return __pic_get_irq_reg(PIC_READ_IRR);
-    a57e:	6a 0a                	push   $0xa
-    a580:	e8 9d ff ff ff       	call   a522 <__pic_get_irq_reg>
-    a585:	83 c4 04             	add    $0x4,%esp
+    a57d:	6a 0a                	push   $0xa
+    a57f:	e8 9d ff ff ff       	call   a521 <__pic_get_irq_reg>
+    a584:	83 c4 04             	add    $0x4,%esp
 }
-    a588:	c9                   	leave  
-    a589:	c3                   	ret    
+    a587:	c9                   	leave  
+    a588:	c3                   	ret    
 
-0000a58a <spurious_IRQ>:
+0000a589 <spurious_IRQ>:
 
 
 //If request getting in ISR is differnet to irq
 void spurious_IRQ(uint8_t irq)
 {
-    a58a:	55                   	push   %ebp
-    a58b:	89 e5                	mov    %esp,%ebp
-    a58d:	83 ec 14             	sub    $0x14,%esp
-    a590:	8b 45 08             	mov    0x8(%ebp),%eax
-    a593:	88 45 ec             	mov    %al,-0x14(%ebp)
+    a589:	55                   	push   %ebp
+    a58a:	89 e5                	mov    %esp,%ebp
+    a58c:	83 ec 14             	sub    $0x14,%esp
+    a58f:	8b 45 08             	mov    0x8(%ebp),%eax
+    a592:	88 45 ec             	mov    %al,-0x14(%ebp)
     uint16_t isr_request = pic_get_isr() ;
-    a596:	e8 d1 ff ff ff       	call   a56c <pic_get_isr>
-    a59b:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+    a595:	e8 d1 ff ff ff       	call   a56b <pic_get_isr>
+    a59a:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
 
     //send the EOI to the master PIC because the master PIC itself 
     //won't know that it was a spurious IRQ from the slave. 
 
     if (isr_request != irq) PIC_sendEOI((uint8_t)(isr_request%8)) ;
-    a59f:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
-    a5a3:	66 39 45 fe          	cmp    %ax,-0x2(%ebp)
-    a5a7:	74 13                	je     a5bc <spurious_IRQ+0x32>
-    a5a9:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a5ad:	0f b6 c0             	movzbl %al,%eax
-    a5b0:	83 e0 07             	and    $0x7,%eax
-    a5b3:	50                   	push   %eax
-    a5b4:	e8 c5 fd ff ff       	call   a37e <PIC_sendEOI>
-    a5b9:	83 c4 04             	add    $0x4,%esp
-    a5bc:	90                   	nop
-    a5bd:	c9                   	leave  
-    a5be:	c3                   	ret    
+    a59e:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
+    a5a2:	66 39 45 fe          	cmp    %ax,-0x2(%ebp)
+    a5a6:	74 13                	je     a5bb <spurious_IRQ+0x32>
+    a5a8:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a5ac:	0f b6 c0             	movzbl %al,%eax
+    a5af:	83 e0 07             	and    $0x7,%eax
+    a5b2:	50                   	push   %eax
+    a5b3:	e8 c5 fd ff ff       	call   a37d <PIC_sendEOI>
+    a5b8:	83 c4 04             	add    $0x4,%esp
+    a5bb:	90                   	nop
+    a5bc:	c9                   	leave  
+    a5bd:	c3                   	ret    
 
-0000a5bf <conserv_status_byte>:
+0000a5be <conserv_status_byte>:
 uint32_t compteur   = 0;
 uint8_t  frequency  = 0;
 uint8_t  status_PIT = 0;
 
 void conserv_status_byte()
 {
-    a5bf:	55                   	push   %ebp
-    a5c0:	89 e5                	mov    %esp,%ebp
-    a5c2:	83 ec 10             	sub    $0x10,%esp
+    a5be:	55                   	push   %ebp
+    a5bf:	89 e5                	mov    %esp,%ebp
+    a5c1:	83 ec 10             	sub    $0x10,%esp
     set_pit_count(PIT_0, PIT_reload_value);
-    a5c5:	ba 43 00 00 00       	mov    $0x43,%edx
-    a5ca:	b8 40 00 00 00       	mov    $0x40,%eax
-    a5cf:	ee                   	out    %al,(%dx)
-    a5d0:	b8 40 00 00 00       	mov    $0x40,%eax
-    a5d5:	89 c2                	mov    %eax,%edx
-    a5d7:	ec                   	in     (%dx),%al
-    a5d8:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
-    a5dc:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
-    a5e0:	88 45 f6             	mov    %al,-0xa(%ebp)
-    a5e3:	b8 40 00 00 00       	mov    $0x40,%eax
-    a5e8:	89 c2                	mov    %eax,%edx
-    a5ea:	ec                   	in     (%dx),%al
-    a5eb:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
-    a5ef:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
-    a5f3:	88 45 f7             	mov    %al,-0x9(%ebp)
-    a5f6:	0f b6 45 f6          	movzbl -0xa(%ebp),%eax
-    a5fa:	66 98                	cbtw   
-    a5fc:	ba 40 00 00 00       	mov    $0x40,%edx
-    a601:	ee                   	out    %al,(%dx)
-    a602:	a1 74 32 02 00       	mov    0x23274,%eax
-    a607:	c1 f8 08             	sar    $0x8,%eax
-    a60a:	ba 40 00 00 00       	mov    $0x40,%edx
-    a60f:	ee                   	out    %al,(%dx)
+    a5c4:	ba 43 00 00 00       	mov    $0x43,%edx
+    a5c9:	b8 40 00 00 00       	mov    $0x40,%eax
+    a5ce:	ee                   	out    %al,(%dx)
+    a5cf:	b8 40 00 00 00       	mov    $0x40,%eax
+    a5d4:	89 c2                	mov    %eax,%edx
+    a5d6:	ec                   	in     (%dx),%al
+    a5d7:	66 89 45 fe          	mov    %ax,-0x2(%ebp)
+    a5db:	0f b7 45 fe          	movzwl -0x2(%ebp),%eax
+    a5df:	88 45 f6             	mov    %al,-0xa(%ebp)
+    a5e2:	b8 40 00 00 00       	mov    $0x40,%eax
+    a5e7:	89 c2                	mov    %eax,%edx
+    a5e9:	ec                   	in     (%dx),%al
+    a5ea:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
+    a5ee:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
+    a5f2:	88 45 f7             	mov    %al,-0x9(%ebp)
+    a5f5:	0f b6 45 f6          	movzbl -0xa(%ebp),%eax
+    a5f9:	66 98                	cbtw   
+    a5fb:	ba 40 00 00 00       	mov    $0x40,%edx
+    a600:	ee                   	out    %al,(%dx)
+    a601:	a1 74 32 02 00       	mov    0x23274,%eax
+    a606:	c1 f8 08             	sar    $0x8,%eax
+    a609:	ba 40 00 00 00       	mov    $0x40,%edx
+    a60e:	ee                   	out    %al,(%dx)
 
     pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
-    a610:	ba 43 00 00 00       	mov    $0x43,%edx
-    a615:	b8 40 00 00 00       	mov    $0x40,%eax
-    a61a:	ee                   	out    %al,(%dx)
-    a61b:	b8 40 00 00 00       	mov    $0x40,%eax
-    a620:	89 c2                	mov    %eax,%edx
-    a622:	ec                   	in     (%dx),%al
-    a623:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-    a627:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
-    a62b:	88 45 f4             	mov    %al,-0xc(%ebp)
-    a62e:	b8 40 00 00 00       	mov    $0x40,%eax
-    a633:	89 c2                	mov    %eax,%edx
-    a635:	ec                   	in     (%dx),%al
-    a636:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
-    a63a:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
-    a63e:	88 45 f5             	mov    %al,-0xb(%ebp)
-    a641:	0f b6 45 f4          	movzbl -0xc(%ebp),%eax
-    a645:	66 98                	cbtw   
-    a647:	ba 43 00 00 00       	mov    $0x43,%edx
-    a64c:	ee                   	out    %al,(%dx)
-    a64d:	ba 43 00 00 00       	mov    $0x43,%edx
-    a652:	b8 34 00 00 00       	mov    $0x34,%eax
-    a657:	ee                   	out    %al,(%dx)
+    a60f:	ba 43 00 00 00       	mov    $0x43,%edx
+    a614:	b8 40 00 00 00       	mov    $0x40,%eax
+    a619:	ee                   	out    %al,(%dx)
+    a61a:	b8 40 00 00 00       	mov    $0x40,%eax
+    a61f:	89 c2                	mov    %eax,%edx
+    a621:	ec                   	in     (%dx),%al
+    a622:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
+    a626:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
+    a62a:	88 45 f4             	mov    %al,-0xc(%ebp)
+    a62d:	b8 40 00 00 00       	mov    $0x40,%eax
+    a632:	89 c2                	mov    %eax,%edx
+    a634:	ec                   	in     (%dx),%al
+    a635:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
+    a639:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
+    a63d:	88 45 f5             	mov    %al,-0xb(%ebp)
+    a640:	0f b6 45 f4          	movzbl -0xc(%ebp),%eax
+    a644:	66 98                	cbtw   
+    a646:	ba 43 00 00 00       	mov    $0x43,%edx
+    a64b:	ee                   	out    %al,(%dx)
+    a64c:	ba 43 00 00 00       	mov    $0x43,%edx
+    a651:	b8 34 00 00 00       	mov    $0x34,%eax
+    a656:	ee                   	out    %al,(%dx)
 }
-    a658:	90                   	nop
-    a659:	c9                   	leave  
-    a65a:	c3                   	ret    
+    a657:	90                   	nop
+    a658:	c9                   	leave  
+    a659:	c3                   	ret    
 
-0000a65b <sheduler_cpu_timer>:
+0000a65a <sheduler_cpu_timer>:
 
 void sheduler_cpu_timer()
 {
-    a65b:	55                   	push   %ebp
-    a65c:	89 e5                	mov    %esp,%ebp
-    a65e:	83 ec 08             	sub    $0x8,%esp
+    a65a:	55                   	push   %ebp
+    a65b:	89 e5                	mov    %esp,%ebp
+    a65d:	83 ec 08             	sub    $0x8,%esp
     if (sheduler.init_timer == 1) {
-    a661:	0f b6 05 40 31 02 00 	movzbl 0x23140,%eax
-    a668:	3c 01                	cmp    $0x1,%al
-    a66a:	75 27                	jne    a693 <sheduler_cpu_timer+0x38>
+    a660:	0f b6 05 40 31 02 00 	movzbl 0x23140,%eax
+    a667:	3c 01                	cmp    $0x1,%al
+    a669:	75 27                	jne    a692 <sheduler_cpu_timer+0x38>
         if (sheduler.task_timer == 0) {
-    a66c:	a1 44 31 02 00       	mov    0x23144,%eax
-    a671:	85 c0                	test   %eax,%eax
-    a673:	75 11                	jne    a686 <sheduler_cpu_timer+0x2b>
+    a66b:	a1 44 31 02 00       	mov    0x23144,%eax
+    a670:	85 c0                	test   %eax,%eax
+    a672:	75 11                	jne    a685 <sheduler_cpu_timer+0x2b>
             sheduler.task_timer = DELAY_PER_TASK;
-    a675:	c7 05 44 31 02 00 2c 	movl   $0x12c,0x23144
-    a67c:	01 00 00 
+    a674:	c7 05 44 31 02 00 2c 	movl   $0x12c,0x23144
+    a67b:	01 00 00 
             __switch();
-    a67f:	e8 d8 0a 00 00       	call   b15c <__switch>
+    a67e:	e8 e1 0a 00 00       	call   b164 <__switch>
         } else
             sheduler.task_timer--;
     }
 }
-    a684:	eb 0d                	jmp    a693 <sheduler_cpu_timer+0x38>
+    a683:	eb 0d                	jmp    a692 <sheduler_cpu_timer+0x38>
             sheduler.task_timer--;
-    a686:	a1 44 31 02 00       	mov    0x23144,%eax
-    a68b:	83 e8 01             	sub    $0x1,%eax
-    a68e:	a3 44 31 02 00       	mov    %eax,0x23144
+    a685:	a1 44 31 02 00       	mov    0x23144,%eax
+    a68a:	83 e8 01             	sub    $0x1,%eax
+    a68d:	a3 44 31 02 00       	mov    %eax,0x23144
 }
-    a693:	90                   	nop
-    a694:	c9                   	leave  
-    a695:	c3                   	ret    
+    a692:	90                   	nop
+    a693:	c9                   	leave  
+    a694:	c3                   	ret    
 
-0000a696 <Init_PIT>:
+0000a695 <Init_PIT>:
 
 void Init_PIT(uint16_t frequence)
 {
-    a696:	55                   	push   %ebp
-    a697:	89 e5                	mov    %esp,%ebp
-    a699:	83 ec 28             	sub    $0x28,%esp
-    a69c:	8b 45 08             	mov    0x8(%ebp),%eax
-    a69f:	66 89 45 e4          	mov    %ax,-0x1c(%ebp)
+    a695:	55                   	push   %ebp
+    a696:	89 e5                	mov    %esp,%ebp
+    a698:	83 ec 28             	sub    $0x28,%esp
+    a69b:	8b 45 08             	mov    0x8(%ebp),%eax
+    a69e:	66 89 45 e4          	mov    %ax,-0x1c(%ebp)
        -send Mode or command register  to select which channel will be configured
 
        -send data to a good channel
 
        */
     frequency = frequence;
-    a6a3:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
-    a6a7:	a2 04 20 01 00       	mov    %al,0x12004
+    a6a2:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
+    a6a6:	a2 04 20 01 00       	mov    %al,0x12004
     calculate_frequency();
-    a6ac:	e8 fb 0c 00 00       	call   b3ac <calculate_frequency>
+    a6ab:	e8 0c 0d 00 00       	call   b3bc <calculate_frequency>
 
     pit_send_command(BCD_BINARY_MODE(0) | OPERATING_MODE(2) | ACCESS_MODE(3) | CHANNEL_0);
-    a6b1:	ba 43 00 00 00       	mov    $0x43,%edx
-    a6b6:	b8 40 00 00 00       	mov    $0x40,%eax
-    a6bb:	ee                   	out    %al,(%dx)
-    a6bc:	b8 40 00 00 00       	mov    $0x40,%eax
-    a6c1:	89 c2                	mov    %eax,%edx
-    a6c3:	ec                   	in     (%dx),%al
-    a6c4:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-    a6c8:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a6cc:	88 45 ee             	mov    %al,-0x12(%ebp)
-    a6cf:	b8 40 00 00 00       	mov    $0x40,%eax
-    a6d4:	89 c2                	mov    %eax,%edx
-    a6d6:	ec                   	in     (%dx),%al
-    a6d7:	66 89 45 f4          	mov    %ax,-0xc(%ebp)
-    a6db:	0f b7 45 f4          	movzwl -0xc(%ebp),%eax
-    a6df:	88 45 ef             	mov    %al,-0x11(%ebp)
-    a6e2:	0f b6 45 ee          	movzbl -0x12(%ebp),%eax
-    a6e6:	66 98                	cbtw   
-    a6e8:	ba 43 00 00 00       	mov    $0x43,%edx
-    a6ed:	ee                   	out    %al,(%dx)
-    a6ee:	ba 43 00 00 00       	mov    $0x43,%edx
-    a6f3:	b8 34 00 00 00       	mov    $0x34,%eax
-    a6f8:	ee                   	out    %al,(%dx)
+    a6b0:	ba 43 00 00 00       	mov    $0x43,%edx
+    a6b5:	b8 40 00 00 00       	mov    $0x40,%eax
+    a6ba:	ee                   	out    %al,(%dx)
+    a6bb:	b8 40 00 00 00       	mov    $0x40,%eax
+    a6c0:	89 c2                	mov    %eax,%edx
+    a6c2:	ec                   	in     (%dx),%al
+    a6c3:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+    a6c7:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a6cb:	88 45 ee             	mov    %al,-0x12(%ebp)
+    a6ce:	b8 40 00 00 00       	mov    $0x40,%eax
+    a6d3:	89 c2                	mov    %eax,%edx
+    a6d5:	ec                   	in     (%dx),%al
+    a6d6:	66 89 45 f4          	mov    %ax,-0xc(%ebp)
+    a6da:	0f b7 45 f4          	movzwl -0xc(%ebp),%eax
+    a6de:	88 45 ef             	mov    %al,-0x11(%ebp)
+    a6e1:	0f b6 45 ee          	movzbl -0x12(%ebp),%eax
+    a6e5:	66 98                	cbtw   
+    a6e7:	ba 43 00 00 00       	mov    $0x43,%edx
+    a6ec:	ee                   	out    %al,(%dx)
+    a6ed:	ba 43 00 00 00       	mov    $0x43,%edx
+    a6f2:	b8 34 00 00 00       	mov    $0x34,%eax
+    a6f7:	ee                   	out    %al,(%dx)
 
     set_pit_count(PIT_0, PIT_reload_value);
-    a6f9:	ba 43 00 00 00       	mov    $0x43,%edx
-    a6fe:	b8 40 00 00 00       	mov    $0x40,%eax
-    a703:	ee                   	out    %al,(%dx)
-    a704:	b8 40 00 00 00       	mov    $0x40,%eax
-    a709:	89 c2                	mov    %eax,%edx
-    a70b:	ec                   	in     (%dx),%al
-    a70c:	66 89 45 f2          	mov    %ax,-0xe(%ebp)
-    a710:	0f b7 45 f2          	movzwl -0xe(%ebp),%eax
-    a714:	88 45 ec             	mov    %al,-0x14(%ebp)
-    a717:	b8 40 00 00 00       	mov    $0x40,%eax
-    a71c:	89 c2                	mov    %eax,%edx
-    a71e:	ec                   	in     (%dx),%al
-    a71f:	66 89 45 f0          	mov    %ax,-0x10(%ebp)
-    a723:	0f b7 45 f0          	movzwl -0x10(%ebp),%eax
-    a727:	88 45 ed             	mov    %al,-0x13(%ebp)
-    a72a:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
-    a72e:	66 98                	cbtw   
-    a730:	ba 40 00 00 00       	mov    $0x40,%edx
-    a735:	ee                   	out    %al,(%dx)
-    a736:	a1 74 32 02 00       	mov    0x23274,%eax
-    a73b:	c1 f8 08             	sar    $0x8,%eax
-    a73e:	ba 40 00 00 00       	mov    $0x40,%edx
-    a743:	ee                   	out    %al,(%dx)
+    a6f8:	ba 43 00 00 00       	mov    $0x43,%edx
+    a6fd:	b8 40 00 00 00       	mov    $0x40,%eax
+    a702:	ee                   	out    %al,(%dx)
+    a703:	b8 40 00 00 00       	mov    $0x40,%eax
+    a708:	89 c2                	mov    %eax,%edx
+    a70a:	ec                   	in     (%dx),%al
+    a70b:	66 89 45 f2          	mov    %ax,-0xe(%ebp)
+    a70f:	0f b7 45 f2          	movzwl -0xe(%ebp),%eax
+    a713:	88 45 ec             	mov    %al,-0x14(%ebp)
+    a716:	b8 40 00 00 00       	mov    $0x40,%eax
+    a71b:	89 c2                	mov    %eax,%edx
+    a71d:	ec                   	in     (%dx),%al
+    a71e:	66 89 45 f0          	mov    %ax,-0x10(%ebp)
+    a722:	0f b7 45 f0          	movzwl -0x10(%ebp),%eax
+    a726:	88 45 ed             	mov    %al,-0x13(%ebp)
+    a729:	0f b6 45 ec          	movzbl -0x14(%ebp),%eax
+    a72d:	66 98                	cbtw   
+    a72f:	ba 40 00 00 00       	mov    $0x40,%edx
+    a734:	ee                   	out    %al,(%dx)
+    a735:	a1 74 32 02 00       	mov    0x23274,%eax
+    a73a:	c1 f8 08             	sar    $0x8,%eax
+    a73d:	ba 40 00 00 00       	mov    $0x40,%edx
+    a742:	ee                   	out    %al,(%dx)
 }
-    a744:	90                   	nop
-    a745:	c9                   	leave  
-    a746:	c3                   	ret    
+    a743:	90                   	nop
+    a744:	c9                   	leave  
+    a745:	c3                   	ret    
 
-0000a747 <read_back_channel>:
+0000a746 <read_back_channel>:
 
 // We should send command before read PIT channel
 
 int8_t read_back_channel(int8_t channel)
 {
-    a747:	55                   	push   %ebp
-    a748:	89 e5                	mov    %esp,%ebp
-    a74a:	83 ec 14             	sub    $0x14,%esp
-    a74d:	8b 45 08             	mov    0x8(%ebp),%eax
-    a750:	88 45 ec             	mov    %al,-0x14(%ebp)
+    a746:	55                   	push   %ebp
+    a747:	89 e5                	mov    %esp,%ebp
+    a749:	83 ec 14             	sub    $0x14,%esp
+    a74c:	8b 45 08             	mov    0x8(%ebp),%eax
+    a74f:	88 45 ec             	mov    %al,-0x14(%ebp)
     uint8_t command = 0x00;
-    a753:	c6 45 ff 00          	movb   $0x0,-0x1(%ebp)
+    a752:	c6 45 ff 00          	movb   $0x0,-0x1(%ebp)
 
     switch (channel) {
-    a757:	0f be 45 ec          	movsbl -0x14(%ebp),%eax
-    a75b:	83 f8 42             	cmp    $0x42,%eax
-    a75e:	74 1d                	je     a77d <read_back_channel+0x36>
-    a760:	83 f8 42             	cmp    $0x42,%eax
-    a763:	7f 1e                	jg     a783 <read_back_channel+0x3c>
-    a765:	83 f8 40             	cmp    $0x40,%eax
-    a768:	74 07                	je     a771 <read_back_channel+0x2a>
-    a76a:	83 f8 41             	cmp    $0x41,%eax
-    a76d:	74 08                	je     a777 <read_back_channel+0x30>
+    a756:	0f be 45 ec          	movsbl -0x14(%ebp),%eax
+    a75a:	83 f8 42             	cmp    $0x42,%eax
+    a75d:	74 1d                	je     a77c <read_back_channel+0x36>
+    a75f:	83 f8 42             	cmp    $0x42,%eax
+    a762:	7f 1e                	jg     a782 <read_back_channel+0x3c>
+    a764:	83 f8 40             	cmp    $0x40,%eax
+    a767:	74 07                	je     a770 <read_back_channel+0x2a>
+    a769:	83 f8 41             	cmp    $0x41,%eax
+    a76c:	74 08                	je     a776 <read_back_channel+0x30>
 
     case PIT_2:
         command |= READ_BACK_TIMER_2(1);
         break;
     default:
         break;
-    a76f:	eb 12                	jmp    a783 <read_back_channel+0x3c>
+    a76e:	eb 12                	jmp    a782 <read_back_channel+0x3c>
         command |= READ_BACK_TIMER_0(1);
-    a771:	80 4d ff 02          	orb    $0x2,-0x1(%ebp)
+    a770:	80 4d ff 02          	orb    $0x2,-0x1(%ebp)
         break;
-    a775:	eb 0d                	jmp    a784 <read_back_channel+0x3d>
+    a774:	eb 0d                	jmp    a783 <read_back_channel+0x3d>
         command |= READ_BACK_TIMER_1(1);
-    a777:	80 4d ff 04          	orb    $0x4,-0x1(%ebp)
+    a776:	80 4d ff 04          	orb    $0x4,-0x1(%ebp)
         break;
-    a77b:	eb 07                	jmp    a784 <read_back_channel+0x3d>
+    a77a:	eb 07                	jmp    a783 <read_back_channel+0x3d>
         command |= READ_BACK_TIMER_2(1);
-    a77d:	80 4d ff 08          	orb    $0x8,-0x1(%ebp)
+    a77c:	80 4d ff 08          	orb    $0x8,-0x1(%ebp)
         break;
-    a781:	eb 01                	jmp    a784 <read_back_channel+0x3d>
+    a780:	eb 01                	jmp    a783 <read_back_channel+0x3d>
         break;
-    a783:	90                   	nop
+    a782:	90                   	nop
     }
 
     command |= LATCH_STATUS_FLAG(0) | LATCH_COUNT_FLAG(0) | READ_BACK_COMMAND;
-    a784:	80 4d ff c0          	orb    $0xc0,-0x1(%ebp)
+    a783:	80 4d ff c0          	orb    $0xc0,-0x1(%ebp)
 
     pit_send_command((uint8_t)command);
-    a788:	ba 43 00 00 00       	mov    $0x43,%edx
-    a78d:	b8 40 00 00 00       	mov    $0x40,%eax
-    a792:	ee                   	out    %al,(%dx)
-    a793:	b8 40 00 00 00       	mov    $0x40,%eax
-    a798:	89 c2                	mov    %eax,%edx
-    a79a:	ec                   	in     (%dx),%al
-    a79b:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
-    a79f:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
-    a7a3:	88 45 f4             	mov    %al,-0xc(%ebp)
-    a7a6:	b8 40 00 00 00       	mov    $0x40,%eax
-    a7ab:	89 c2                	mov    %eax,%edx
-    a7ad:	ec                   	in     (%dx),%al
-    a7ae:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-    a7b2:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
-    a7b6:	88 45 f5             	mov    %al,-0xb(%ebp)
-    a7b9:	0f b6 45 f4          	movzbl -0xc(%ebp),%eax
-    a7bd:	66 98                	cbtw   
-    a7bf:	ba 43 00 00 00       	mov    $0x43,%edx
-    a7c4:	ee                   	out    %al,(%dx)
-    a7c5:	0f b6 45 ff          	movzbl -0x1(%ebp),%eax
-    a7c9:	c1 f8 08             	sar    $0x8,%eax
-    a7cc:	ba 43 00 00 00       	mov    $0x43,%edx
-    a7d1:	ee                   	out    %al,(%dx)
+    a787:	ba 43 00 00 00       	mov    $0x43,%edx
+    a78c:	b8 40 00 00 00       	mov    $0x40,%eax
+    a791:	ee                   	out    %al,(%dx)
+    a792:	b8 40 00 00 00       	mov    $0x40,%eax
+    a797:	89 c2                	mov    %eax,%edx
+    a799:	ec                   	in     (%dx),%al
+    a79a:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
+    a79e:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
+    a7a2:	88 45 f4             	mov    %al,-0xc(%ebp)
+    a7a5:	b8 40 00 00 00       	mov    $0x40,%eax
+    a7aa:	89 c2                	mov    %eax,%edx
+    a7ac:	ec                   	in     (%dx),%al
+    a7ad:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
+    a7b1:	0f b7 45 fa          	movzwl -0x6(%ebp),%eax
+    a7b5:	88 45 f5             	mov    %al,-0xb(%ebp)
+    a7b8:	0f b6 45 f4          	movzbl -0xc(%ebp),%eax
+    a7bc:	66 98                	cbtw   
+    a7be:	ba 43 00 00 00       	mov    $0x43,%edx
+    a7c3:	ee                   	out    %al,(%dx)
+    a7c4:	0f b6 45 ff          	movzbl -0x1(%ebp),%eax
+    a7c8:	c1 f8 08             	sar    $0x8,%eax
+    a7cb:	ba 43 00 00 00       	mov    $0x43,%edx
+    a7d0:	ee                   	out    %al,(%dx)
 
     return read_pit_count(PIT_0);
-    a7d2:	ba 43 00 00 00       	mov    $0x43,%edx
-    a7d7:	b8 40 00 00 00       	mov    $0x40,%eax
-    a7dc:	ee                   	out    %al,(%dx)
-    a7dd:	b8 40 00 00 00       	mov    $0x40,%eax
-    a7e2:	89 c2                	mov    %eax,%edx
-    a7e4:	ec                   	in     (%dx),%al
-    a7e5:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
-    a7e9:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
-    a7ed:	88 45 f2             	mov    %al,-0xe(%ebp)
-    a7f0:	b8 40 00 00 00       	mov    $0x40,%eax
-    a7f5:	89 c2                	mov    %eax,%edx
-    a7f7:	ec                   	in     (%dx),%al
-    a7f8:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-    a7fc:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
-    a800:	88 45 f3             	mov    %al,-0xd(%ebp)
-    a803:	0f b6 45 f2          	movzbl -0xe(%ebp),%eax
-    a807:	66 98                	cbtw   
-    a809:	c9                   	leave  
-    a80a:	c3                   	ret    
+    a7d1:	ba 43 00 00 00       	mov    $0x43,%edx
+    a7d6:	b8 40 00 00 00       	mov    $0x40,%eax
+    a7db:	ee                   	out    %al,(%dx)
+    a7dc:	b8 40 00 00 00       	mov    $0x40,%eax
+    a7e1:	89 c2                	mov    %eax,%edx
+    a7e3:	ec                   	in     (%dx),%al
+    a7e4:	66 89 45 f8          	mov    %ax,-0x8(%ebp)
+    a7e8:	0f b7 45 f8          	movzwl -0x8(%ebp),%eax
+    a7ec:	88 45 f2             	mov    %al,-0xe(%ebp)
+    a7ef:	b8 40 00 00 00       	mov    $0x40,%eax
+    a7f4:	89 c2                	mov    %eax,%edx
+    a7f6:	ec                   	in     (%dx),%al
+    a7f7:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+    a7fb:	0f b7 45 f6          	movzwl -0xa(%ebp),%eax
+    a7ff:	88 45 f3             	mov    %al,-0xd(%ebp)
+    a802:	0f b6 45 f2          	movzbl -0xe(%ebp),%eax
+    a806:	66 98                	cbtw   
+    a808:	c9                   	leave  
+    a809:	c3                   	ret    
 
-0000a80b <read_ebp>:
+0000a80a <read_ebp>:
         registers;                                                     \
     })
 
 static inline uint32_t
 read_ebp(void)
 {
-    a80b:	55                   	push   %ebp
-    a80c:	89 e5                	mov    %esp,%ebp
-    a80e:	83 ec 10             	sub    $0x10,%esp
+    a80a:	55                   	push   %ebp
+    a80b:	89 e5                	mov    %esp,%ebp
+    a80d:	83 ec 10             	sub    $0x10,%esp
     uint32_t ebp;
     asm volatile("movl %%ebp,%0"
-    a811:	89 e8                	mov    %ebp,%eax
-    a813:	89 45 fc             	mov    %eax,-0x4(%ebp)
+    a810:	89 e8                	mov    %ebp,%eax
+    a812:	89 45 fc             	mov    %eax,-0x4(%ebp)
                  : "=r"(ebp));
     return ebp;
-    a816:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    a815:	8b 45 fc             	mov    -0x4(%ebp),%eax
 }
-    a819:	c9                   	leave  
-    a81a:	c3                   	ret    
+    a818:	c9                   	leave  
+    a819:	c3                   	ret    
 
-0000a81b <backtrace>:
+0000a81a <backtrace>:
           { "help", "Display this list of commands", mon_help },
           { "backtrace", "Affiche le trace des piles", backtrace },
       };
 
 int backtrace(int argc, char** argv)
 {
-    a81b:	55                   	push   %ebp
-    a81c:	89 e5                	mov    %esp,%ebp
-    a81e:	83 ec 18             	sub    $0x18,%esp
+    a81a:	55                   	push   %ebp
+    a81b:	89 e5                	mov    %esp,%ebp
+    a81d:	83 ec 18             	sub    $0x18,%esp
     // Your code here.
     int ebp = read_ebp(), *eip = (int*)(ebp + 4), *ptr;
-    a821:	e8 e5 ff ff ff       	call   a80b <read_ebp>
-    a826:	89 45 f4             	mov    %eax,-0xc(%ebp)
-    a829:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a82c:	83 c0 04             	add    $0x4,%eax
-    a82f:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    a820:	e8 e5 ff ff ff       	call   a80a <read_ebp>
+    a825:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    a828:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a82b:	83 c0 04             	add    $0x4,%eax
+    a82e:	89 45 f0             	mov    %eax,-0x10(%ebp)
 
     while (ebp != 0) {
-    a832:	eb 30                	jmp    a864 <backtrace+0x49>
+    a831:	eb 30                	jmp    a863 <backtrace+0x49>
         kprintf("ebp %x eip %x\n", ebp, *eip);
-    a834:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    a837:	8b 00                	mov    (%eax),%eax
-    a839:	83 ec 04             	sub    $0x4,%esp
-    a83c:	50                   	push   %eax
-    a83d:	ff 75 f4             	pushl  -0xc(%ebp)
-    a840:	68 c3 f0 00 00       	push   $0xf0c3
-    a845:	e8 03 01 00 00       	call   a94d <kprintf>
-    a84a:	83 c4 10             	add    $0x10,%esp
+    a833:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    a836:	8b 00                	mov    (%eax),%eax
+    a838:	83 ec 04             	sub    $0x4,%esp
+    a83b:	50                   	push   %eax
+    a83c:	ff 75 f4             	pushl  -0xc(%ebp)
+    a83f:	68 c3 f0 00 00       	push   $0xf0c3
+    a844:	e8 0c 01 00 00       	call   a955 <kprintf>
+    a849:	83 c4 10             	add    $0x10,%esp
 
         ptr = (int*)(ebp);
-    a84d:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a850:	89 45 ec             	mov    %eax,-0x14(%ebp)
+    a84c:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a84f:	89 45 ec             	mov    %eax,-0x14(%ebp)
 
         ebp = (int)(*ptr);
-    a853:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    a856:	8b 00                	mov    (%eax),%eax
-    a858:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    a852:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    a855:	8b 00                	mov    (%eax),%eax
+    a857:	89 45 f4             	mov    %eax,-0xc(%ebp)
 
         eip = (int*)(ebp + 4);
-    a85b:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a85e:	83 c0 04             	add    $0x4,%eax
-    a861:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    a85a:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a85d:	83 c0 04             	add    $0x4,%eax
+    a860:	89 45 f0             	mov    %eax,-0x10(%ebp)
     while (ebp != 0) {
-    a864:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)
-    a868:	75 ca                	jne    a834 <backtrace+0x19>
+    a863:	83 7d f4 00          	cmpl   $0x0,-0xc(%ebp)
+    a867:	75 ca                	jne    a833 <backtrace+0x19>
     }
     return 0;
-    a86a:	b8 00 00 00 00       	mov    $0x0,%eax
+    a869:	b8 00 00 00 00       	mov    $0x0,%eax
 }
-    a86f:	c9                   	leave  
-    a870:	c3                   	ret    
+    a86e:	c9                   	leave  
+    a86f:	c3                   	ret    
 
-0000a871 <mon_help>:
+0000a870 <mon_help>:
 
 int mon_help(int argc, char** argv)
 {
-    a871:	55                   	push   %ebp
-    a872:	89 e5                	mov    %esp,%ebp
-    a874:	83 ec 18             	sub    $0x18,%esp
+    a870:	55                   	push   %ebp
+    a871:	89 e5                	mov    %esp,%ebp
+    a873:	83 ec 18             	sub    $0x18,%esp
     int i;
 
     for (i = 0; i < 2; i++)
-    a877:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-    a87e:	eb 3c                	jmp    a8bc <mon_help+0x4b>
+    a876:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    a87d:	eb 3c                	jmp    a8bb <mon_help+0x4b>
         kprintf("%s - %s\n", commands[i].name, commands[i].desc);
-    a880:	8b 55 f4             	mov    -0xc(%ebp),%edx
-    a883:	89 d0                	mov    %edx,%eax
-    a885:	01 c0                	add    %eax,%eax
-    a887:	01 d0                	add    %edx,%eax
-    a889:	c1 e0 02             	shl    $0x2,%eax
-    a88c:	05 68 b6 00 00       	add    $0xb668,%eax
-    a891:	8b 10                	mov    (%eax),%edx
-    a893:	8b 4d f4             	mov    -0xc(%ebp),%ecx
-    a896:	89 c8                	mov    %ecx,%eax
-    a898:	01 c0                	add    %eax,%eax
-    a89a:	01 c8                	add    %ecx,%eax
-    a89c:	c1 e0 02             	shl    $0x2,%eax
-    a89f:	05 64 b6 00 00       	add    $0xb664,%eax
-    a8a4:	8b 00                	mov    (%eax),%eax
-    a8a6:	83 ec 04             	sub    $0x4,%esp
-    a8a9:	52                   	push   %edx
-    a8aa:	50                   	push   %eax
-    a8ab:	68 d2 f0 00 00       	push   $0xf0d2
-    a8b0:	e8 98 00 00 00       	call   a94d <kprintf>
-    a8b5:	83 c4 10             	add    $0x10,%esp
+    a87f:	8b 55 f4             	mov    -0xc(%ebp),%edx
+    a882:	89 d0                	mov    %edx,%eax
+    a884:	01 c0                	add    %eax,%eax
+    a886:	01 d0                	add    %edx,%eax
+    a888:	c1 e0 02             	shl    $0x2,%eax
+    a88b:	05 68 b6 00 00       	add    $0xb668,%eax
+    a890:	8b 10                	mov    (%eax),%edx
+    a892:	8b 4d f4             	mov    -0xc(%ebp),%ecx
+    a895:	89 c8                	mov    %ecx,%eax
+    a897:	01 c0                	add    %eax,%eax
+    a899:	01 c8                	add    %ecx,%eax
+    a89b:	c1 e0 02             	shl    $0x2,%eax
+    a89e:	05 64 b6 00 00       	add    $0xb664,%eax
+    a8a3:	8b 00                	mov    (%eax),%eax
+    a8a5:	83 ec 04             	sub    $0x4,%esp
+    a8a8:	52                   	push   %edx
+    a8a9:	50                   	push   %eax
+    a8aa:	68 d2 f0 00 00       	push   $0xf0d2
+    a8af:	e8 a1 00 00 00       	call   a955 <kprintf>
+    a8b4:	83 c4 10             	add    $0x10,%esp
     for (i = 0; i < 2; i++)
-    a8b8:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
-    a8bc:	83 7d f4 01          	cmpl   $0x1,-0xc(%ebp)
-    a8c0:	7e be                	jle    a880 <mon_help+0xf>
+    a8b7:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    a8bb:	83 7d f4 01          	cmpl   $0x1,-0xc(%ebp)
+    a8bf:	7e be                	jle    a87f <mon_help+0xf>
     return 0;
-    a8c2:	b8 00 00 00 00       	mov    $0x0,%eax
+    a8c1:	b8 00 00 00 00       	mov    $0x0,%eax
 }
-    a8c7:	c9                   	leave  
-    a8c8:	c3                   	ret    
+    a8c6:	c9                   	leave  
+    a8c7:	c3                   	ret    
 
-0000a8c9 <monitor_service_keyboard>:
+0000a8c8 <monitor_service_keyboard>:
 
 #define KEYBOARD_CODE_MAX 0xff
 static int8_t keyboard_code_monitor[KEYBOARD_CODE_MAX], keyboard_num = 0;
 
 void monitor_service_keyboard()
 {
-    a8c9:	55                   	push   %ebp
-    a8ca:	89 e5                	mov    %esp,%ebp
-    a8cc:	83 ec 18             	sub    $0x18,%esp
-    int8_t code = get_ASCII_code_keyboard();
-    a8cf:	e8 b5 f8 ff ff       	call   a189 <get_ASCII_code_keyboard>
-    a8d4:	88 45 f3             	mov    %al,-0xd(%ebp)
-    if (code != '\n') {
-    a8d7:	80 7d f3 0a          	cmpb   $0xa,-0xd(%ebp)
-    a8db:	74 25                	je     a902 <monitor_service_keyboard+0x39>
-        keyboard_code_monitor[keyboard_num] = code;
-    a8dd:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
-    a8e4:	0f be c0             	movsbl %al,%eax
-    a8e7:	0f b6 55 f3          	movzbl -0xd(%ebp),%edx
-    a8eb:	88 90 20 20 01 00    	mov    %dl,0x12020(%eax)
-        keyboard_num++;
-    a8f1:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
-    a8f8:	83 c0 01             	add    $0x1,%eax
-    a8fb:	a2 1f 21 01 00       	mov    %al,0x1211f
-            keyboard_code_monitor[i] = 0;
+    a8c8:	55                   	push   %ebp
+    a8c9:	89 e5                	mov    %esp,%ebp
+    a8cb:	83 ec 18             	sub    $0x18,%esp
+    if (get_ASCII_code_keyboard() != '\0') {
+    a8ce:	e8 b5 f8 ff ff       	call   a188 <get_ASCII_code_keyboard>
+    a8d3:	84 c0                	test   %al,%al
+    a8d5:	74 7b                	je     a952 <monitor_service_keyboard+0x8a>
+        int8_t code = get_ASCII_code_keyboard();
+    a8d7:	e8 ac f8 ff ff       	call   a188 <get_ASCII_code_keyboard>
+    a8dc:	88 45 f3             	mov    %al,-0xd(%ebp)
+        if (code != '\n') {
+    a8df:	80 7d f3 0a          	cmpb   $0xa,-0xd(%ebp)
+    a8e3:	74 25                	je     a90a <monitor_service_keyboard+0x42>
+            keyboard_code_monitor[keyboard_num] = code;
+    a8e5:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
+    a8ec:	0f be c0             	movsbl %al,%eax
+    a8ef:	0f b6 55 f3          	movzbl -0xd(%ebp),%edx
+    a8f3:	88 90 20 20 01 00    	mov    %dl,0x12020(%eax)
+            keyboard_num++;
+    a8f9:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
+    a900:	83 c0 01             	add    $0x1,%eax
+    a903:	a2 1f 21 01 00       	mov    %al,0x1211f
+            }
+
+            keyboard_num = 0;
         }
-
-        keyboard_num = 0;
     }
-    a900:	eb 48                	jmp    a94a <monitor_service_keyboard+0x81>
-        for (i = 0; i < keyboard_num; i++) {
-    a902:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-    a909:	eb 29                	jmp    a934 <monitor_service_keyboard+0x6b>
-            putchar(keyboard_code_monitor[i]);
-    a90b:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a90e:	05 20 20 01 00       	add    $0x12020,%eax
-    a913:	0f b6 00             	movzbl (%eax),%eax
-    a916:	0f b6 c0             	movzbl %al,%eax
-    a919:	83 ec 0c             	sub    $0xc,%esp
-    a91c:	50                   	push   %eax
-    a91d:	e8 f7 e6 ff ff       	call   9019 <putchar>
-    a922:	83 c4 10             	add    $0x10,%esp
-            keyboard_code_monitor[i] = 0;
-    a925:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a928:	05 20 20 01 00       	add    $0x12020,%eax
-    a92d:	c6 00 00             	movb   $0x0,(%eax)
-        for (i = 0; i < keyboard_num; i++) {
-    a930:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
-    a934:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
-    a93b:	0f be c0             	movsbl %al,%eax
-    a93e:	39 45 f4             	cmp    %eax,-0xc(%ebp)
-    a941:	7c c8                	jl     a90b <monitor_service_keyboard+0x42>
-        keyboard_num = 0;
-    a943:	c6 05 1f 21 01 00 00 	movb   $0x0,0x1211f
-    a94a:	90                   	nop
-    a94b:	c9                   	leave  
-    a94c:	c3                   	ret    
+    a908:	eb 48                	jmp    a952 <monitor_service_keyboard+0x8a>
+            for (i = 0; i < keyboard_num; i++) {
+    a90a:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    a911:	eb 29                	jmp    a93c <monitor_service_keyboard+0x74>
+                putchar(keyboard_code_monitor[i]);
+    a913:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a916:	05 20 20 01 00       	add    $0x12020,%eax
+    a91b:	0f b6 00             	movzbl (%eax),%eax
+    a91e:	0f b6 c0             	movzbl %al,%eax
+    a921:	83 ec 0c             	sub    $0xc,%esp
+    a924:	50                   	push   %eax
+    a925:	e8 ef e6 ff ff       	call   9019 <putchar>
+    a92a:	83 c4 10             	add    $0x10,%esp
+                keyboard_code_monitor[i] = 0;
+    a92d:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a930:	05 20 20 01 00       	add    $0x12020,%eax
+    a935:	c6 00 00             	movb   $0x0,(%eax)
+            for (i = 0; i < keyboard_num; i++) {
+    a938:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    a93c:	0f b6 05 1f 21 01 00 	movzbl 0x1211f,%eax
+    a943:	0f be c0             	movsbl %al,%eax
+    a946:	39 45 f4             	cmp    %eax,-0xc(%ebp)
+    a949:	7c c8                	jl     a913 <monitor_service_keyboard+0x4b>
+            keyboard_num = 0;
+    a94b:	c6 05 1f 21 01 00 00 	movb   $0x0,0x1211f
+    a952:	90                   	nop
+    a953:	c9                   	leave  
+    a954:	c3                   	ret    
 
-0000a94d <kprintf>:
+0000a955 <kprintf>:
 #include <stdint.h>
 
 extern void printf(const char* fmt, va_list arg);
 
 void kprintf(const char* frmt, ...)
 {
-    a94d:	55                   	push   %ebp
-    a94e:	89 e5                	mov    %esp,%ebp
-    a950:	83 ec 18             	sub    $0x18,%esp
+    a955:	55                   	push   %ebp
+    a956:	89 e5                	mov    %esp,%ebp
+    a958:	83 ec 18             	sub    $0x18,%esp
     va_list arg;
     va_start(arg, frmt);
-    a953:	8d 45 0c             	lea    0xc(%ebp),%eax
-    a956:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    a95b:	8d 45 0c             	lea    0xc(%ebp),%eax
+    a95e:	89 45 f4             	mov    %eax,-0xc(%ebp)
     printf(frmt, arg);
-    a959:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    a95c:	83 ec 08             	sub    $0x8,%esp
-    a95f:	50                   	push   %eax
-    a960:	ff 75 08             	pushl  0x8(%ebp)
-    a963:	e8 36 e7 ff ff       	call   909e <printf>
-    a968:	83 c4 10             	add    $0x10,%esp
+    a961:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    a964:	83 ec 08             	sub    $0x8,%esp
+    a967:	50                   	push   %eax
+    a968:	ff 75 08             	pushl  0x8(%ebp)
+    a96b:	e8 2e e7 ff ff       	call   909e <printf>
+    a970:	83 c4 10             	add    $0x10,%esp
     va_end(arg);
 }
-    a96b:	90                   	nop
-    a96c:	c9                   	leave  
-    a96d:	c3                   	ret    
+    a973:	90                   	nop
+    a974:	c9                   	leave  
+    a975:	c3                   	ret    
 
-0000a96e <get_apic_base>:
+0000a976 <get_apic_base>:
 /*
     Get Physical address of the APIC registers page
 */
 
 static uintptr_t get_apic_base()
 {
-    a96e:	55                   	push   %ebp
-    a96f:	89 e5                	mov    %esp,%ebp
-    a971:	83 ec 10             	sub    $0x10,%esp
+    a976:	55                   	push   %ebp
+    a977:	89 e5                	mov    %esp,%ebp
+    a979:	83 ec 10             	sub    $0x10,%esp
     uint32_t msr_data[2];
 
     ReadMSR(IA32_APIC_BASE_MSR, msr_data);
-    a974:	b8 1b 00 00 00       	mov    $0x1b,%eax
-    a979:	89 c1                	mov    %eax,%ecx
-    a97b:	0f 32                	rdmsr  
-    a97d:	89 45 f8             	mov    %eax,-0x8(%ebp)
-    a980:	89 55 fc             	mov    %edx,-0x4(%ebp)
+    a97c:	b8 1b 00 00 00       	mov    $0x1b,%eax
+    a981:	89 c1                	mov    %eax,%ecx
+    a983:	0f 32                	rdmsr  
+    a985:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    a988:	89 55 fc             	mov    %edx,-0x4(%ebp)
 
     return (uintptr_t)(msr_data[1] * 32 + msr_data[0]);
-    a983:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    a986:	c1 e0 05             	shl    $0x5,%eax
-    a989:	89 c2                	mov    %eax,%edx
-    a98b:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    a98e:	01 d0                	add    %edx,%eax
+    a98b:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    a98e:	c1 e0 05             	shl    $0x5,%eax
+    a991:	89 c2                	mov    %eax,%edx
+    a993:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    a996:	01 d0                	add    %edx,%eax
 }
-    a990:	c9                   	leave  
-    a991:	c3                   	ret    
+    a998:	c9                   	leave  
+    a999:	c3                   	ret    
 
-0000a992 <set_apic_base>:
+0000a99a <set_apic_base>:
 
 static void set_apic_base(uintptr_t apic)
 {
-    a992:	55                   	push   %ebp
-    a993:	89 e5                	mov    %esp,%ebp
-    a995:	83 ec 10             	sub    $0x10,%esp
+    a99a:	55                   	push   %ebp
+    a99b:	89 e5                	mov    %esp,%ebp
+    a99d:	83 ec 10             	sub    $0x10,%esp
     uint32_t data[2];
 
     data[1] = 0;
-    a998:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
+    a9a0:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
     data[0] = (apic & 0xfffff000) | IA32_APIC_BASE_MSR_ENABLE;
-    a99f:	8b 45 08             	mov    0x8(%ebp),%eax
-    a9a2:	25 00 f0 ff ff       	and    $0xfffff000,%eax
-    a9a7:	80 cc 08             	or     $0x8,%ah
-    a9aa:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    a9a7:	8b 45 08             	mov    0x8(%ebp),%eax
+    a9aa:	25 00 f0 ff ff       	and    $0xfffff000,%eax
+    a9af:	80 cc 08             	or     $0x8,%ah
+    a9b2:	89 45 f8             	mov    %eax,-0x8(%ebp)
 
     SetMSR(IA32_APIC_BASE_MSR, data);
-    a9ad:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    a9b0:	8b 55 fc             	mov    -0x4(%ebp),%edx
-    a9b3:	b9 1b 00 00 00       	mov    $0x1b,%ecx
-    a9b8:	0f 30                	wrmsr  
+    a9b5:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    a9b8:	8b 55 fc             	mov    -0x4(%ebp),%edx
+    a9bb:	b9 1b 00 00 00       	mov    $0x1b,%ecx
+    a9c0:	0f 30                	wrmsr  
 }
-    a9ba:	90                   	nop
-    a9bb:	c9                   	leave  
-    a9bc:	c3                   	ret    
+    a9c2:	90                   	nop
+    a9c3:	c9                   	leave  
+    a9c4:	c3                   	ret    
 
-0000a9bd <cpu_ReadLocalAPICReg>:
+0000a9c5 <cpu_ReadLocalAPICReg>:
 
 static uint32_t cpu_ReadLocalAPICReg(uint32_t offset)
 {
-    a9bd:	55                   	push   %ebp
-    a9be:	89 e5                	mov    %esp,%ebp
+    a9c5:	55                   	push   %ebp
+    a9c6:	89 e5                	mov    %esp,%ebp
     return __ioapic_reg__[offset];
-    a9c0:	8b 15 20 21 01 00    	mov    0x12120,%edx
-    a9c6:	8b 45 08             	mov    0x8(%ebp),%eax
-    a9c9:	01 c0                	add    %eax,%eax
-    a9cb:	01 d0                	add    %edx,%eax
-    a9cd:	0f b7 00             	movzwl (%eax),%eax
-    a9d0:	0f b7 c0             	movzwl %ax,%eax
+    a9c8:	8b 15 20 21 01 00    	mov    0x12120,%edx
+    a9ce:	8b 45 08             	mov    0x8(%ebp),%eax
+    a9d1:	01 c0                	add    %eax,%eax
+    a9d3:	01 d0                	add    %edx,%eax
+    a9d5:	0f b7 00             	movzwl (%eax),%eax
+    a9d8:	0f b7 c0             	movzwl %ax,%eax
 }
-    a9d3:	5d                   	pop    %ebp
-    a9d4:	c3                   	ret    
+    a9db:	5d                   	pop    %ebp
+    a9dc:	c3                   	ret    
 
-0000a9d5 <cpu_SetLocalAPICReg>:
+0000a9dd <cpu_SetLocalAPICReg>:
 
 static void cpu_SetLocalAPICReg(uint32_t offset, uint16_t data)
 {
-    a9d5:	55                   	push   %ebp
-    a9d6:	89 e5                	mov    %esp,%ebp
-    a9d8:	83 ec 04             	sub    $0x4,%esp
-    a9db:	8b 45 0c             	mov    0xc(%ebp),%eax
-    a9de:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
+    a9dd:	55                   	push   %ebp
+    a9de:	89 e5                	mov    %esp,%ebp
+    a9e0:	83 ec 04             	sub    $0x4,%esp
+    a9e3:	8b 45 0c             	mov    0xc(%ebp),%eax
+    a9e6:	66 89 45 fc          	mov    %ax,-0x4(%ebp)
     __ioapic_reg__[offset] = data;
-    a9e2:	8b 15 20 21 01 00    	mov    0x12120,%edx
-    a9e8:	8b 45 08             	mov    0x8(%ebp),%eax
-    a9eb:	01 c0                	add    %eax,%eax
-    a9ed:	01 c2                	add    %eax,%edx
-    a9ef:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
-    a9f3:	66 89 02             	mov    %ax,(%edx)
+    a9ea:	8b 15 20 21 01 00    	mov    0x12120,%edx
+    a9f0:	8b 45 08             	mov    0x8(%ebp),%eax
+    a9f3:	01 c0                	add    %eax,%eax
+    a9f5:	01 c2                	add    %eax,%edx
+    a9f7:	0f b7 45 fc          	movzwl -0x4(%ebp),%eax
+    a9fb:	66 89 02             	mov    %ax,(%edx)
 }
-    a9f6:	90                   	nop
-    a9f7:	c9                   	leave  
-    a9f8:	c3                   	ret    
+    a9fe:	90                   	nop
+    a9ff:	c9                   	leave  
+    aa00:	c3                   	ret    
 
-0000a9f9 <enable_local_apic>:
+0000aa01 <enable_local_apic>:
 
 void enable_local_apic()
 {
-    a9f9:	55                   	push   %ebp
-    a9fa:	89 e5                	mov    %esp,%ebp
-    a9fc:	83 ec 08             	sub    $0x8,%esp
+    aa01:	55                   	push   %ebp
+    aa02:	89 e5                	mov    %esp,%ebp
+    aa04:	83 ec 08             	sub    $0x8,%esp
     // Acces to read the top of the memory
     create_page_table(__3fb_index_page_directory__, 0x3FB);
-    a9ff:	83 ec 08             	sub    $0x8,%esp
-    aa02:	68 fb 03 00 00       	push   $0x3fb
-    aa07:	68 00 d0 00 00       	push   $0xd000
-    aa0c:	e8 89 f7 ff ff       	call   a19a <create_page_table>
-    aa11:	83 c4 10             	add    $0x10,%esp
+    aa07:	83 ec 08             	sub    $0x8,%esp
+    aa0a:	68 fb 03 00 00       	push   $0x3fb
+    aa0f:	68 00 d0 00 00       	push   $0xd000
+    aa14:	e8 80 f7 ff ff       	call   a199 <create_page_table>
+    aa19:	83 c4 10             	add    $0x10,%esp
 
     __ioapic_reg__ = (uint16_t*)get_apic_base();
-    aa14:	e8 55 ff ff ff       	call   a96e <get_apic_base>
-    aa19:	a3 20 21 01 00       	mov    %eax,0x12120
+    aa1c:	e8 55 ff ff ff       	call   a976 <get_apic_base>
+    aa21:	a3 20 21 01 00       	mov    %eax,0x12120
 
     set_apic_base(get_apic_base());
-    aa1e:	e8 4b ff ff ff       	call   a96e <get_apic_base>
-    aa23:	83 ec 0c             	sub    $0xc,%esp
-    aa26:	50                   	push   %eax
-    aa27:	e8 66 ff ff ff       	call   a992 <set_apic_base>
-    aa2c:	83 c4 10             	add    $0x10,%esp
+    aa26:	e8 4b ff ff ff       	call   a976 <get_apic_base>
+    aa2b:	83 ec 0c             	sub    $0xc,%esp
+    aa2e:	50                   	push   %eax
+    aa2f:	e8 66 ff ff ff       	call   a99a <set_apic_base>
+    aa34:	83 c4 10             	add    $0x10,%esp
 
     cpu_SetLocalAPICReg(0xF0, cpu_ReadLocalAPICReg(0xF0) | 0x100);
-    aa2f:	83 ec 0c             	sub    $0xc,%esp
-    aa32:	68 f0 00 00 00       	push   $0xf0
-    aa37:	e8 81 ff ff ff       	call   a9bd <cpu_ReadLocalAPICReg>
-    aa3c:	83 c4 10             	add    $0x10,%esp
-    aa3f:	80 cc 01             	or     $0x1,%ah
-    aa42:	0f b7 c0             	movzwl %ax,%eax
-    aa45:	83 ec 08             	sub    $0x8,%esp
-    aa48:	50                   	push   %eax
-    aa49:	68 f0 00 00 00       	push   $0xf0
-    aa4e:	e8 82 ff ff ff       	call   a9d5 <cpu_SetLocalAPICReg>
-    aa53:	83 c4 10             	add    $0x10,%esp
+    aa37:	83 ec 0c             	sub    $0xc,%esp
+    aa3a:	68 f0 00 00 00       	push   $0xf0
+    aa3f:	e8 81 ff ff ff       	call   a9c5 <cpu_ReadLocalAPICReg>
+    aa44:	83 c4 10             	add    $0x10,%esp
+    aa47:	80 cc 01             	or     $0x1,%ah
+    aa4a:	0f b7 c0             	movzwl %ax,%eax
+    aa4d:	83 ec 08             	sub    $0x8,%esp
+    aa50:	50                   	push   %eax
+    aa51:	68 f0 00 00 00       	push   $0xf0
+    aa56:	e8 82 ff ff ff       	call   a9dd <cpu_SetLocalAPICReg>
+    aa5b:	83 c4 10             	add    $0x10,%esp
 
     cpu_SetLocalAPICReg(0x20, 2);
-    aa56:	83 ec 08             	sub    $0x8,%esp
-    aa59:	6a 02                	push   $0x2
-    aa5b:	6a 20                	push   $0x20
-    aa5d:	e8 73 ff ff ff       	call   a9d5 <cpu_SetLocalAPICReg>
-    aa62:	83 c4 10             	add    $0x10,%esp
+    aa5e:	83 ec 08             	sub    $0x8,%esp
+    aa61:	6a 02                	push   $0x2
+    aa63:	6a 20                	push   $0x20
+    aa65:	e8 73 ff ff ff       	call   a9dd <cpu_SetLocalAPICReg>
+    aa6a:	83 c4 10             	add    $0x10,%esp
 }
-    aa65:	90                   	nop
-    aa66:	c9                   	leave  
-    aa67:	c3                   	ret    
+    aa6d:	90                   	nop
+    aa6e:	c9                   	leave  
+    aa6f:	c3                   	ret    
 
-0000aa68 <init_vmm>:
+0000aa70 <init_vmm>:
 
 _virt_mm_ MM_BLOCK[0x1000], *_head_vmm_;
 extern test_case_result __vm_mm_manager__;
 
 void init_vmm()
 {
-    aa68:	55                   	push   %ebp
-    aa69:	89 e5                	mov    %esp,%ebp
-    aa6b:	83 ec 10             	sub    $0x10,%esp
+    aa70:	55                   	push   %ebp
+    aa71:	89 e5                	mov    %esp,%ebp
+    aa73:	83 ec 10             	sub    $0x10,%esp
     int i;
 
     for (i = 0; i < 0x1000; i++) {
-    aa6e:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
-    aa75:	eb 49                	jmp    aac0 <init_vmm+0x58>
+    aa76:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
+    aa7d:	eb 49                	jmp    aac8 <init_vmm+0x58>
         MM_BLOCK[i].address = VM__NO_VM_ADDRESS;
-    aa77:	8b 55 fc             	mov    -0x4(%ebp),%edx
-    aa7a:	89 d0                	mov    %edx,%eax
-    aa7c:	01 c0                	add    %eax,%eax
-    aa7e:	01 d0                	add    %edx,%eax
-    aa80:	c1 e0 02             	shl    $0x2,%eax
-    aa83:	05 40 21 01 00       	add    $0x12140,%eax
-    aa88:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    aa7f:	8b 55 fc             	mov    -0x4(%ebp),%edx
+    aa82:	89 d0                	mov    %edx,%eax
+    aa84:	01 c0                	add    %eax,%eax
+    aa86:	01 d0                	add    %edx,%eax
+    aa88:	c1 e0 02             	shl    $0x2,%eax
+    aa8b:	05 40 21 01 00       	add    $0x12140,%eax
+    aa90:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         MM_BLOCK[i].next = (_virt_mm_*)NULL;
-    aa8e:	8b 55 fc             	mov    -0x4(%ebp),%edx
-    aa91:	89 d0                	mov    %edx,%eax
-    aa93:	01 c0                	add    %eax,%eax
-    aa95:	01 d0                	add    %edx,%eax
-    aa97:	c1 e0 02             	shl    $0x2,%eax
-    aa9a:	05 48 21 01 00       	add    $0x12148,%eax
-    aa9f:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    aa96:	8b 55 fc             	mov    -0x4(%ebp),%edx
+    aa99:	89 d0                	mov    %edx,%eax
+    aa9b:	01 c0                	add    %eax,%eax
+    aa9d:	01 d0                	add    %edx,%eax
+    aa9f:	c1 e0 02             	shl    $0x2,%eax
+    aaa2:	05 48 21 01 00       	add    $0x12148,%eax
+    aaa7:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         MM_BLOCK[i].size = 0;
-    aaa5:	8b 55 fc             	mov    -0x4(%ebp),%edx
-    aaa8:	89 d0                	mov    %edx,%eax
-    aaaa:	01 c0                	add    %eax,%eax
-    aaac:	01 d0                	add    %edx,%eax
-    aaae:	c1 e0 02             	shl    $0x2,%eax
-    aab1:	05 44 21 01 00       	add    $0x12144,%eax
-    aab6:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    aaad:	8b 55 fc             	mov    -0x4(%ebp),%edx
+    aab0:	89 d0                	mov    %edx,%eax
+    aab2:	01 c0                	add    %eax,%eax
+    aab4:	01 d0                	add    %edx,%eax
+    aab6:	c1 e0 02             	shl    $0x2,%eax
+    aab9:	05 44 21 01 00       	add    $0x12144,%eax
+    aabe:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
     for (i = 0; i < 0x1000; i++) {
-    aabc:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)
-    aac0:	81 7d fc ff 0f 00 00 	cmpl   $0xfff,-0x4(%ebp)
-    aac7:	7e ae                	jle    aa77 <init_vmm+0xf>
+    aac4:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)
+    aac8:	81 7d fc ff 0f 00 00 	cmpl   $0xfff,-0x4(%ebp)
+    aacf:	7e ae                	jle    aa7f <init_vmm+0xf>
     }
     _head_vmm_ = MM_BLOCK;
-    aac9:	c7 05 40 e1 01 00 40 	movl   $0x12140,0x1e140
-    aad0:	21 01 00 
+    aad1:	c7 05 40 e1 01 00 40 	movl   $0x12140,0x1e140
+    aad8:	21 01 00 
 
     // __RUN_TEST__(__vm_mm_manager__);
 }
-    aad3:	90                   	nop
-    aad4:	c9                   	leave  
-    aad5:	c3                   	ret    
+    aadb:	90                   	nop
+    aadc:	c9                   	leave  
+    aadd:	c3                   	ret    
 
-0000aad6 <kmalloc>:
+0000aade <kmalloc>:
 
 void* kmalloc(uint32_t size)
 {
-    aad6:	55                   	push   %ebp
-    aad7:	89 e5                	mov    %esp,%ebp
-    aad9:	83 ec 18             	sub    $0x18,%esp
+    aade:	55                   	push   %ebp
+    aadf:	89 e5                	mov    %esp,%ebp
+    aae1:	83 ec 18             	sub    $0x18,%esp
     // Insert at the head
     if (_head_vmm_->address == VM__NO_VM_ADDRESS) {
-    aadc:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    aae1:	8b 00                	mov    (%eax),%eax
-    aae3:	85 c0                	test   %eax,%eax
-    aae5:	75 36                	jne    ab1d <kmalloc+0x47>
+    aae4:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    aae9:	8b 00                	mov    (%eax),%eax
+    aaeb:	85 c0                	test   %eax,%eax
+    aaed:	75 36                	jne    ab25 <kmalloc+0x47>
         _head_vmm_->address = KERNEL__VM_BASE;
-    aae7:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    aaec:	ba 60 e1 01 00       	mov    $0x1e160,%edx
-    aaf1:	89 10                	mov    %edx,(%eax)
+    aaef:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    aaf4:	ba 60 e1 01 00       	mov    $0x1e160,%edx
+    aaf9:	89 10                	mov    %edx,(%eax)
         _head_vmm_->size = size;
-    aaf3:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    aaf8:	8b 55 08             	mov    0x8(%ebp),%edx
-    aafb:	89 50 04             	mov    %edx,0x4(%eax)
+    aafb:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    ab00:	8b 55 08             	mov    0x8(%ebp),%edx
+    ab03:	89 50 04             	mov    %edx,0x4(%eax)
         memset((void*)KERNEL__VM_BASE, 0, size);
-    aafe:	83 ec 04             	sub    $0x4,%esp
-    ab01:	ff 75 08             	pushl  0x8(%ebp)
-    ab04:	6a 00                	push   $0x0
-    ab06:	68 60 e1 01 00       	push   $0x1e160
-    ab0b:	e8 5f e8 ff ff       	call   936f <memset>
-    ab10:	83 c4 10             	add    $0x10,%esp
+    ab06:	83 ec 04             	sub    $0x4,%esp
+    ab09:	ff 75 08             	pushl  0x8(%ebp)
+    ab0c:	6a 00                	push   $0x0
+    ab0e:	68 60 e1 01 00       	push   $0x1e160
+    ab13:	e8 57 e8 ff ff       	call   936f <memset>
+    ab18:	83 c4 10             	add    $0x10,%esp
 
         return (void*)KERNEL__VM_BASE;
-    ab13:	b8 60 e1 01 00       	mov    $0x1e160,%eax
-    ab18:	e9 7b 01 00 00       	jmp    ac98 <kmalloc+0x1c2>
+    ab1b:	b8 60 e1 01 00       	mov    $0x1e160,%eax
+    ab20:	e9 7b 01 00 00       	jmp    aca0 <kmalloc+0x1c2>
     }
 
     _virt_mm_ *tmp, *_new_item_;
     uint32_t i = 0;
-    ab1d:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
+    ab25:	c7 45 f0 00 00 00 00 	movl   $0x0,-0x10(%ebp)
 
     while (i < 0x1000 && MM_BLOCK[i].address != VM__NO_VM_ADDRESS)
-    ab24:	eb 04                	jmp    ab2a <kmalloc+0x54>
+    ab2c:	eb 04                	jmp    ab32 <kmalloc+0x54>
         i++;
-    ab26:	83 45 f0 01          	addl   $0x1,-0x10(%ebp)
+    ab2e:	83 45 f0 01          	addl   $0x1,-0x10(%ebp)
     while (i < 0x1000 && MM_BLOCK[i].address != VM__NO_VM_ADDRESS)
-    ab2a:	81 7d f0 ff 0f 00 00 	cmpl   $0xfff,-0x10(%ebp)
-    ab31:	77 17                	ja     ab4a <kmalloc+0x74>
-    ab33:	8b 55 f0             	mov    -0x10(%ebp),%edx
-    ab36:	89 d0                	mov    %edx,%eax
-    ab38:	01 c0                	add    %eax,%eax
-    ab3a:	01 d0                	add    %edx,%eax
-    ab3c:	c1 e0 02             	shl    $0x2,%eax
-    ab3f:	05 40 21 01 00       	add    $0x12140,%eax
-    ab44:	8b 00                	mov    (%eax),%eax
-    ab46:	85 c0                	test   %eax,%eax
-    ab48:	75 dc                	jne    ab26 <kmalloc+0x50>
+    ab32:	81 7d f0 ff 0f 00 00 	cmpl   $0xfff,-0x10(%ebp)
+    ab39:	77 17                	ja     ab52 <kmalloc+0x74>
+    ab3b:	8b 55 f0             	mov    -0x10(%ebp),%edx
+    ab3e:	89 d0                	mov    %edx,%eax
+    ab40:	01 c0                	add    %eax,%eax
+    ab42:	01 d0                	add    %edx,%eax
+    ab44:	c1 e0 02             	shl    $0x2,%eax
+    ab47:	05 40 21 01 00       	add    $0x12140,%eax
+    ab4c:	8b 00                	mov    (%eax),%eax
+    ab4e:	85 c0                	test   %eax,%eax
+    ab50:	75 dc                	jne    ab2e <kmalloc+0x50>
 
     _new_item_ = &MM_BLOCK[i];
-    ab4a:	8b 55 f0             	mov    -0x10(%ebp),%edx
-    ab4d:	89 d0                	mov    %edx,%eax
-    ab4f:	01 c0                	add    %eax,%eax
-    ab51:	01 d0                	add    %edx,%eax
-    ab53:	c1 e0 02             	shl    $0x2,%eax
-    ab56:	05 40 21 01 00       	add    $0x12140,%eax
-    ab5b:	89 45 ec             	mov    %eax,-0x14(%ebp)
+    ab52:	8b 55 f0             	mov    -0x10(%ebp),%edx
+    ab55:	89 d0                	mov    %edx,%eax
+    ab57:	01 c0                	add    %eax,%eax
+    ab59:	01 d0                	add    %edx,%eax
+    ab5b:	c1 e0 02             	shl    $0x2,%eax
+    ab5e:	05 40 21 01 00       	add    $0x12140,%eax
+    ab63:	89 45 ec             	mov    %eax,-0x14(%ebp)
 
     // If the base address is free
     if (_head_vmm_->address != KERNEL__VM_BASE + size) {
-    ab5e:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    ab63:	8b 00                	mov    (%eax),%eax
-    ab65:	b9 60 e1 01 00       	mov    $0x1e160,%ecx
-    ab6a:	8b 55 08             	mov    0x8(%ebp),%edx
-    ab6d:	01 ca                	add    %ecx,%edx
-    ab6f:	39 d0                	cmp    %edx,%eax
-    ab71:	74 47                	je     abba <kmalloc+0xe4>
+    ab66:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    ab6b:	8b 00                	mov    (%eax),%eax
+    ab6d:	b9 60 e1 01 00       	mov    $0x1e160,%ecx
+    ab72:	8b 55 08             	mov    0x8(%ebp),%edx
+    ab75:	01 ca                	add    %ecx,%edx
+    ab77:	39 d0                	cmp    %edx,%eax
+    ab79:	74 47                	je     abc2 <kmalloc+0xe4>
         _new_item_->address = KERNEL__VM_BASE;
-    ab73:	ba 60 e1 01 00       	mov    $0x1e160,%edx
-    ab78:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ab7b:	89 10                	mov    %edx,(%eax)
+    ab7b:	ba 60 e1 01 00       	mov    $0x1e160,%edx
+    ab80:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ab83:	89 10                	mov    %edx,(%eax)
         _new_item_->size = size;
-    ab7d:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ab80:	8b 55 08             	mov    0x8(%ebp),%edx
-    ab83:	89 50 04             	mov    %edx,0x4(%eax)
+    ab85:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ab88:	8b 55 08             	mov    0x8(%ebp),%edx
+    ab8b:	89 50 04             	mov    %edx,0x4(%eax)
         _new_item_->next = _head_vmm_;
-    ab86:	8b 15 40 e1 01 00    	mov    0x1e140,%edx
-    ab8c:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ab8f:	89 50 08             	mov    %edx,0x8(%eax)
+    ab8e:	8b 15 40 e1 01 00    	mov    0x1e140,%edx
+    ab94:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ab97:	89 50 08             	mov    %edx,0x8(%eax)
 
         _head_vmm_ = _new_item_;
-    ab92:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ab95:	a3 40 e1 01 00       	mov    %eax,0x1e140
+    ab9a:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ab9d:	a3 40 e1 01 00       	mov    %eax,0x1e140
 
         memset((void*)_new_item_->address, 0, size);
-    ab9a:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ab9d:	8b 00                	mov    (%eax),%eax
-    ab9f:	83 ec 04             	sub    $0x4,%esp
-    aba2:	ff 75 08             	pushl  0x8(%ebp)
-    aba5:	6a 00                	push   $0x0
-    aba7:	50                   	push   %eax
-    aba8:	e8 c2 e7 ff ff       	call   936f <memset>
-    abad:	83 c4 10             	add    $0x10,%esp
+    aba2:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aba5:	8b 00                	mov    (%eax),%eax
+    aba7:	83 ec 04             	sub    $0x4,%esp
+    abaa:	ff 75 08             	pushl  0x8(%ebp)
+    abad:	6a 00                	push   $0x0
+    abaf:	50                   	push   %eax
+    abb0:	e8 ba e7 ff ff       	call   936f <memset>
+    abb5:	83 c4 10             	add    $0x10,%esp
 
         return (void*)_new_item_->address;
-    abb0:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    abb3:	8b 00                	mov    (%eax),%eax
-    abb5:	e9 de 00 00 00       	jmp    ac98 <kmalloc+0x1c2>
+    abb8:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    abbb:	8b 00                	mov    (%eax),%eax
+    abbd:	e9 de 00 00 00       	jmp    aca0 <kmalloc+0x1c2>
     }
 
     tmp = _head_vmm_;
-    abba:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    abbf:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    abc2:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    abc7:	89 45 f4             	mov    %eax,-0xc(%ebp)
 
     while (tmp->next != (_virt_mm_*)NULL) {
-    abc2:	eb 27                	jmp    abeb <kmalloc+0x115>
+    abca:	eb 27                	jmp    abf3 <kmalloc+0x115>
         if (tmp->next->address >= tmp->address + tmp->size + size)
-    abc4:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abc7:	8b 40 08             	mov    0x8(%eax),%eax
-    abca:	8b 10                	mov    (%eax),%edx
     abcc:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abcf:	8b 08                	mov    (%eax),%ecx
-    abd1:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abd4:	8b 40 04             	mov    0x4(%eax),%eax
-    abd7:	01 c1                	add    %eax,%ecx
-    abd9:	8b 45 08             	mov    0x8(%ebp),%eax
-    abdc:	01 c8                	add    %ecx,%eax
-    abde:	39 c2                	cmp    %eax,%edx
-    abe0:	73 15                	jae    abf7 <kmalloc+0x121>
+    abcf:	8b 40 08             	mov    0x8(%eax),%eax
+    abd2:	8b 10                	mov    (%eax),%edx
+    abd4:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    abd7:	8b 08                	mov    (%eax),%ecx
+    abd9:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    abdc:	8b 40 04             	mov    0x4(%eax),%eax
+    abdf:	01 c1                	add    %eax,%ecx
+    abe1:	8b 45 08             	mov    0x8(%ebp),%eax
+    abe4:	01 c8                	add    %ecx,%eax
+    abe6:	39 c2                	cmp    %eax,%edx
+    abe8:	73 15                	jae    abff <kmalloc+0x121>
             break;
 
         tmp = tmp->next;
-    abe2:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abe5:	8b 40 08             	mov    0x8(%eax),%eax
-    abe8:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    abea:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    abed:	8b 40 08             	mov    0x8(%eax),%eax
+    abf0:	89 45 f4             	mov    %eax,-0xc(%ebp)
     while (tmp->next != (_virt_mm_*)NULL) {
-    abeb:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abee:	8b 40 08             	mov    0x8(%eax),%eax
-    abf1:	85 c0                	test   %eax,%eax
-    abf3:	75 cf                	jne    abc4 <kmalloc+0xee>
-    abf5:	eb 01                	jmp    abf8 <kmalloc+0x122>
+    abf3:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    abf6:	8b 40 08             	mov    0x8(%eax),%eax
+    abf9:	85 c0                	test   %eax,%eax
+    abfb:	75 cf                	jne    abcc <kmalloc+0xee>
+    abfd:	eb 01                	jmp    ac00 <kmalloc+0x122>
             break;
-    abf7:	90                   	nop
+    abff:	90                   	nop
     }
 
     // if we are at the end
     if (tmp->next == (_virt_mm_*)NULL) {
-    abf8:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    abfb:	8b 40 08             	mov    0x8(%eax),%eax
-    abfe:	85 c0                	test   %eax,%eax
-    ac00:	75 4b                	jne    ac4d <kmalloc+0x177>
+    ac00:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac03:	8b 40 08             	mov    0x8(%eax),%eax
+    ac06:	85 c0                	test   %eax,%eax
+    ac08:	75 4b                	jne    ac55 <kmalloc+0x177>
         _new_item_->size = size;
-    ac02:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac05:	8b 55 08             	mov    0x8(%ebp),%edx
-    ac08:	89 50 04             	mov    %edx,0x4(%eax)
+    ac0a:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac0d:	8b 55 08             	mov    0x8(%ebp),%edx
+    ac10:	89 50 04             	mov    %edx,0x4(%eax)
         _new_item_->address = tmp->address + tmp->size;
-    ac0b:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac0e:	8b 10                	mov    (%eax),%edx
-    ac10:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac13:	8b 40 04             	mov    0x4(%eax),%eax
-    ac16:	01 c2                	add    %eax,%edx
-    ac18:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac1b:	89 10                	mov    %edx,(%eax)
+    ac13:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac16:	8b 10                	mov    (%eax),%edx
+    ac18:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac1b:	8b 40 04             	mov    0x4(%eax),%eax
+    ac1e:	01 c2                	add    %eax,%edx
+    ac20:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac23:	89 10                	mov    %edx,(%eax)
         _new_item_->next = (_virt_mm_*)NULL;
-    ac1d:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac20:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
+    ac25:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac28:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
 
         tmp->next = _new_item_;
-    ac27:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac2a:	8b 55 ec             	mov    -0x14(%ebp),%edx
-    ac2d:	89 50 08             	mov    %edx,0x8(%eax)
+    ac2f:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac32:	8b 55 ec             	mov    -0x14(%ebp),%edx
+    ac35:	89 50 08             	mov    %edx,0x8(%eax)
 
         memset((void*)_new_item_->address, 0, size);
-    ac30:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac33:	8b 00                	mov    (%eax),%eax
-    ac35:	83 ec 04             	sub    $0x4,%esp
-    ac38:	ff 75 08             	pushl  0x8(%ebp)
-    ac3b:	6a 00                	push   $0x0
-    ac3d:	50                   	push   %eax
-    ac3e:	e8 2c e7 ff ff       	call   936f <memset>
-    ac43:	83 c4 10             	add    $0x10,%esp
+    ac38:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac3b:	8b 00                	mov    (%eax),%eax
+    ac3d:	83 ec 04             	sub    $0x4,%esp
+    ac40:	ff 75 08             	pushl  0x8(%ebp)
+    ac43:	6a 00                	push   $0x0
+    ac45:	50                   	push   %eax
+    ac46:	e8 24 e7 ff ff       	call   936f <memset>
+    ac4b:	83 c4 10             	add    $0x10,%esp
 
         return (void*)_new_item_->address;
-    ac46:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac49:	8b 00                	mov    (%eax),%eax
-    ac4b:	eb 4b                	jmp    ac98 <kmalloc+0x1c2>
+    ac4e:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac51:	8b 00                	mov    (%eax),%eax
+    ac53:	eb 4b                	jmp    aca0 <kmalloc+0x1c2>
     }
 
     else {
         _new_item_->size = size;
-    ac4d:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac50:	8b 55 08             	mov    0x8(%ebp),%edx
-    ac53:	89 50 04             	mov    %edx,0x4(%eax)
+    ac55:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac58:	8b 55 08             	mov    0x8(%ebp),%edx
+    ac5b:	89 50 04             	mov    %edx,0x4(%eax)
         _new_item_->address = tmp->address + tmp->size;
-    ac56:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac59:	8b 10                	mov    (%eax),%edx
-    ac5b:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac5e:	8b 40 04             	mov    0x4(%eax),%eax
-    ac61:	01 c2                	add    %eax,%edx
-    ac63:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac66:	89 10                	mov    %edx,(%eax)
+    ac5e:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac61:	8b 10                	mov    (%eax),%edx
+    ac63:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac66:	8b 40 04             	mov    0x4(%eax),%eax
+    ac69:	01 c2                	add    %eax,%edx
+    ac6b:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac6e:	89 10                	mov    %edx,(%eax)
 
         _new_item_->next = tmp->next;
-    ac68:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac6b:	8b 50 08             	mov    0x8(%eax),%edx
-    ac6e:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac71:	89 50 08             	mov    %edx,0x8(%eax)
+    ac70:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac73:	8b 50 08             	mov    0x8(%eax),%edx
+    ac76:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac79:	89 50 08             	mov    %edx,0x8(%eax)
         tmp->next = _new_item_;
-    ac74:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ac77:	8b 55 ec             	mov    -0x14(%ebp),%edx
-    ac7a:	89 50 08             	mov    %edx,0x8(%eax)
+    ac7c:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ac7f:	8b 55 ec             	mov    -0x14(%ebp),%edx
+    ac82:	89 50 08             	mov    %edx,0x8(%eax)
 
         memset((void*)_new_item_->address, 0, size);
-    ac7d:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac80:	8b 00                	mov    (%eax),%eax
-    ac82:	83 ec 04             	sub    $0x4,%esp
-    ac85:	ff 75 08             	pushl  0x8(%ebp)
-    ac88:	6a 00                	push   $0x0
-    ac8a:	50                   	push   %eax
-    ac8b:	e8 df e6 ff ff       	call   936f <memset>
-    ac90:	83 c4 10             	add    $0x10,%esp
+    ac85:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac88:	8b 00                	mov    (%eax),%eax
+    ac8a:	83 ec 04             	sub    $0x4,%esp
+    ac8d:	ff 75 08             	pushl  0x8(%ebp)
+    ac90:	6a 00                	push   $0x0
+    ac92:	50                   	push   %eax
+    ac93:	e8 d7 e6 ff ff       	call   936f <memset>
+    ac98:	83 c4 10             	add    $0x10,%esp
 
         return (void*)_new_item_->address;
-    ac93:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    ac96:	8b 00                	mov    (%eax),%eax
+    ac9b:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    ac9e:	8b 00                	mov    (%eax),%eax
     }
 }
-    ac98:	c9                   	leave  
-    ac99:	c3                   	ret    
+    aca0:	c9                   	leave  
+    aca1:	c3                   	ret    
 
-0000ac9a <free>:
+0000aca2 <free>:
 
 void free(virtaddr_t _addr__)
 {
-    ac9a:	55                   	push   %ebp
-    ac9b:	89 e5                	mov    %esp,%ebp
-    ac9d:	83 ec 10             	sub    $0x10,%esp
+    aca2:	55                   	push   %ebp
+    aca3:	89 e5                	mov    %esp,%ebp
+    aca5:	83 ec 10             	sub    $0x10,%esp
     _virt_mm_ *tmp, *tmp_prev;
     // Remove at the head
     if (_head_vmm_->address == _addr__) {
-    aca0:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    aca5:	8b 00                	mov    (%eax),%eax
-    aca7:	39 45 08             	cmp    %eax,0x8(%ebp)
-    acaa:	75 29                	jne    acd5 <free+0x3b>
+    aca8:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    acad:	8b 00                	mov    (%eax),%eax
+    acaf:	39 45 08             	cmp    %eax,0x8(%ebp)
+    acb2:	75 29                	jne    acdd <free+0x3b>
         // Mark free
         _head_vmm_->address = VM__NO_VM_ADDRESS;
-    acac:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    acb1:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    acb4:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    acb9:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         _head_vmm_->size = 0;
-    acb7:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    acbc:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
+    acbf:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    acc4:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
 
         _head_vmm_ = _head_vmm_->next;
-    acc3:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    acc8:	8b 40 08             	mov    0x8(%eax),%eax
-    accb:	a3 40 e1 01 00       	mov    %eax,0x1e140
+    accb:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    acd0:	8b 40 08             	mov    0x8(%eax),%eax
+    acd3:	a3 40 e1 01 00       	mov    %eax,0x1e140
         return;
-    acd0:	e9 ac 00 00 00       	jmp    ad81 <free+0xe7>
+    acd8:	e9 ac 00 00 00       	jmp    ad89 <free+0xe7>
     }
 
     // If it is the last item
     if (_head_vmm_->next == (_virt_mm_*)NULL && _head_vmm_->address == _addr__) {
-    acd5:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    acda:	8b 40 08             	mov    0x8(%eax),%eax
-    acdd:	85 c0                	test   %eax,%eax
-    acdf:	75 16                	jne    acf7 <free+0x5d>
-    ace1:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    ace6:	8b 00                	mov    (%eax),%eax
-    ace8:	39 45 08             	cmp    %eax,0x8(%ebp)
-    aceb:	75 0a                	jne    acf7 <free+0x5d>
+    acdd:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    ace2:	8b 40 08             	mov    0x8(%eax),%eax
+    ace5:	85 c0                	test   %eax,%eax
+    ace7:	75 16                	jne    acff <free+0x5d>
+    ace9:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    acee:	8b 00                	mov    (%eax),%eax
+    acf0:	39 45 08             	cmp    %eax,0x8(%ebp)
+    acf3:	75 0a                	jne    acff <free+0x5d>
         init_vmm();
-    aced:	e8 76 fd ff ff       	call   aa68 <init_vmm>
+    acf5:	e8 76 fd ff ff       	call   aa70 <init_vmm>
         return;
-    acf2:	e9 8a 00 00 00       	jmp    ad81 <free+0xe7>
+    acfa:	e9 8a 00 00 00       	jmp    ad89 <free+0xe7>
     }
 
     tmp = _head_vmm_;
-    acf7:	a1 40 e1 01 00       	mov    0x1e140,%eax
-    acfc:	89 45 fc             	mov    %eax,-0x4(%ebp)
+    acff:	a1 40 e1 01 00       	mov    0x1e140,%eax
+    ad04:	89 45 fc             	mov    %eax,-0x4(%ebp)
 
     while (tmp->next != (_virt_mm_*)NULL && tmp->address != _addr__) {
-    acff:	eb 0f                	jmp    ad10 <free+0x76>
+    ad07:	eb 0f                	jmp    ad18 <free+0x76>
         tmp_prev = tmp;
-    ad01:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad04:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    ad09:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad0c:	89 45 f8             	mov    %eax,-0x8(%ebp)
         tmp = tmp->next;
-    ad07:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad0a:	8b 40 08             	mov    0x8(%eax),%eax
-    ad0d:	89 45 fc             	mov    %eax,-0x4(%ebp)
+    ad0f:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad12:	8b 40 08             	mov    0x8(%eax),%eax
+    ad15:	89 45 fc             	mov    %eax,-0x4(%ebp)
     while (tmp->next != (_virt_mm_*)NULL && tmp->address != _addr__) {
-    ad10:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad13:	8b 40 08             	mov    0x8(%eax),%eax
-    ad16:	85 c0                	test   %eax,%eax
-    ad18:	74 0a                	je     ad24 <free+0x8a>
-    ad1a:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad1d:	8b 00                	mov    (%eax),%eax
-    ad1f:	39 45 08             	cmp    %eax,0x8(%ebp)
-    ad22:	75 dd                	jne    ad01 <free+0x67>
+    ad18:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad1b:	8b 40 08             	mov    0x8(%eax),%eax
+    ad1e:	85 c0                	test   %eax,%eax
+    ad20:	74 0a                	je     ad2c <free+0x8a>
+    ad22:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad25:	8b 00                	mov    (%eax),%eax
+    ad27:	39 45 08             	cmp    %eax,0x8(%ebp)
+    ad2a:	75 dd                	jne    ad09 <free+0x67>
     }
 
     if (tmp->next == (_virt_mm_*)NULL && tmp->address == _addr__) {
-    ad24:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad27:	8b 40 08             	mov    0x8(%eax),%eax
-    ad2a:	85 c0                	test   %eax,%eax
-    ad2c:	75 29                	jne    ad57 <free+0xbd>
-    ad2e:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad31:	8b 00                	mov    (%eax),%eax
-    ad33:	39 45 08             	cmp    %eax,0x8(%ebp)
-    ad36:	75 1f                	jne    ad57 <free+0xbd>
+    ad2c:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad2f:	8b 40 08             	mov    0x8(%eax),%eax
+    ad32:	85 c0                	test   %eax,%eax
+    ad34:	75 29                	jne    ad5f <free+0xbd>
+    ad36:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad39:	8b 00                	mov    (%eax),%eax
+    ad3b:	39 45 08             	cmp    %eax,0x8(%ebp)
+    ad3e:	75 1f                	jne    ad5f <free+0xbd>
         // Mark it , the item is free
         tmp->address = VM__NO_VM_ADDRESS;
-    ad38:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad3b:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    ad40:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad43:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         tmp->size = 0;
-    ad41:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad44:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
+    ad49:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad4c:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
 
         tmp_prev->next = (_virt_mm_*)NULL;
-    ad4b:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    ad4e:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
+    ad53:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    ad56:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
         return;
-    ad55:	eb 2a                	jmp    ad81 <free+0xe7>
+    ad5d:	eb 2a                	jmp    ad89 <free+0xe7>
     }
 
     if (tmp->address == _addr__) {
-    ad57:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad5a:	8b 00                	mov    (%eax),%eax
-    ad5c:	39 45 08             	cmp    %eax,0x8(%ebp)
-    ad5f:	75 20                	jne    ad81 <free+0xe7>
+    ad5f:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad62:	8b 00                	mov    (%eax),%eax
+    ad64:	39 45 08             	cmp    %eax,0x8(%ebp)
+    ad67:	75 20                	jne    ad89 <free+0xe7>
         // Mark it , the item is free
         tmp->address = VM__NO_VM_ADDRESS;
-    ad61:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad64:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    ad69:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad6c:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         tmp->size = 0;
-    ad6a:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad6d:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
+    ad72:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad75:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
 
         tmp_prev->next = tmp->next;
-    ad74:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    ad77:	8b 50 08             	mov    0x8(%eax),%edx
-    ad7a:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    ad7d:	89 50 08             	mov    %edx,0x8(%eax)
+    ad7c:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    ad7f:	8b 50 08             	mov    0x8(%eax),%edx
+    ad82:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    ad85:	89 50 08             	mov    %edx,0x8(%eax)
         return;
-    ad80:	90                   	nop
+    ad88:	90                   	nop
     }
-    ad81:	c9                   	leave  
-    ad82:	c3                   	ret    
+    ad89:	c9                   	leave  
+    ad8a:	c3                   	ret    
 
-0000ad83 <init_page_mem_manage>:
+0000ad8b <init_page_mem_manage>:
 */
 __page_table_frame__ uint32_t __kernel_phys_mem_manager__[PAGE_TABLE_OFFSET]
     __attribute__((aligned(PAGE_TABLE_SIZE)));
 
 void init_page_mem_manage()
 {
-    ad83:	55                   	push   %ebp
-    ad84:	89 e5                	mov    %esp,%ebp
-    ad86:	83 ec 18             	sub    $0x18,%esp
+    ad8b:	55                   	push   %ebp
+    ad8c:	89 e5                	mov    %esp,%ebp
+    ad8e:	83 ec 18             	sub    $0x18,%esp
     uint32_t i;
 
     for (i = 0; i < 0x400; i++) {
-    ad89:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
-    ad90:	eb 49                	jmp    addb <init_page_mem_manage+0x58>
+    ad91:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    ad98:	eb 49                	jmp    ade3 <init_page_mem_manage+0x58>
         MEMORY_SPACES_PAGES[i]._address_ = NO_PHYSICAL_ADDRESS;
-    ad92:	ba db f0 00 00       	mov    $0xf0db,%edx
-    ad97:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ad9a:	c1 e0 04             	shl    $0x4,%eax
-    ad9d:	05 40 f1 01 00       	add    $0x1f140,%eax
-    ada2:	89 10                	mov    %edx,(%eax)
+    ad9a:	ba db f0 00 00       	mov    $0xf0db,%edx
+    ad9f:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ada2:	c1 e0 04             	shl    $0x4,%eax
+    ada5:	05 40 f1 01 00       	add    $0x1f140,%eax
+    adaa:	89 10                	mov    %edx,(%eax)
         MEMORY_SPACES_PAGES[i].order = 0;
-    ada4:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ada7:	c1 e0 04             	shl    $0x4,%eax
-    adaa:	05 44 f1 01 00       	add    $0x1f144,%eax
-    adaf:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    adac:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    adaf:	c1 e0 04             	shl    $0x4,%eax
+    adb2:	05 44 f1 01 00       	add    $0x1f144,%eax
+    adb7:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         MEMORY_SPACES_PAGES[i].next_ = END_LIST;
-    adb5:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    adb8:	c1 e0 04             	shl    $0x4,%eax
-    adbb:	05 4c f1 01 00       	add    $0x1f14c,%eax
-    adc0:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    adbd:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    adc0:	c1 e0 04             	shl    $0x4,%eax
+    adc3:	05 4c f1 01 00       	add    $0x1f14c,%eax
+    adc8:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         MEMORY_SPACES_PAGES[i].previous_ = END_LIST;
-    adc6:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    adc9:	c1 e0 04             	shl    $0x4,%eax
-    adcc:	05 48 f1 01 00       	add    $0x1f148,%eax
-    add1:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    adce:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    add1:	c1 e0 04             	shl    $0x4,%eax
+    add4:	05 48 f1 01 00       	add    $0x1f148,%eax
+    add9:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
     for (i = 0; i < 0x400; i++) {
-    add7:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
-    addb:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
-    ade2:	76 ae                	jbe    ad92 <init_page_mem_manage+0xf>
+    addf:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    ade3:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
+    adea:	76 ae                	jbe    ad9a <init_page_mem_manage+0xf>
     }
 
     create_page_table(__kernel_phys_mem_manager__, 1);
-    ade4:	83 ec 08             	sub    $0x8,%esp
-    ade7:	6a 01                	push   $0x1
-    ade9:	68 00 e0 00 00       	push   $0xe000
-    adee:	e8 a7 f3 ff ff       	call   a19a <create_page_table>
-    adf3:	83 c4 10             	add    $0x10,%esp
+    adec:	83 ec 08             	sub    $0x8,%esp
+    adef:	6a 01                	push   $0x1
+    adf1:	68 00 e0 00 00       	push   $0xe000
+    adf6:	e8 9e f3 ff ff       	call   a199 <create_page_table>
+    adfb:	83 c4 10             	add    $0x10,%esp
 
     _page_area_track_ = MEMORY_SPACES_PAGES;
-    adf6:	c7 05 20 f1 01 00 40 	movl   $0x1f140,0x1f120
-    adfd:	f1 01 00 
+    adfe:	c7 05 20 f1 01 00 40 	movl   $0x1f140,0x1f120
+    ae05:	f1 01 00 
 
     // __RUN_TEST__(__phy_mem_manager__);
 }
-    ae00:	90                   	nop
-    ae01:	c9                   	leave  
-    ae02:	c3                   	ret    
+    ae08:	90                   	nop
+    ae09:	c9                   	leave  
+    ae0a:	c3                   	ret    
 
-0000ae03 <alloc_page>:
+0000ae0b <alloc_page>:
 
 physaddr_t alloc_page(uint32_t order)
 {
-    ae03:	55                   	push   %ebp
-    ae04:	89 e5                	mov    %esp,%ebp
-    ae06:	53                   	push   %ebx
-    ae07:	83 ec 14             	sub    $0x14,%esp
+    ae0b:	55                   	push   %ebp
+    ae0c:	89 e5                	mov    %esp,%ebp
+    ae0e:	53                   	push   %ebx
+    ae0f:	83 ec 14             	sub    $0x14,%esp
     // Insert at the head
     if (_page_area_track_->_address_ == NO_PHYSICAL_ADDRESS) {
-    ae0a:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae0f:	8b 00                	mov    (%eax),%eax
-    ae11:	ba db f0 00 00       	mov    $0xf0db,%edx
-    ae16:	39 d0                	cmp    %edx,%eax
-    ae18:	75 40                	jne    ae5a <alloc_page+0x57>
+    ae12:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    ae17:	8b 00                	mov    (%eax),%eax
+    ae19:	ba db f0 00 00       	mov    $0xf0db,%edx
+    ae1e:	39 d0                	cmp    %edx,%eax
+    ae20:	75 40                	jne    ae62 <alloc_page+0x57>
         _page_area_track_->_address_ = KERNEL__PHY_MEM;
-    ae1a:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae1f:	c7 00 00 00 10 00    	movl   $0x100000,(%eax)
+    ae22:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    ae27:	c7 00 00 00 10 00    	movl   $0x100000,(%eax)
         _page_area_track_->order = order;
-    ae25:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae2a:	8b 55 08             	mov    0x8(%ebp),%edx
-    ae2d:	89 50 04             	mov    %edx,0x4(%eax)
+    ae2d:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    ae32:	8b 55 08             	mov    0x8(%ebp),%edx
+    ae35:	89 50 04             	mov    %edx,0x4(%eax)
         memset((void*)(*_page_area_track_)._address_, 0, order * 0x1000);
-    ae30:	8b 45 08             	mov    0x8(%ebp),%eax
-    ae33:	c1 e0 0c             	shl    $0xc,%eax
-    ae36:	89 c2                	mov    %eax,%edx
-    ae38:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae3d:	8b 00                	mov    (%eax),%eax
-    ae3f:	83 ec 04             	sub    $0x4,%esp
-    ae42:	52                   	push   %edx
-    ae43:	6a 00                	push   $0x0
-    ae45:	50                   	push   %eax
-    ae46:	e8 24 e5 ff ff       	call   936f <memset>
-    ae4b:	83 c4 10             	add    $0x10,%esp
+    ae38:	8b 45 08             	mov    0x8(%ebp),%eax
+    ae3b:	c1 e0 0c             	shl    $0xc,%eax
+    ae3e:	89 c2                	mov    %eax,%edx
+    ae40:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    ae45:	8b 00                	mov    (%eax),%eax
+    ae47:	83 ec 04             	sub    $0x4,%esp
+    ae4a:	52                   	push   %edx
+    ae4b:	6a 00                	push   $0x0
+    ae4d:	50                   	push   %eax
+    ae4e:	e8 1c e5 ff ff       	call   936f <memset>
+    ae53:	83 c4 10             	add    $0x10,%esp
 
         return (*_page_area_track_)._address_;
-    ae4e:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae53:	8b 00                	mov    (%eax),%eax
-    ae55:	e9 ae 01 00 00       	jmp    b008 <alloc_page+0x205>
+    ae56:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    ae5b:	8b 00                	mov    (%eax),%eax
+    ae5d:	e9 ae 01 00 00       	jmp    b010 <alloc_page+0x205>
     }
 
     // FInd the free address space
     uint32_t i = 0;
-    ae5a:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
+    ae62:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%ebp)
     _address_order_track_* new_page;
 
     while (MEMORY_SPACES_PAGES[i]._address_ != NO_PHYSICAL_ADDRESS && i < 0x400)
-    ae61:	eb 04                	jmp    ae67 <alloc_page+0x64>
+    ae69:	eb 04                	jmp    ae6f <alloc_page+0x64>
         i++;
-    ae63:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
+    ae6b:	83 45 f4 01          	addl   $0x1,-0xc(%ebp)
     while (MEMORY_SPACES_PAGES[i]._address_ != NO_PHYSICAL_ADDRESS && i < 0x400)
-    ae67:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ae6a:	c1 e0 04             	shl    $0x4,%eax
-    ae6d:	05 40 f1 01 00       	add    $0x1f140,%eax
-    ae72:	8b 00                	mov    (%eax),%eax
-    ae74:	ba db f0 00 00       	mov    $0xf0db,%edx
-    ae79:	39 d0                	cmp    %edx,%eax
-    ae7b:	74 09                	je     ae86 <alloc_page+0x83>
-    ae7d:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
-    ae84:	76 dd                	jbe    ae63 <alloc_page+0x60>
+    ae6f:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ae72:	c1 e0 04             	shl    $0x4,%eax
+    ae75:	05 40 f1 01 00       	add    $0x1f140,%eax
+    ae7a:	8b 00                	mov    (%eax),%eax
+    ae7c:	ba db f0 00 00       	mov    $0xf0db,%edx
+    ae81:	39 d0                	cmp    %edx,%eax
+    ae83:	74 09                	je     ae8e <alloc_page+0x83>
+    ae85:	81 7d f4 ff 03 00 00 	cmpl   $0x3ff,-0xc(%ebp)
+    ae8c:	76 dd                	jbe    ae6b <alloc_page+0x60>
 
     new_page = (_address_order_track_*)(&MEMORY_SPACES_PAGES[i]);
-    ae86:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    ae89:	c1 e0 04             	shl    $0x4,%eax
-    ae8c:	05 40 f1 01 00       	add    $0x1f140,%eax
-    ae91:	89 45 ec             	mov    %eax,-0x14(%ebp)
+    ae8e:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    ae91:	c1 e0 04             	shl    $0x4,%eax
+    ae94:	05 40 f1 01 00       	add    $0x1f140,%eax
+    ae99:	89 45 ec             	mov    %eax,-0x14(%ebp)
 
     // If the head doesn't have a base address
 
     if (_page_area_track_->_address_ >= KERNEL__PHY_MEM + (PAGE_SIZE * order)) {
-    ae94:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    ae99:	8b 00                	mov    (%eax),%eax
-    ae9b:	8b 55 08             	mov    0x8(%ebp),%edx
-    ae9e:	81 c2 00 01 00 00    	add    $0x100,%edx
-    aea4:	c1 e2 0c             	shl    $0xc,%edx
-    aea7:	39 d0                	cmp    %edx,%eax
-    aea9:	72 4c                	jb     aef7 <alloc_page+0xf4>
+    ae9c:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    aea1:	8b 00                	mov    (%eax),%eax
+    aea3:	8b 55 08             	mov    0x8(%ebp),%edx
+    aea6:	81 c2 00 01 00 00    	add    $0x100,%edx
+    aeac:	c1 e2 0c             	shl    $0xc,%edx
+    aeaf:	39 d0                	cmp    %edx,%eax
+    aeb1:	72 4c                	jb     aeff <alloc_page+0xf4>
         new_page->_address_ = KERNEL__PHY_MEM;
-    aeab:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aeae:	c7 00 00 00 10 00    	movl   $0x100000,(%eax)
+    aeb3:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aeb6:	c7 00 00 00 10 00    	movl   $0x100000,(%eax)
         new_page->order = order;
-    aeb4:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aeb7:	8b 55 08             	mov    0x8(%ebp),%edx
-    aeba:	89 50 04             	mov    %edx,0x4(%eax)
+    aebc:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aebf:	8b 55 08             	mov    0x8(%ebp),%edx
+    aec2:	89 50 04             	mov    %edx,0x4(%eax)
         new_page->next_ = _page_area_track_;
-    aebd:	8b 15 20 f1 01 00    	mov    0x1f120,%edx
-    aec3:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aec6:	89 50 0c             	mov    %edx,0xc(%eax)
+    aec5:	8b 15 20 f1 01 00    	mov    0x1f120,%edx
+    aecb:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aece:	89 50 0c             	mov    %edx,0xc(%eax)
         _page_area_track_ = new_page;
-    aec9:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aecc:	a3 20 f1 01 00       	mov    %eax,0x1f120
+    aed1:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aed4:	a3 20 f1 01 00       	mov    %eax,0x1f120
 
         memset((void*)(*new_page)._address_, 0, order * 0x1000);
-    aed1:	8b 45 08             	mov    0x8(%ebp),%eax
-    aed4:	c1 e0 0c             	shl    $0xc,%eax
-    aed7:	89 c2                	mov    %eax,%edx
-    aed9:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aedc:	8b 00                	mov    (%eax),%eax
-    aede:	83 ec 04             	sub    $0x4,%esp
-    aee1:	52                   	push   %edx
-    aee2:	6a 00                	push   $0x0
-    aee4:	50                   	push   %eax
-    aee5:	e8 85 e4 ff ff       	call   936f <memset>
-    aeea:	83 c4 10             	add    $0x10,%esp
+    aed9:	8b 45 08             	mov    0x8(%ebp),%eax
+    aedc:	c1 e0 0c             	shl    $0xc,%eax
+    aedf:	89 c2                	mov    %eax,%edx
+    aee1:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aee4:	8b 00                	mov    (%eax),%eax
+    aee6:	83 ec 04             	sub    $0x4,%esp
+    aee9:	52                   	push   %edx
+    aeea:	6a 00                	push   $0x0
+    aeec:	50                   	push   %eax
+    aeed:	e8 7d e4 ff ff       	call   936f <memset>
+    aef2:	83 c4 10             	add    $0x10,%esp
         return (*new_page)._address_;
-    aeed:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aef0:	8b 00                	mov    (%eax),%eax
-    aef2:	e9 11 01 00 00       	jmp    b008 <alloc_page+0x205>
+    aef5:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    aef8:	8b 00                	mov    (%eax),%eax
+    aefa:	e9 11 01 00 00       	jmp    b010 <alloc_page+0x205>
     }
 
     _address_order_track_* tmp;
 
     tmp = (_page_area_track_);
-    aef7:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    aefc:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    aeff:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    af04:	89 45 f0             	mov    %eax,-0x10(%ebp)
 
     // Find a optimal position for the new page
     while (tmp->next_ != END_LIST) {
-    aeff:	eb 2a                	jmp    af2b <alloc_page+0x128>
+    af07:	eb 2a                	jmp    af33 <alloc_page+0x128>
         if ((tmp->next_->_address_) > (tmp->_address_ + ((tmp->order + order) * PAGE_SIZE)))
-    af01:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af04:	8b 40 0c             	mov    0xc(%eax),%eax
-    af07:	8b 10                	mov    (%eax),%edx
     af09:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af0c:	8b 08                	mov    (%eax),%ecx
-    af0e:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af11:	8b 58 04             	mov    0x4(%eax),%ebx
-    af14:	8b 45 08             	mov    0x8(%ebp),%eax
-    af17:	01 d8                	add    %ebx,%eax
-    af19:	c1 e0 0c             	shl    $0xc,%eax
-    af1c:	01 c8                	add    %ecx,%eax
-    af1e:	39 c2                	cmp    %eax,%edx
-    af20:	77 15                	ja     af37 <alloc_page+0x134>
+    af0c:	8b 40 0c             	mov    0xc(%eax),%eax
+    af0f:	8b 10                	mov    (%eax),%edx
+    af11:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af14:	8b 08                	mov    (%eax),%ecx
+    af16:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af19:	8b 58 04             	mov    0x4(%eax),%ebx
+    af1c:	8b 45 08             	mov    0x8(%ebp),%eax
+    af1f:	01 d8                	add    %ebx,%eax
+    af21:	c1 e0 0c             	shl    $0xc,%eax
+    af24:	01 c8                	add    %ecx,%eax
+    af26:	39 c2                	cmp    %eax,%edx
+    af28:	77 15                	ja     af3f <alloc_page+0x134>
             break;
         else
             tmp = tmp->next_;
-    af22:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af25:	8b 40 0c             	mov    0xc(%eax),%eax
-    af28:	89 45 f0             	mov    %eax,-0x10(%ebp)
+    af2a:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af2d:	8b 40 0c             	mov    0xc(%eax),%eax
+    af30:	89 45 f0             	mov    %eax,-0x10(%ebp)
     while (tmp->next_ != END_LIST) {
-    af2b:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af2e:	8b 40 0c             	mov    0xc(%eax),%eax
-    af31:	85 c0                	test   %eax,%eax
-    af33:	75 cc                	jne    af01 <alloc_page+0xfe>
-    af35:	eb 01                	jmp    af38 <alloc_page+0x135>
+    af33:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af36:	8b 40 0c             	mov    0xc(%eax),%eax
+    af39:	85 c0                	test   %eax,%eax
+    af3b:	75 cc                	jne    af09 <alloc_page+0xfe>
+    af3d:	eb 01                	jmp    af40 <alloc_page+0x135>
             break;
-    af37:	90                   	nop
+    af3f:	90                   	nop
     }
 
     if (tmp->next_ == END_LIST) {
-    af38:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af3b:	8b 40 0c             	mov    0xc(%eax),%eax
-    af3e:	85 c0                	test   %eax,%eax
-    af40:	75 5d                	jne    af9f <alloc_page+0x19c>
+    af40:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af43:	8b 40 0c             	mov    0xc(%eax),%eax
+    af46:	85 c0                	test   %eax,%eax
+    af48:	75 5d                	jne    afa7 <alloc_page+0x19c>
         new_page->_address_ = (tmp->_address_) + (tmp->order * PAGE_SIZE);
-    af42:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af45:	8b 10                	mov    (%eax),%edx
-    af47:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af4a:	8b 40 04             	mov    0x4(%eax),%eax
-    af4d:	c1 e0 0c             	shl    $0xc,%eax
-    af50:	01 c2                	add    %eax,%edx
-    af52:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af55:	89 10                	mov    %edx,(%eax)
+    af4a:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af4d:	8b 10                	mov    (%eax),%edx
+    af4f:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af52:	8b 40 04             	mov    0x4(%eax),%eax
+    af55:	c1 e0 0c             	shl    $0xc,%eax
+    af58:	01 c2                	add    %eax,%edx
+    af5a:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    af5d:	89 10                	mov    %edx,(%eax)
         new_page->order = order;
-    af57:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af5a:	8b 55 08             	mov    0x8(%ebp),%edx
-    af5d:	89 50 04             	mov    %edx,0x4(%eax)
+    af5f:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    af62:	8b 55 08             	mov    0x8(%ebp),%edx
+    af65:	89 50 04             	mov    %edx,0x4(%eax)
 
         new_page->next_ = END_LIST;
-    af60:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af63:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
+    af68:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    af6b:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
         new_page->previous_ = tmp;
-    af6a:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af6d:	8b 55 f0             	mov    -0x10(%ebp),%edx
-    af70:	89 50 08             	mov    %edx,0x8(%eax)
+    af72:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    af75:	8b 55 f0             	mov    -0x10(%ebp),%edx
+    af78:	89 50 08             	mov    %edx,0x8(%eax)
 
         tmp->next_ = new_page;
-    af73:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    af76:	8b 55 ec             	mov    -0x14(%ebp),%edx
-    af79:	89 50 0c             	mov    %edx,0xc(%eax)
+    af7b:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    af7e:	8b 55 ec             	mov    -0x14(%ebp),%edx
+    af81:	89 50 0c             	mov    %edx,0xc(%eax)
 
         memset((void*)(*new_page)._address_, 0, order * 0x1000);
-    af7c:	8b 45 08             	mov    0x8(%ebp),%eax
-    af7f:	c1 e0 0c             	shl    $0xc,%eax
-    af82:	89 c2                	mov    %eax,%edx
-    af84:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af87:	8b 00                	mov    (%eax),%eax
-    af89:	83 ec 04             	sub    $0x4,%esp
-    af8c:	52                   	push   %edx
-    af8d:	6a 00                	push   $0x0
-    af8f:	50                   	push   %eax
-    af90:	e8 da e3 ff ff       	call   936f <memset>
-    af95:	83 c4 10             	add    $0x10,%esp
+    af84:	8b 45 08             	mov    0x8(%ebp),%eax
+    af87:	c1 e0 0c             	shl    $0xc,%eax
+    af8a:	89 c2                	mov    %eax,%edx
+    af8c:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    af8f:	8b 00                	mov    (%eax),%eax
+    af91:	83 ec 04             	sub    $0x4,%esp
+    af94:	52                   	push   %edx
+    af95:	6a 00                	push   $0x0
+    af97:	50                   	push   %eax
+    af98:	e8 d2 e3 ff ff       	call   936f <memset>
+    af9d:	83 c4 10             	add    $0x10,%esp
         return (*new_page)._address_;
-    af98:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    af9b:	8b 00                	mov    (%eax),%eax
-    af9d:	eb 69                	jmp    b008 <alloc_page+0x205>
+    afa0:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    afa3:	8b 00                	mov    (%eax),%eax
+    afa5:	eb 69                	jmp    b010 <alloc_page+0x205>
     }
 
     else {
         new_page->_address_ = (tmp->_address_) + (tmp->order * PAGE_SIZE);
-    af9f:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    afa2:	8b 10                	mov    (%eax),%edx
-    afa4:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    afa7:	8b 40 04             	mov    0x4(%eax),%eax
-    afaa:	c1 e0 0c             	shl    $0xc,%eax
-    afad:	01 c2                	add    %eax,%edx
-    afaf:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    afb2:	89 10                	mov    %edx,(%eax)
+    afa7:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    afaa:	8b 10                	mov    (%eax),%edx
+    afac:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    afaf:	8b 40 04             	mov    0x4(%eax),%eax
+    afb2:	c1 e0 0c             	shl    $0xc,%eax
+    afb5:	01 c2                	add    %eax,%edx
+    afb7:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    afba:	89 10                	mov    %edx,(%eax)
         new_page->order = order;
-    afb4:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    afb7:	8b 55 08             	mov    0x8(%ebp),%edx
-    afba:	89 50 04             	mov    %edx,0x4(%eax)
+    afbc:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    afbf:	8b 55 08             	mov    0x8(%ebp),%edx
+    afc2:	89 50 04             	mov    %edx,0x4(%eax)
 
         new_page->next_ = tmp->next_;
-    afbd:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    afc0:	8b 50 0c             	mov    0xc(%eax),%edx
-    afc3:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    afc6:	89 50 0c             	mov    %edx,0xc(%eax)
+    afc5:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    afc8:	8b 50 0c             	mov    0xc(%eax),%edx
+    afcb:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    afce:	89 50 0c             	mov    %edx,0xc(%eax)
         new_page->previous_ = tmp;
-    afc9:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    afcc:	8b 55 f0             	mov    -0x10(%ebp),%edx
-    afcf:	89 50 08             	mov    %edx,0x8(%eax)
+    afd1:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    afd4:	8b 55 f0             	mov    -0x10(%ebp),%edx
+    afd7:	89 50 08             	mov    %edx,0x8(%eax)
         tmp->next_ = new_page;
-    afd2:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    afd5:	8b 55 ec             	mov    -0x14(%ebp),%edx
-    afd8:	89 50 0c             	mov    %edx,0xc(%eax)
+    afda:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    afdd:	8b 55 ec             	mov    -0x14(%ebp),%edx
+    afe0:	89 50 0c             	mov    %edx,0xc(%eax)
         tmp->next_->previous_ = new_page;
-    afdb:	8b 45 f0             	mov    -0x10(%ebp),%eax
-    afde:	8b 40 0c             	mov    0xc(%eax),%eax
-    afe1:	8b 55 ec             	mov    -0x14(%ebp),%edx
-    afe4:	89 50 08             	mov    %edx,0x8(%eax)
+    afe3:	8b 45 f0             	mov    -0x10(%ebp),%eax
+    afe6:	8b 40 0c             	mov    0xc(%eax),%eax
+    afe9:	8b 55 ec             	mov    -0x14(%ebp),%edx
+    afec:	89 50 08             	mov    %edx,0x8(%eax)
 
         memset((void*)(*new_page)._address_, 0, order * 0x1000);
-    afe7:	8b 45 08             	mov    0x8(%ebp),%eax
-    afea:	c1 e0 0c             	shl    $0xc,%eax
-    afed:	89 c2                	mov    %eax,%edx
-    afef:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    aff2:	8b 00                	mov    (%eax),%eax
-    aff4:	83 ec 04             	sub    $0x4,%esp
-    aff7:	52                   	push   %edx
-    aff8:	6a 00                	push   $0x0
-    affa:	50                   	push   %eax
-    affb:	e8 6f e3 ff ff       	call   936f <memset>
-    b000:	83 c4 10             	add    $0x10,%esp
+    afef:	8b 45 08             	mov    0x8(%ebp),%eax
+    aff2:	c1 e0 0c             	shl    $0xc,%eax
+    aff5:	89 c2                	mov    %eax,%edx
+    aff7:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    affa:	8b 00                	mov    (%eax),%eax
+    affc:	83 ec 04             	sub    $0x4,%esp
+    afff:	52                   	push   %edx
+    b000:	6a 00                	push   $0x0
+    b002:	50                   	push   %eax
+    b003:	e8 67 e3 ff ff       	call   936f <memset>
+    b008:	83 c4 10             	add    $0x10,%esp
         return (*new_page)._address_;
-    b003:	8b 45 ec             	mov    -0x14(%ebp),%eax
-    b006:	8b 00                	mov    (%eax),%eax
+    b00b:	8b 45 ec             	mov    -0x14(%ebp),%eax
+    b00e:	8b 00                	mov    (%eax),%eax
     }
     NMBER_PAGES_ALLOC++;
 }
-    b008:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-    b00b:	c9                   	leave  
-    b00c:	c3                   	ret    
+    b010:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+    b013:	c9                   	leave  
+    b014:	c3                   	ret    
 
-0000b00d <free_page>:
+0000b015 <free_page>:
 
 void free_page(_address_order_track_ page)
 {
-    b00d:	55                   	push   %ebp
-    b00e:	89 e5                	mov    %esp,%ebp
-    b010:	83 ec 10             	sub    $0x10,%esp
+    b015:	55                   	push   %ebp
+    b016:	89 e5                	mov    %esp,%ebp
+    b018:	83 ec 10             	sub    $0x10,%esp
     // If it is the head of the list
     if (page.previous_ == END_LIST && page.next_ != END_LIST) {
-    b013:	8b 45 10             	mov    0x10(%ebp),%eax
-    b016:	85 c0                	test   %eax,%eax
-    b018:	75 2d                	jne    b047 <free_page+0x3a>
-    b01a:	8b 45 14             	mov    0x14(%ebp),%eax
-    b01d:	85 c0                	test   %eax,%eax
-    b01f:	74 26                	je     b047 <free_page+0x3a>
+    b01b:	8b 45 10             	mov    0x10(%ebp),%eax
+    b01e:	85 c0                	test   %eax,%eax
+    b020:	75 2d                	jne    b04f <free_page+0x3a>
+    b022:	8b 45 14             	mov    0x14(%ebp),%eax
+    b025:	85 c0                	test   %eax,%eax
+    b027:	74 26                	je     b04f <free_page+0x3a>
         page._address_ = NO_PHYSICAL_ADDRESS; // freeing one memory address
-    b021:	b8 db f0 00 00       	mov    $0xf0db,%eax
-    b026:	89 45 08             	mov    %eax,0x8(%ebp)
+    b029:	b8 db f0 00 00       	mov    $0xf0db,%eax
+    b02e:	89 45 08             	mov    %eax,0x8(%ebp)
         _page_area_track_ = _page_area_track_->next_; // point to the second item
-    b029:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    b02e:	8b 40 0c             	mov    0xc(%eax),%eax
-    b031:	a3 20 f1 01 00       	mov    %eax,0x1f120
+    b031:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    b036:	8b 40 0c             	mov    0xc(%eax),%eax
+    b039:	a3 20 f1 01 00       	mov    %eax,0x1f120
         _page_area_track_->previous_ = END_LIST;
-    b036:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    b03b:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
+    b03e:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    b043:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
         return;
-    b042:	e9 13 01 00 00       	jmp    b15a <free_page+0x14d>
+    b04a:	e9 13 01 00 00       	jmp    b162 <free_page+0x14d>
     }
 
     // If we have only one page in the list
     else if (page.previous_ == END_LIST && page.next_ == END_LIST) {
-    b047:	8b 45 10             	mov    0x10(%ebp),%eax
-    b04a:	85 c0                	test   %eax,%eax
-    b04c:	75 67                	jne    b0b5 <free_page+0xa8>
-    b04e:	8b 45 14             	mov    0x14(%ebp),%eax
-    b051:	85 c0                	test   %eax,%eax
-    b053:	75 60                	jne    b0b5 <free_page+0xa8>
+    b04f:	8b 45 10             	mov    0x10(%ebp),%eax
+    b052:	85 c0                	test   %eax,%eax
+    b054:	75 67                	jne    b0bd <free_page+0xa8>
+    b056:	8b 45 14             	mov    0x14(%ebp),%eax
+    b059:	85 c0                	test   %eax,%eax
+    b05b:	75 60                	jne    b0bd <free_page+0xa8>
         uintptr_t i;
         for (i = 0; i < 0x400; i++) {
-    b055:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
-    b05c:	eb 49                	jmp    b0a7 <free_page+0x9a>
+    b05d:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%ebp)
+    b064:	eb 49                	jmp    b0af <free_page+0x9a>
             MEMORY_SPACES_PAGES[i]._address_ = NO_PHYSICAL_ADDRESS;
-    b05e:	ba db f0 00 00       	mov    $0xf0db,%edx
-    b063:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    b066:	c1 e0 04             	shl    $0x4,%eax
-    b069:	05 40 f1 01 00       	add    $0x1f140,%eax
-    b06e:	89 10                	mov    %edx,(%eax)
+    b066:	ba db f0 00 00       	mov    $0xf0db,%edx
+    b06b:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    b06e:	c1 e0 04             	shl    $0x4,%eax
+    b071:	05 40 f1 01 00       	add    $0x1f140,%eax
+    b076:	89 10                	mov    %edx,(%eax)
             MEMORY_SPACES_PAGES[i].order = 0;
-    b070:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    b073:	c1 e0 04             	shl    $0x4,%eax
-    b076:	05 44 f1 01 00       	add    $0x1f144,%eax
-    b07b:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    b078:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    b07b:	c1 e0 04             	shl    $0x4,%eax
+    b07e:	05 44 f1 01 00       	add    $0x1f144,%eax
+    b083:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
             MEMORY_SPACES_PAGES[i].next_ = END_LIST;
-    b081:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    b084:	c1 e0 04             	shl    $0x4,%eax
-    b087:	05 4c f1 01 00       	add    $0x1f14c,%eax
-    b08c:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    b089:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    b08c:	c1 e0 04             	shl    $0x4,%eax
+    b08f:	05 4c f1 01 00       	add    $0x1f14c,%eax
+    b094:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
             MEMORY_SPACES_PAGES[i].previous_ = END_LIST;
-    b092:	8b 45 fc             	mov    -0x4(%ebp),%eax
-    b095:	c1 e0 04             	shl    $0x4,%eax
-    b098:	05 48 f1 01 00       	add    $0x1f148,%eax
-    b09d:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    b09a:	8b 45 fc             	mov    -0x4(%ebp),%eax
+    b09d:	c1 e0 04             	shl    $0x4,%eax
+    b0a0:	05 48 f1 01 00       	add    $0x1f148,%eax
+    b0a5:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
         for (i = 0; i < 0x400; i++) {
-    b0a3:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)
-    b0a7:	81 7d fc ff 03 00 00 	cmpl   $0x3ff,-0x4(%ebp)
-    b0ae:	76 ae                	jbe    b05e <free_page+0x51>
+    b0ab:	83 45 fc 01          	addl   $0x1,-0x4(%ebp)
+    b0af:	81 7d fc ff 03 00 00 	cmpl   $0x3ff,-0x4(%ebp)
+    b0b6:	76 ae                	jbe    b066 <free_page+0x51>
         }
         return;
-    b0b0:	e9 a5 00 00 00       	jmp    b15a <free_page+0x14d>
+    b0b8:	e9 a5 00 00 00       	jmp    b162 <free_page+0x14d>
     }
 
     else {
         _address_order_track_* tmp;
 
         tmp = _page_area_track_;
-    b0b5:	a1 20 f1 01 00       	mov    0x1f120,%eax
-    b0ba:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    b0bd:	a1 20 f1 01 00       	mov    0x1f120,%eax
+    b0c2:	89 45 f8             	mov    %eax,-0x8(%ebp)
 
         while (tmp->_address_ != page._address_ && tmp->next_ != END_LIST)
-    b0bd:	eb 09                	jmp    b0c8 <free_page+0xbb>
+    b0c5:	eb 09                	jmp    b0d0 <free_page+0xbb>
             tmp = tmp->next_;
-    b0bf:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0c2:	8b 40 0c             	mov    0xc(%eax),%eax
-    b0c5:	89 45 f8             	mov    %eax,-0x8(%ebp)
+    b0c7:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b0ca:	8b 40 0c             	mov    0xc(%eax),%eax
+    b0cd:	89 45 f8             	mov    %eax,-0x8(%ebp)
         while (tmp->_address_ != page._address_ && tmp->next_ != END_LIST)
-    b0c8:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0cb:	8b 10                	mov    (%eax),%edx
-    b0cd:	8b 45 08             	mov    0x8(%ebp),%eax
-    b0d0:	39 c2                	cmp    %eax,%edx
-    b0d2:	74 0a                	je     b0de <free_page+0xd1>
-    b0d4:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0d7:	8b 40 0c             	mov    0xc(%eax),%eax
-    b0da:	85 c0                	test   %eax,%eax
-    b0dc:	75 e1                	jne    b0bf <free_page+0xb2>
+    b0d0:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b0d3:	8b 10                	mov    (%eax),%edx
+    b0d5:	8b 45 08             	mov    0x8(%ebp),%eax
+    b0d8:	39 c2                	cmp    %eax,%edx
+    b0da:	74 0a                	je     b0e6 <free_page+0xd1>
+    b0dc:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b0df:	8b 40 0c             	mov    0xc(%eax),%eax
+    b0e2:	85 c0                	test   %eax,%eax
+    b0e4:	75 e1                	jne    b0c7 <free_page+0xb2>
 
         if (tmp->next_ == END_LIST && tmp->_address_ == page._address_) // At the end of the list
-    b0de:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0e1:	8b 40 0c             	mov    0xc(%eax),%eax
-    b0e4:	85 c0                	test   %eax,%eax
-    b0e6:	75 25                	jne    b10d <free_page+0x100>
-    b0e8:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0eb:	8b 10                	mov    (%eax),%edx
-    b0ed:	8b 45 08             	mov    0x8(%ebp),%eax
-    b0f0:	39 c2                	cmp    %eax,%edx
-    b0f2:	75 19                	jne    b10d <free_page+0x100>
+    b0e6:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b0e9:	8b 40 0c             	mov    0xc(%eax),%eax
+    b0ec:	85 c0                	test   %eax,%eax
+    b0ee:	75 25                	jne    b115 <free_page+0x100>
+    b0f0:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b0f3:	8b 10                	mov    (%eax),%edx
+    b0f5:	8b 45 08             	mov    0x8(%ebp),%eax
+    b0f8:	39 c2                	cmp    %eax,%edx
+    b0fa:	75 19                	jne    b115 <free_page+0x100>
         {
             tmp->_address_ = NO_PHYSICAL_ADDRESS;
-    b0f4:	ba db f0 00 00       	mov    $0xf0db,%edx
-    b0f9:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b0fc:	89 10                	mov    %edx,(%eax)
+    b0fc:	ba db f0 00 00       	mov    $0xf0db,%edx
+    b101:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b104:	89 10                	mov    %edx,(%eax)
             tmp->previous_->next_ = END_LIST;
-    b0fe:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b101:	8b 40 08             	mov    0x8(%eax),%eax
-    b104:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
+    b106:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b109:	8b 40 08             	mov    0x8(%eax),%eax
+    b10c:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
             return;
-    b10b:	eb 4d                	jmp    b15a <free_page+0x14d>
+    b113:	eb 4d                	jmp    b162 <free_page+0x14d>
         }
 
         if (tmp->next_ != END_LIST && tmp->_address_ == page._address_) // At the middle
-    b10d:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b110:	8b 40 0c             	mov    0xc(%eax),%eax
-    b113:	85 c0                	test   %eax,%eax
-    b115:	74 36                	je     b14d <free_page+0x140>
-    b117:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b11a:	8b 10                	mov    (%eax),%edx
-    b11c:	8b 45 08             	mov    0x8(%ebp),%eax
-    b11f:	39 c2                	cmp    %eax,%edx
-    b121:	75 2a                	jne    b14d <free_page+0x140>
+    b115:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b118:	8b 40 0c             	mov    0xc(%eax),%eax
+    b11b:	85 c0                	test   %eax,%eax
+    b11d:	74 36                	je     b155 <free_page+0x140>
+    b11f:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b122:	8b 10                	mov    (%eax),%edx
+    b124:	8b 45 08             	mov    0x8(%ebp),%eax
+    b127:	39 c2                	cmp    %eax,%edx
+    b129:	75 2a                	jne    b155 <free_page+0x140>
         {
             tmp->_address_ = NO_PHYSICAL_ADDRESS;
-    b123:	ba db f0 00 00       	mov    $0xf0db,%edx
-    b128:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b12b:	89 10                	mov    %edx,(%eax)
+    b12b:	ba db f0 00 00       	mov    $0xf0db,%edx
+    b130:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b133:	89 10                	mov    %edx,(%eax)
             tmp->previous_->next_ = tmp->next_;
-    b12d:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b130:	8b 40 08             	mov    0x8(%eax),%eax
-    b133:	8b 55 f8             	mov    -0x8(%ebp),%edx
-    b136:	8b 52 0c             	mov    0xc(%edx),%edx
-    b139:	89 50 0c             	mov    %edx,0xc(%eax)
+    b135:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b138:	8b 40 08             	mov    0x8(%eax),%eax
+    b13b:	8b 55 f8             	mov    -0x8(%ebp),%edx
+    b13e:	8b 52 0c             	mov    0xc(%edx),%edx
+    b141:	89 50 0c             	mov    %edx,0xc(%eax)
             tmp->next_->previous_ = tmp->previous_;
-    b13c:	8b 45 f8             	mov    -0x8(%ebp),%eax
-    b13f:	8b 40 0c             	mov    0xc(%eax),%eax
-    b142:	8b 55 f8             	mov    -0x8(%ebp),%edx
-    b145:	8b 52 08             	mov    0x8(%edx),%edx
-    b148:	89 50 08             	mov    %edx,0x8(%eax)
+    b144:	8b 45 f8             	mov    -0x8(%ebp),%eax
+    b147:	8b 40 0c             	mov    0xc(%eax),%eax
+    b14a:	8b 55 f8             	mov    -0x8(%ebp),%edx
+    b14d:	8b 52 08             	mov    0x8(%edx),%edx
+    b150:	89 50 08             	mov    %edx,0x8(%eax)
             return;
-    b14b:	eb 0d                	jmp    b15a <free_page+0x14d>
+    b153:	eb 0d                	jmp    b162 <free_page+0x14d>
         }
     }
     NMBER_PAGES_ALLOC--;
-    b14d:	a1 24 f1 01 00       	mov    0x1f124,%eax
-    b152:	83 e8 01             	sub    $0x1,%eax
-    b155:	a3 24 f1 01 00       	mov    %eax,0x1f124
-    b15a:	c9                   	leave  
-    b15b:	c3                   	ret    
+    b155:	a1 24 f1 01 00       	mov    0x1f124,%eax
+    b15a:	83 e8 01             	sub    $0x1,%eax
+    b15d:	a3 24 f1 01 00       	mov    %eax,0x1f124
+    b162:	c9                   	leave  
+    b163:	c3                   	ret    
 
-0000b15c <__switch>:
+0000b164 <__switch>:
 sheduler_t sheduler;
 
 static task_control_block_t main_task, task1, task2, task3;
 
 void __switch()
 {
-    b15c:	55                   	push   %ebp
-    b15d:	89 e5                	mov    %esp,%ebp
-    b15f:	83 ec 18             	sub    $0x18,%esp
+    b164:	55                   	push   %ebp
+    b165:	89 e5                	mov    %esp,%ebp
+    b167:	83 ec 18             	sub    $0x18,%esp
     task_control_block_t* prev_task;
 
     prev_task = sheduler.running_task;
-    b162:	a1 48 31 02 00       	mov    0x23148,%eax
-    b167:	89 45 f4             	mov    %eax,-0xc(%ebp)
+    b16a:	a1 48 31 02 00       	mov    0x23148,%eax
+    b16f:	89 45 f4             	mov    %eax,-0xc(%ebp)
 
     sheduler.running_task = sheduler.running_task->new_tasks;
-    b16a:	a1 48 31 02 00       	mov    0x23148,%eax
-    b16f:	8b 40 3c             	mov    0x3c(%eax),%eax
-    b172:	a3 48 31 02 00       	mov    %eax,0x23148
+    b172:	a1 48 31 02 00       	mov    0x23148,%eax
+    b177:	8b 40 3c             	mov    0x3c(%eax),%eax
+    b17a:	a3 48 31 02 00       	mov    %eax,0x23148
 
     switch_to_task(&(prev_task->regs), &(sheduler.running_task->regs));
-    b177:	a1 48 31 02 00       	mov    0x23148,%eax
-    b17c:	89 c2                	mov    %eax,%edx
-    b17e:	8b 45 f4             	mov    -0xc(%ebp),%eax
-    b181:	83 ec 08             	sub    $0x8,%esp
-    b184:	52                   	push   %edx
-    b185:	50                   	push   %eax
-    b186:	e8 c5 02 00 00       	call   b450 <switch_to_task>
-    b18b:	83 c4 10             	add    $0x10,%esp
+    b17f:	a1 48 31 02 00       	mov    0x23148,%eax
+    b184:	89 c2                	mov    %eax,%edx
+    b186:	8b 45 f4             	mov    -0xc(%ebp),%eax
+    b189:	83 ec 08             	sub    $0x8,%esp
+    b18c:	52                   	push   %edx
+    b18d:	50                   	push   %eax
+    b18e:	e8 cd 02 00 00       	call   b460 <switch_to_task>
+    b193:	83 c4 10             	add    $0x10,%esp
 }
-    b18e:	90                   	nop
-    b18f:	c9                   	leave  
-    b190:	c3                   	ret    
+    b196:	90                   	nop
+    b197:	c9                   	leave  
+    b198:	c3                   	ret    
 
-0000b191 <init_multitasking>:
+0000b199 <init_multitasking>:
 
 void init_multitasking()
 {
-    b191:	55                   	push   %ebp
-    b192:	89 e5                	mov    %esp,%ebp
+    b199:	55                   	push   %ebp
+    b19a:	89 e5                	mov    %esp,%ebp
     sheduler.init_timer = 0;
-    b194:	c6 05 40 31 02 00 00 	movb   $0x0,0x23140
+    b19c:	c6 05 40 31 02 00 00 	movb   $0x0,0x23140
     sheduler.task_timer = DELAY_PER_TASK;
-    b19b:	c7 05 44 31 02 00 2c 	movl   $0x12c,0x23144
-    b1a2:	01 00 00 
+    b1a3:	c7 05 44 31 02 00 2c 	movl   $0x12c,0x23144
+    b1aa:	01 00 00 
 }
-    b1a5:	90                   	nop
-    b1a6:	5d                   	pop    %ebp
-    b1a7:	c3                   	ret    
+    b1ad:	90                   	nop
+    b1ae:	5d                   	pop    %ebp
+    b1af:	c3                   	ret    
 
-0000b1a8 <create_task>:
+0000b1b0 <create_task>:
 
 void create_task(task_control_block_t* task, void (*task_func)(), uint32_t eflags, uint32_t cr3)
 {
-    b1a8:	55                   	push   %ebp
-    b1a9:	89 e5                	mov    %esp,%ebp
-    b1ab:	83 ec 08             	sub    $0x8,%esp
+    b1b0:	55                   	push   %ebp
+    b1b1:	89 e5                	mov    %esp,%ebp
+    b1b3:	83 ec 08             	sub    $0x8,%esp
     task->regs.eax = 0;
-    b1ae:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1b1:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
+    b1b6:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1b9:	c7 00 00 00 00 00    	movl   $0x0,(%eax)
     task->regs.ebx = 0;
-    b1b7:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1ba:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
+    b1bf:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1c2:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%eax)
     task->regs.ecx = 0;
-    b1c1:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1c4:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
+    b1c9:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1cc:	c7 40 08 00 00 00 00 	movl   $0x0,0x8(%eax)
     task->regs.edx = 0;
-    b1cb:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1ce:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
+    b1d3:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1d6:	c7 40 0c 00 00 00 00 	movl   $0x0,0xc(%eax)
     task->regs.esi = 0;
-    b1d5:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1d8:	c7 40 10 00 00 00 00 	movl   $0x0,0x10(%eax)
+    b1dd:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1e0:	c7 40 10 00 00 00 00 	movl   $0x0,0x10(%eax)
     task->regs.edi = 0;
-    b1df:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1e2:	c7 40 14 00 00 00 00 	movl   $0x0,0x14(%eax)
+    b1e7:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1ea:	c7 40 14 00 00 00 00 	movl   $0x0,0x14(%eax)
 
     task->regs.eflags = eflags;
-    b1e9:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1ec:	8b 55 10             	mov    0x10(%ebp),%edx
-    b1ef:	89 50 24             	mov    %edx,0x24(%eax)
+    b1f1:	8b 45 08             	mov    0x8(%ebp),%eax
+    b1f4:	8b 55 10             	mov    0x10(%ebp),%edx
+    b1f7:	89 50 24             	mov    %edx,0x24(%eax)
     task->regs.eip    = (uint32_t)task_func;
-    b1f2:	8b 55 0c             	mov    0xc(%ebp),%edx
-    b1f5:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1f8:	89 50 20             	mov    %edx,0x20(%eax)
+    b1fa:	8b 55 0c             	mov    0xc(%ebp),%edx
+    b1fd:	8b 45 08             	mov    0x8(%ebp),%eax
+    b200:	89 50 20             	mov    %edx,0x20(%eax)
     task->regs.cr3    = (uint32_t)cr3;
-    b1fb:	8b 45 08             	mov    0x8(%ebp),%eax
-    b1fe:	8b 55 14             	mov    0x14(%ebp),%edx
-    b201:	89 50 28             	mov    %edx,0x28(%eax)
+    b203:	8b 45 08             	mov    0x8(%ebp),%eax
+    b206:	8b 55 14             	mov    0x14(%ebp),%edx
+    b209:	89 50 28             	mov    %edx,0x28(%eax)
     task->regs.esp    = (uint32_t)kmalloc(200);
-    b204:	83 ec 0c             	sub    $0xc,%esp
-    b207:	68 c8 00 00 00       	push   $0xc8
-    b20c:	e8 c5 f8 ff ff       	call   aad6 <kmalloc>
-    b211:	83 c4 10             	add    $0x10,%esp
-    b214:	89 c2                	mov    %eax,%edx
-    b216:	8b 45 08             	mov    0x8(%ebp),%eax
-    b219:	89 50 18             	mov    %edx,0x18(%eax)
+    b20c:	83 ec 0c             	sub    $0xc,%esp
+    b20f:	68 c8 00 00 00       	push   $0xc8
+    b214:	e8 c5 f8 ff ff       	call   aade <kmalloc>
+    b219:	83 c4 10             	add    $0x10,%esp
+    b21c:	89 c2                	mov    %eax,%edx
+    b21e:	8b 45 08             	mov    0x8(%ebp),%eax
+    b221:	89 50 18             	mov    %edx,0x18(%eax)
     task->new_tasks   = 0;
-    b21c:	8b 45 08             	mov    0x8(%ebp),%eax
-    b21f:	c7 40 3c 00 00 00 00 	movl   $0x0,0x3c(%eax)
+    b224:	8b 45 08             	mov    0x8(%ebp),%eax
+    b227:	c7 40 3c 00 00 00 00 	movl   $0x0,0x3c(%eax)
 }
-    b226:	90                   	nop
-    b227:	c9                   	leave  
-    b228:	c3                   	ret    
-    b229:	66 90                	xchg   %ax,%ax
-    b22b:	66 90                	xchg   %ax,%ax
-    b22d:	66 90                	xchg   %ax,%ax
-    b22f:	90                   	nop
+    b22e:	90                   	nop
+    b22f:	c9                   	leave  
+    b230:	c3                   	ret    
+    b231:	66 90                	xchg   %ax,%ax
+    b233:	66 90                	xchg   %ax,%ax
+    b235:	66 90                	xchg   %ax,%ax
+    b237:	66 90                	xchg   %ax,%ax
+    b239:	66 90                	xchg   %ax,%ax
+    b23b:	66 90                	xchg   %ax,%ax
+    b23d:	66 90                	xchg   %ax,%ax
+    b23f:	90                   	nop
 
-0000b230 <__exception_handler__>:
-    b230:	58                   	pop    %eax
-    b231:	a3 7c b6 00 00       	mov    %eax,0xb67c
-    b236:	e8 5b e4 ff ff       	call   9696 <__exception__>
-    b23b:	cf                   	iret   
+0000b240 <__exception_handler__>:
+    b240:	58                   	pop    %eax
+    b241:	a3 7c b6 00 00       	mov    %eax,0xb67c
+    b246:	e8 54 e4 ff ff       	call   969f <__exception__>
+    b24b:	cf                   	iret   
 
-0000b23c <__exception_no_ERRCODE_handler__>:
-    b23c:	e8 5b e4 ff ff       	call   969c <__exception_no_ERRCODE__>
-    b241:	cf                   	iret   
-    b242:	66 90                	xchg   %ax,%ax
-    b244:	66 90                	xchg   %ax,%ax
-    b246:	66 90                	xchg   %ax,%ax
-    b248:	66 90                	xchg   %ax,%ax
-    b24a:	66 90                	xchg   %ax,%ax
-    b24c:	66 90                	xchg   %ax,%ax
-    b24e:	66 90                	xchg   %ax,%ax
+0000b24c <__exception_no_ERRCODE_handler__>:
+    b24c:	e8 54 e4 ff ff       	call   96a5 <__exception_no_ERRCODE__>
+    b251:	cf                   	iret   
+    b252:	66 90                	xchg   %ax,%ax
+    b254:	66 90                	xchg   %ax,%ax
+    b256:	66 90                	xchg   %ax,%ax
+    b258:	66 90                	xchg   %ax,%ax
+    b25a:	66 90                	xchg   %ax,%ax
+    b25c:	66 90                	xchg   %ax,%ax
+    b25e:	66 90                	xchg   %ax,%ax
 
-0000b250 <gdtr>:
-    b250:	00 00                	add    %al,(%eax)
-    b252:	00 00                	add    %al,(%eax)
+0000b260 <gdtr>:
+    b260:	00 00                	add    %al,(%eax)
+    b262:	00 00                	add    %al,(%eax)
 	...
 
-0000b256 <load_gdt>:
-    b256:	fa                   	cli    
-    b257:	50                   	push   %eax
-    b258:	51                   	push   %ecx
-    b259:	b9 00 00 00 00       	mov    $0x0,%ecx
-    b25e:	89 0d 52 b2 00 00    	mov    %ecx,0xb252
-    b264:	31 c0                	xor    %eax,%eax
-    b266:	b8 00 01 00 00       	mov    $0x100,%eax
-    b26b:	01 c8                	add    %ecx,%eax
-    b26d:	66 a3 50 b2 00 00    	mov    %ax,0xb250
-    b273:	0f 01 15 50 b2 00 00 	lgdtl  0xb250
-    b27a:	8b 0d 52 b2 00 00    	mov    0xb252,%ecx
-    b280:	83 c1 20             	add    $0x20,%ecx
-    b283:	0f 00 d9             	ltr    %cx
-    b286:	59                   	pop    %ecx
-    b287:	58                   	pop    %eax
-    b288:	c3                   	ret    
+0000b266 <load_gdt>:
+    b266:	fa                   	cli    
+    b267:	50                   	push   %eax
+    b268:	51                   	push   %ecx
+    b269:	b9 00 00 00 00       	mov    $0x0,%ecx
+    b26e:	89 0d 62 b2 00 00    	mov    %ecx,0xb262
+    b274:	31 c0                	xor    %eax,%eax
+    b276:	b8 00 01 00 00       	mov    $0x100,%eax
+    b27b:	01 c8                	add    %ecx,%eax
+    b27d:	66 a3 60 b2 00 00    	mov    %ax,0xb260
+    b283:	0f 01 15 60 b2 00 00 	lgdtl  0xb260
+    b28a:	8b 0d 62 b2 00 00    	mov    0xb262,%ecx
+    b290:	83 c1 20             	add    $0x20,%ecx
+    b293:	0f 00 d9             	ltr    %cx
+    b296:	59                   	pop    %ecx
+    b297:	58                   	pop    %eax
+    b298:	c3                   	ret    
 
-0000b289 <idtr>:
-    b289:	00 00                	add    %al,(%eax)
-    b28b:	00 00                	add    %al,(%eax)
+0000b299 <idtr>:
+    b299:	00 00                	add    %al,(%eax)
+    b29b:	00 00                	add    %al,(%eax)
 	...
 
-0000b28f <load_idt>:
-    b28f:	fa                   	cli    
-    b290:	50                   	push   %eax
-    b291:	51                   	push   %ecx
-    b292:	31 c9                	xor    %ecx,%ecx
-    b294:	b9 20 00 01 00       	mov    $0x10020,%ecx
-    b299:	89 0d 8b b2 00 00    	mov    %ecx,0xb28b
-    b29f:	31 c0                	xor    %eax,%eax
-    b2a1:	b8 00 04 00 00       	mov    $0x400,%eax
-    b2a6:	01 c8                	add    %ecx,%eax
-    b2a8:	66 a3 89 b2 00 00    	mov    %ax,0xb289
-    b2ae:	0f 01 1d 89 b2 00 00 	lidtl  0xb289
-    b2b5:	59                   	pop    %ecx
-    b2b6:	58                   	pop    %eax
-    b2b7:	c3                   	ret    
-    b2b8:	66 90                	xchg   %ax,%ax
-    b2ba:	66 90                	xchg   %ax,%ax
-    b2bc:	66 90                	xchg   %ax,%ax
-    b2be:	66 90                	xchg   %ax,%ax
+0000b29f <load_idt>:
+    b29f:	fa                   	cli    
+    b2a0:	50                   	push   %eax
+    b2a1:	51                   	push   %ecx
+    b2a2:	31 c9                	xor    %ecx,%ecx
+    b2a4:	b9 20 00 01 00       	mov    $0x10020,%ecx
+    b2a9:	89 0d 9b b2 00 00    	mov    %ecx,0xb29b
+    b2af:	31 c0                	xor    %eax,%eax
+    b2b1:	b8 00 04 00 00       	mov    $0x400,%eax
+    b2b6:	01 c8                	add    %ecx,%eax
+    b2b8:	66 a3 99 b2 00 00    	mov    %ax,0xb299
+    b2be:	0f 01 1d 99 b2 00 00 	lidtl  0xb299
+    b2c5:	59                   	pop    %ecx
+    b2c6:	58                   	pop    %eax
+    b2c7:	c3                   	ret    
+    b2c8:	66 90                	xchg   %ax,%ax
+    b2ca:	66 90                	xchg   %ax,%ax
+    b2cc:	66 90                	xchg   %ax,%ax
+    b2ce:	66 90                	xchg   %ax,%ax
 
-0000b2c0 <irq1>:
-    b2c0:	60                   	pusha  
-    b2c1:	e8 6e ea ff ff       	call   9d34 <irq1_handler>
-    b2c6:	61                   	popa   
-    b2c7:	cf                   	iret   
-
-0000b2c8 <irq2>:
-    b2c8:	60                   	pusha  
-    b2c9:	e8 81 ea ff ff       	call   9d4f <irq2_handler>
-    b2ce:	61                   	popa   
-    b2cf:	cf                   	iret   
-
-0000b2d0 <irq3>:
+0000b2d0 <irq1>:
     b2d0:	60                   	pusha  
-    b2d1:	e8 9c ea ff ff       	call   9d72 <irq3_handler>
+    b2d1:	e8 67 ea ff ff       	call   9d3d <irq1_handler>
     b2d6:	61                   	popa   
     b2d7:	cf                   	iret   
 
-0000b2d8 <irq4>:
+0000b2d8 <irq2>:
     b2d8:	60                   	pusha  
-    b2d9:	e8 b7 ea ff ff       	call   9d95 <irq4_handler>
+    b2d9:	e8 7a ea ff ff       	call   9d58 <irq2_handler>
     b2de:	61                   	popa   
     b2df:	cf                   	iret   
 
-0000b2e0 <irq5>:
+0000b2e0 <irq3>:
     b2e0:	60                   	pusha  
-    b2e1:	e8 d2 ea ff ff       	call   9db8 <irq5_handler>
+    b2e1:	e8 95 ea ff ff       	call   9d7b <irq3_handler>
     b2e6:	61                   	popa   
     b2e7:	cf                   	iret   
 
-0000b2e8 <irq6>:
+0000b2e8 <irq4>:
     b2e8:	60                   	pusha  
-    b2e9:	e8 ed ea ff ff       	call   9ddb <irq6_handler>
+    b2e9:	e8 b0 ea ff ff       	call   9d9e <irq4_handler>
     b2ee:	61                   	popa   
     b2ef:	cf                   	iret   
 
-0000b2f0 <irq7>:
+0000b2f0 <irq5>:
     b2f0:	60                   	pusha  
-    b2f1:	e8 08 eb ff ff       	call   9dfe <irq7_handler>
+    b2f1:	e8 cb ea ff ff       	call   9dc1 <irq5_handler>
     b2f6:	61                   	popa   
     b2f7:	cf                   	iret   
 
-0000b2f8 <irq8>:
+0000b2f8 <irq6>:
     b2f8:	60                   	pusha  
-    b2f9:	e8 23 eb ff ff       	call   9e21 <irq8_handler>
+    b2f9:	e8 e6 ea ff ff       	call   9de4 <irq6_handler>
     b2fe:	61                   	popa   
     b2ff:	cf                   	iret   
 
-0000b300 <irq9>:
+0000b300 <irq7>:
     b300:	60                   	pusha  
-    b301:	e8 3e eb ff ff       	call   9e44 <irq9_handler>
+    b301:	e8 01 eb ff ff       	call   9e07 <irq7_handler>
     b306:	61                   	popa   
     b307:	cf                   	iret   
 
-0000b308 <irq10>:
+0000b308 <irq8>:
     b308:	60                   	pusha  
-    b309:	e8 59 eb ff ff       	call   9e67 <irq10_handler>
+    b309:	e8 1c eb ff ff       	call   9e2a <irq8_handler>
     b30e:	61                   	popa   
     b30f:	cf                   	iret   
 
-0000b310 <irq11>:
+0000b310 <irq9>:
     b310:	60                   	pusha  
-    b311:	e8 74 eb ff ff       	call   9e8a <irq11_handler>
+    b311:	e8 37 eb ff ff       	call   9e4d <irq9_handler>
     b316:	61                   	popa   
     b317:	cf                   	iret   
 
-0000b318 <irq12>:
+0000b318 <irq10>:
     b318:	60                   	pusha  
-    b319:	e8 8f eb ff ff       	call   9ead <irq12_handler>
+    b319:	e8 52 eb ff ff       	call   9e70 <irq10_handler>
     b31e:	61                   	popa   
     b31f:	cf                   	iret   
 
-0000b320 <irq13>:
+0000b320 <irq11>:
     b320:	60                   	pusha  
-    b321:	e8 aa eb ff ff       	call   9ed0 <irq13_handler>
+    b321:	e8 6d eb ff ff       	call   9e93 <irq11_handler>
     b326:	61                   	popa   
     b327:	cf                   	iret   
 
-0000b328 <irq14>:
+0000b328 <irq12>:
     b328:	60                   	pusha  
-    b329:	e8 c5 eb ff ff       	call   9ef3 <irq14_handler>
+    b329:	e8 88 eb ff ff       	call   9eb6 <irq12_handler>
     b32e:	61                   	popa   
     b32f:	cf                   	iret   
 
-0000b330 <irq15>:
+0000b330 <irq13>:
     b330:	60                   	pusha  
-    b331:	e8 e0 eb ff ff       	call   9f16 <irq15_handler>
+    b331:	e8 a3 eb ff ff       	call   9ed9 <irq13_handler>
     b336:	61                   	popa   
     b337:	cf                   	iret   
-    b338:	66 90                	xchg   %ax,%ax
-    b33a:	66 90                	xchg   %ax,%ax
-    b33c:	66 90                	xchg   %ax,%ax
-    b33e:	66 90                	xchg   %ax,%ax
 
-0000b340 <_FlushPagingCache_>:
-    b340:	b8 00 10 01 00       	mov    $0x11000,%eax
-    b345:	0f 22 d8             	mov    %eax,%cr3
-    b348:	c3                   	ret    
+0000b338 <irq14>:
+    b338:	60                   	pusha  
+    b339:	e8 be eb ff ff       	call   9efc <irq14_handler>
+    b33e:	61                   	popa   
+    b33f:	cf                   	iret   
 
-0000b349 <_EnablingPaging_>:
-    b349:	e8 f2 ff ff ff       	call   b340 <_FlushPagingCache_>
-    b34e:	0f 20 c0             	mov    %cr0,%eax
-    b351:	0d 01 00 00 80       	or     $0x80000001,%eax
-    b356:	0f 22 c0             	mov    %eax,%cr0
-    b359:	c3                   	ret    
+0000b340 <irq15>:
+    b340:	60                   	pusha  
+    b341:	e8 d9 eb ff ff       	call   9f1f <irq15_handler>
+    b346:	61                   	popa   
+    b347:	cf                   	iret   
+    b348:	66 90                	xchg   %ax,%ax
+    b34a:	66 90                	xchg   %ax,%ax
+    b34c:	66 90                	xchg   %ax,%ax
+    b34e:	66 90                	xchg   %ax,%ax
 
-0000b35a <PagingFault_Handler>:
-    b35a:	58                   	pop    %eax
-    b35b:	a3 80 b6 00 00       	mov    %eax,0xb680
-    b360:	e8 13 f0 ff ff       	call   a378 <Paging_fault>
-    b365:	cf                   	iret   
-    b366:	66 90                	xchg   %ax,%ax
-    b368:	66 90                	xchg   %ax,%ax
-    b36a:	66 90                	xchg   %ax,%ax
-    b36c:	66 90                	xchg   %ax,%ax
-    b36e:	66 90                	xchg   %ax,%ax
+0000b350 <_FlushPagingCache_>:
+    b350:	b8 00 10 01 00       	mov    $0x11000,%eax
+    b355:	0f 22 d8             	mov    %eax,%cr3
+    b358:	c3                   	ret    
 
-0000b370 <PIT_handler>:
-    b370:	9c                   	pushf  
-    b371:	e8 16 00 00 00       	call   b38c <irq_PIT>
-    b376:	e8 44 f2 ff ff       	call   a5bf <conserv_status_byte>
-    b37b:	e8 db f2 ff ff       	call   a65b <sheduler_cpu_timer>
-    b380:	90                   	nop
-    b381:	90                   	nop
-    b382:	90                   	nop
-    b383:	90                   	nop
-    b384:	90                   	nop
-    b385:	90                   	nop
-    b386:	90                   	nop
-    b387:	90                   	nop
-    b388:	90                   	nop
-    b389:	90                   	nop
-    b38a:	9d                   	popf   
-    b38b:	cf                   	iret   
+0000b359 <_EnablingPaging_>:
+    b359:	e8 f2 ff ff ff       	call   b350 <_FlushPagingCache_>
+    b35e:	0f 20 c0             	mov    %cr0,%eax
+    b361:	0d 01 00 00 80       	or     $0x80000001,%eax
+    b366:	0f 22 c0             	mov    %eax,%cr0
+    b369:	c3                   	ret    
 
-0000b38c <irq_PIT>:
-    b38c:	a1 68 32 02 00       	mov    0x23268,%eax
-    b391:	8b 1d 6c 32 02 00    	mov    0x2326c,%ebx
-    b397:	01 05 60 32 02 00    	add    %eax,0x23260
-    b39d:	11 1d 64 32 02 00    	adc    %ebx,0x23264
-    b3a3:	6a 00                	push   $0x0
-    b3a5:	e8 d4 ef ff ff       	call   a37e <PIC_sendEOI>
-    b3aa:	58                   	pop    %eax
-    b3ab:	c3                   	ret    
+0000b36a <PagingFault_Handler>:
+    b36a:	58                   	pop    %eax
+    b36b:	a3 80 b6 00 00       	mov    %eax,0xb680
+    b370:	e8 02 f0 ff ff       	call   a377 <Paging_fault>
+    b375:	cf                   	iret   
+    b376:	66 90                	xchg   %ax,%ax
+    b378:	66 90                	xchg   %ax,%ax
+    b37a:	66 90                	xchg   %ax,%ax
+    b37c:	66 90                	xchg   %ax,%ax
+    b37e:	66 90                	xchg   %ax,%ax
 
-0000b3ac <calculate_frequency>:
-    b3ac:	60                   	pusha  
-    b3ad:	8b 1d 04 20 01 00    	mov    0x12004,%ebx
-    b3b3:	b8 00 00 01 00       	mov    $0x10000,%eax
-    b3b8:	83 fb 12             	cmp    $0x12,%ebx
-    b3bb:	76 34                	jbe    b3f1 <calculate_frequency.gotReloadValue>
-    b3bd:	b8 01 00 00 00       	mov    $0x1,%eax
-    b3c2:	81 fb dd 34 12 00    	cmp    $0x1234dd,%ebx
-    b3c8:	73 27                	jae    b3f1 <calculate_frequency.gotReloadValue>
-    b3ca:	b8 99 9e 36 00       	mov    $0x369e99,%eax
-    b3cf:	ba 00 00 00 00       	mov    $0x0,%edx
-    b3d4:	f7 f3                	div    %ebx
-    b3d6:	81 fa 4c 4f 1b 00    	cmp    $0x1b4f4c,%edx
-    b3dc:	72 01                	jb     b3df <calculate_frequency.l1>
-    b3de:	40                   	inc    %eax
+0000b380 <PIT_handler>:
+    b380:	9c                   	pushf  
+    b381:	e8 16 00 00 00       	call   b39c <irq_PIT>
+    b386:	e8 33 f2 ff ff       	call   a5be <conserv_status_byte>
+    b38b:	e8 ca f2 ff ff       	call   a65a <sheduler_cpu_timer>
+    b390:	90                   	nop
+    b391:	90                   	nop
+    b392:	90                   	nop
+    b393:	90                   	nop
+    b394:	90                   	nop
+    b395:	90                   	nop
+    b396:	90                   	nop
+    b397:	90                   	nop
+    b398:	90                   	nop
+    b399:	90                   	nop
+    b39a:	9d                   	popf   
+    b39b:	cf                   	iret   
 
-0000b3df <calculate_frequency.l1>:
-    b3df:	bb 03 00 00 00       	mov    $0x3,%ebx
-    b3e4:	ba 00 00 00 00       	mov    $0x0,%edx
-    b3e9:	f7 f3                	div    %ebx
-    b3eb:	83 fa 01             	cmp    $0x1,%edx
-    b3ee:	72 01                	jb     b3f1 <calculate_frequency.gotReloadValue>
-    b3f0:	40                   	inc    %eax
+0000b39c <irq_PIT>:
+    b39c:	a1 68 32 02 00       	mov    0x23268,%eax
+    b3a1:	8b 1d 6c 32 02 00    	mov    0x2326c,%ebx
+    b3a7:	01 05 60 32 02 00    	add    %eax,0x23260
+    b3ad:	11 1d 64 32 02 00    	adc    %ebx,0x23264
+    b3b3:	6a 00                	push   $0x0
+    b3b5:	e8 c3 ef ff ff       	call   a37d <PIC_sendEOI>
+    b3ba:	58                   	pop    %eax
+    b3bb:	c3                   	ret    
 
-0000b3f1 <calculate_frequency.gotReloadValue>:
-    b3f1:	50                   	push   %eax
-    b3f2:	66 a3 74 32 02 00    	mov    %ax,0x23274
-    b3f8:	89 c3                	mov    %eax,%ebx
-    b3fa:	b8 99 9e 36 00       	mov    $0x369e99,%eax
-    b3ff:	ba 00 00 00 00       	mov    $0x0,%edx
-    b404:	f7 f3                	div    %ebx
-    b406:	81 fa 4c 4f 1b 00    	cmp    $0x1b4f4c,%edx
-    b40c:	72 01                	jb     b40f <calculate_frequency.l3>
-    b40e:	40                   	inc    %eax
+0000b3bc <calculate_frequency>:
+    b3bc:	60                   	pusha  
+    b3bd:	8b 1d 04 20 01 00    	mov    0x12004,%ebx
+    b3c3:	b8 00 00 01 00       	mov    $0x10000,%eax
+    b3c8:	83 fb 12             	cmp    $0x12,%ebx
+    b3cb:	76 34                	jbe    b401 <calculate_frequency.gotReloadValue>
+    b3cd:	b8 01 00 00 00       	mov    $0x1,%eax
+    b3d2:	81 fb dd 34 12 00    	cmp    $0x1234dd,%ebx
+    b3d8:	73 27                	jae    b401 <calculate_frequency.gotReloadValue>
+    b3da:	b8 99 9e 36 00       	mov    $0x369e99,%eax
+    b3df:	ba 00 00 00 00       	mov    $0x0,%edx
+    b3e4:	f7 f3                	div    %ebx
+    b3e6:	81 fa 4c 4f 1b 00    	cmp    $0x1b4f4c,%edx
+    b3ec:	72 01                	jb     b3ef <calculate_frequency.l1>
+    b3ee:	40                   	inc    %eax
 
-0000b40f <calculate_frequency.l3>:
-    b40f:	bb 03 00 00 00       	mov    $0x3,%ebx
-    b414:	ba 00 00 00 00       	mov    $0x0,%edx
-    b419:	f7 f3                	div    %ebx
-    b41b:	83 fa 01             	cmp    $0x1,%edx
-    b41e:	72 01                	jb     b421 <calculate_frequency.l4>
-    b420:	40                   	inc    %eax
+0000b3ef <calculate_frequency.l1>:
+    b3ef:	bb 03 00 00 00       	mov    $0x3,%ebx
+    b3f4:	ba 00 00 00 00       	mov    $0x0,%edx
+    b3f9:	f7 f3                	div    %ebx
+    b3fb:	83 fa 01             	cmp    $0x1,%edx
+    b3fe:	72 01                	jb     b401 <calculate_frequency.gotReloadValue>
+    b400:	40                   	inc    %eax
 
-0000b421 <calculate_frequency.l4>:
-    b421:	a3 70 32 02 00       	mov    %eax,0x23270
-    b426:	5b                   	pop    %ebx
-    b427:	b8 62 a0 b3 db       	mov    $0xdbb3a062,%eax
-    b42c:	f7 e3                	mul    %ebx
-    b42e:	0f ac d0 0a          	shrd   $0xa,%edx,%eax
-    b432:	c1 ea 0a             	shr    $0xa,%edx
-    b435:	89 15 6c 32 02 00    	mov    %edx,0x2326c
-    b43b:	a3 68 32 02 00       	mov    %eax,0x23268
-    b440:	61                   	popa   
-    b441:	c3                   	ret    
-    b442:	66 90                	xchg   %ax,%ax
-    b444:	66 90                	xchg   %ax,%ax
-    b446:	66 90                	xchg   %ax,%ax
-    b448:	66 90                	xchg   %ax,%ax
-    b44a:	66 90                	xchg   %ax,%ax
-    b44c:	66 90                	xchg   %ax,%ax
-    b44e:	66 90                	xchg   %ax,%ax
+0000b401 <calculate_frequency.gotReloadValue>:
+    b401:	50                   	push   %eax
+    b402:	66 a3 74 32 02 00    	mov    %ax,0x23274
+    b408:	89 c3                	mov    %eax,%ebx
+    b40a:	b8 99 9e 36 00       	mov    $0x369e99,%eax
+    b40f:	ba 00 00 00 00       	mov    $0x0,%edx
+    b414:	f7 f3                	div    %ebx
+    b416:	81 fa 4c 4f 1b 00    	cmp    $0x1b4f4c,%edx
+    b41c:	72 01                	jb     b41f <calculate_frequency.l3>
+    b41e:	40                   	inc    %eax
 
-0000b450 <switch_to_task>:
-    b450:	50                   	push   %eax
-    b451:	8b 44 24 08          	mov    0x8(%esp),%eax
-    b455:	89 58 04             	mov    %ebx,0x4(%eax)
-    b458:	89 48 08             	mov    %ecx,0x8(%eax)
-    b45b:	89 50 0c             	mov    %edx,0xc(%eax)
-    b45e:	89 70 10             	mov    %esi,0x10(%eax)
-    b461:	89 78 14             	mov    %edi,0x14(%eax)
-    b464:	89 60 18             	mov    %esp,0x18(%eax)
-    b467:	89 68 1c             	mov    %ebp,0x1c(%eax)
-    b46a:	51                   	push   %ecx
-    b46b:	8b 4c 24 08          	mov    0x8(%esp),%ecx
-    b46f:	89 48 20             	mov    %ecx,0x20(%eax)
-    b472:	59                   	pop    %ecx
-    b473:	51                   	push   %ecx
-    b474:	9c                   	pushf  
-    b475:	59                   	pop    %ecx
-    b476:	89 48 24             	mov    %ecx,0x24(%eax)
-    b479:	59                   	pop    %ecx
+0000b41f <calculate_frequency.l3>:
+    b41f:	bb 03 00 00 00       	mov    $0x3,%ebx
+    b424:	ba 00 00 00 00       	mov    $0x0,%edx
+    b429:	f7 f3                	div    %ebx
+    b42b:	83 fa 01             	cmp    $0x1,%edx
+    b42e:	72 01                	jb     b431 <calculate_frequency.l4>
+    b430:	40                   	inc    %eax
+
+0000b431 <calculate_frequency.l4>:
+    b431:	a3 70 32 02 00       	mov    %eax,0x23270
+    b436:	5b                   	pop    %ebx
+    b437:	b8 62 a0 b3 db       	mov    $0xdbb3a062,%eax
+    b43c:	f7 e3                	mul    %ebx
+    b43e:	0f ac d0 0a          	shrd   $0xa,%edx,%eax
+    b442:	c1 ea 0a             	shr    $0xa,%edx
+    b445:	89 15 6c 32 02 00    	mov    %edx,0x2326c
+    b44b:	a3 68 32 02 00       	mov    %eax,0x23268
+    b450:	61                   	popa   
+    b451:	c3                   	ret    
+    b452:	66 90                	xchg   %ax,%ax
+    b454:	66 90                	xchg   %ax,%ax
+    b456:	66 90                	xchg   %ax,%ax
+    b458:	66 90                	xchg   %ax,%ax
+    b45a:	66 90                	xchg   %ax,%ax
+    b45c:	66 90                	xchg   %ax,%ax
+    b45e:	66 90                	xchg   %ax,%ax
+
+0000b460 <switch_to_task>:
+    b460:	50                   	push   %eax
+    b461:	8b 44 24 08          	mov    0x8(%esp),%eax
+    b465:	89 58 04             	mov    %ebx,0x4(%eax)
+    b468:	89 48 08             	mov    %ecx,0x8(%eax)
+    b46b:	89 50 0c             	mov    %edx,0xc(%eax)
+    b46e:	89 70 10             	mov    %esi,0x10(%eax)
+    b471:	89 78 14             	mov    %edi,0x14(%eax)
+    b474:	89 60 18             	mov    %esp,0x18(%eax)
+    b477:	89 68 1c             	mov    %ebp,0x1c(%eax)
     b47a:	51                   	push   %ecx
-    b47b:	0f 20 d9             	mov    %cr3,%ecx
-    b47e:	89 48 28             	mov    %ecx,0x28(%eax)
-    b481:	59                   	pop    %ecx
-    b482:	8c 40 2c             	mov    %es,0x2c(%eax)
-    b485:	8c 68 2e             	mov    %gs,0x2e(%eax)
-    b488:	8c 60 30             	mov    %fs,0x30(%eax)
-    b48b:	51                   	push   %ecx
-    b48c:	8b 4c 24 04          	mov    0x4(%esp),%ecx
-    b490:	89 08                	mov    %ecx,(%eax)
-    b492:	59                   	pop    %ecx
-    b493:	58                   	pop    %eax
-    b494:	8b 44 24 08          	mov    0x8(%esp),%eax
-    b498:	8b 58 04             	mov    0x4(%eax),%ebx
-    b49b:	8b 48 08             	mov    0x8(%eax),%ecx
-    b49e:	8b 50 0c             	mov    0xc(%eax),%edx
-    b4a1:	8b 70 10             	mov    0x10(%eax),%esi
-    b4a4:	8b 78 14             	mov    0x14(%eax),%edi
-    b4a7:	8b 60 18             	mov    0x18(%eax),%esp
-    b4aa:	8b 68 1c             	mov    0x1c(%eax),%ebp
-    b4ad:	51                   	push   %ecx
-    b4ae:	8b 48 24             	mov    0x24(%eax),%ecx
-    b4b1:	51                   	push   %ecx
-    b4b2:	9d                   	popf   
-    b4b3:	59                   	pop    %ecx
-    b4b4:	51                   	push   %ecx
-    b4b5:	8b 48 28             	mov    0x28(%eax),%ecx
-    b4b8:	0f 22 d9             	mov    %ecx,%cr3
-    b4bb:	59                   	pop    %ecx
-    b4bc:	8e 40 2c             	mov    0x2c(%eax),%es
-    b4bf:	8e 68 2e             	mov    0x2e(%eax),%gs
-    b4c2:	8e 60 30             	mov    0x30(%eax),%fs
-    b4c5:	8b 40 20             	mov    0x20(%eax),%eax
-    b4c8:	89 04 24             	mov    %eax,(%esp)
-    b4cb:	c3                   	ret    
+    b47b:	8b 4c 24 08          	mov    0x8(%esp),%ecx
+    b47f:	89 48 20             	mov    %ecx,0x20(%eax)
+    b482:	59                   	pop    %ecx
+    b483:	51                   	push   %ecx
+    b484:	9c                   	pushf  
+    b485:	59                   	pop    %ecx
+    b486:	89 48 24             	mov    %ecx,0x24(%eax)
+    b489:	59                   	pop    %ecx
+    b48a:	51                   	push   %ecx
+    b48b:	0f 20 d9             	mov    %cr3,%ecx
+    b48e:	89 48 28             	mov    %ecx,0x28(%eax)
+    b491:	59                   	pop    %ecx
+    b492:	8c 40 2c             	mov    %es,0x2c(%eax)
+    b495:	8c 68 2e             	mov    %gs,0x2e(%eax)
+    b498:	8c 60 30             	mov    %fs,0x30(%eax)
+    b49b:	51                   	push   %ecx
+    b49c:	8b 4c 24 04          	mov    0x4(%esp),%ecx
+    b4a0:	89 08                	mov    %ecx,(%eax)
+    b4a2:	59                   	pop    %ecx
+    b4a3:	58                   	pop    %eax
+    b4a4:	8b 44 24 08          	mov    0x8(%esp),%eax
+    b4a8:	8b 58 04             	mov    0x4(%eax),%ebx
+    b4ab:	8b 48 08             	mov    0x8(%eax),%ecx
+    b4ae:	8b 50 0c             	mov    0xc(%eax),%edx
+    b4b1:	8b 70 10             	mov    0x10(%eax),%esi
+    b4b4:	8b 78 14             	mov    0x14(%eax),%edi
+    b4b7:	8b 60 18             	mov    0x18(%eax),%esp
+    b4ba:	8b 68 1c             	mov    0x1c(%eax),%ebp
+    b4bd:	51                   	push   %ecx
+    b4be:	8b 48 24             	mov    0x24(%eax),%ecx
+    b4c1:	51                   	push   %ecx
+    b4c2:	9d                   	popf   
+    b4c3:	59                   	pop    %ecx
+    b4c4:	51                   	push   %ecx
+    b4c5:	8b 48 28             	mov    0x28(%eax),%ecx
+    b4c8:	0f 22 d9             	mov    %ecx,%cr3
+    b4cb:	59                   	pop    %ecx
+    b4cc:	8e 40 2c             	mov    0x2c(%eax),%es
+    b4cf:	8e 68 2e             	mov    0x2e(%eax),%gs
+    b4d2:	8e 60 30             	mov    0x30(%eax),%fs
+    b4d5:	8b 40 20             	mov    0x20(%eax),%eax
+    b4d8:	89 04 24             	mov    %eax,(%esp)
+    b4db:	c3                   	ret    
