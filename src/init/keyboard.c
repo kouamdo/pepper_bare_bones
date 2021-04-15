@@ -5,6 +5,11 @@ static kbd_8042_t keyboard_ctrl; //Keyboard services control
 void        reinitialise_kbd();
 static void wait_8042_ACK();
 
+static int8_t lshift_enable;
+static int8_t rshift_enable;
+static int8_t alt_enable;
+static int8_t ctrl_enable;
+
 extern void show_cursor();
 
 //Add all services here
@@ -173,11 +178,7 @@ int16_t get_code_kbd_control()
 
 static void handle_ASCII_code_keyboard()
 {
-    int16_t        _code = keyboard_ctrl.code - 1;
-    static int16_t lshift_enable;
-    static int16_t rshift_enable;
-    static int16_t alt_enable;
-    static int16_t ctrl_enable;
+    int16_t _code = keyboard_ctrl.code - 1;
 
     if (_code < 0x80) { /* key held down */
         switch (_code) {
@@ -187,10 +188,10 @@ static void handle_ASCII_code_keyboard()
         case 0x37: alt_enable = 1; break;
         default:
             keyboard_ctrl.ascii_code_keyboard = kbdmap[_code * 4 + (lshift_enable || rshift_enable)];
-            return;
         }
     } else {
         _code -= 0x80;
+        keyboard_ctrl.ascii_code_keyboard = '\0'; //Free it when release the key
         switch (_code) {
         case 0x29: lshift_enable = 0; break;
         case 0x35: rshift_enable = 0; break;
@@ -202,6 +203,8 @@ static void handle_ASCII_code_keyboard()
 
 int8_t get_ASCII_code_keyboard()
 {
+
     handle_ASCII_code_keyboard();
+
     return keyboard_ctrl.ascii_code_keyboard;
 }

@@ -65,5 +65,6 @@ typedef struct kdb_8042_ {
 int16_t get_code_kbd_control();
 int8_t  get_ASCII_code_keyboard();
 void    keyboard_add_service(void (*func)());
+void    clear_buffer_ascii();
 
 #endif
