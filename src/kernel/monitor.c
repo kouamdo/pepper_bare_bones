@@ -54,19 +54,21 @@ static int8_t keyboard_code_monitor[KEYBOARD_CODE_MAX], keyboard_num = 0;
 
 void monitor_service_keyboard()
 {
-    int8_t code = get_ASCII_code_keyboard();
-    if (code != '\n') {
-        keyboard_code_monitor[keyboard_num] = code;
-        keyboard_num++;
-    }
-
-    else {
-        int i;
-        for (i = 0; i < keyboard_num; i++) {
-            putchar(keyboard_code_monitor[i]);
-            keyboard_code_monitor[i] = 0;
+    if (get_ASCII_code_keyboard() != '\0') {
+        int8_t code = get_ASCII_code_keyboard();
+        if (code != '\n') {
+            keyboard_code_monitor[keyboard_num] = code;
+            keyboard_num++;
         }
 
-        keyboard_num = 0;
+        else {
+            int i;
+            for (i = 0; i < keyboard_num; i++) {
+                putchar(keyboard_code_monitor[i]);
+                keyboard_code_monitor[i] = 0;
+            }
+
+            keyboard_num = 0;
+        }
     }
 }

@@ -105,8 +105,10 @@ void show_cursor(void)
 
 void console_service_keyboard()
 {
-    cputchar(READY_COLOR, get_ASCII_code_keyboard());
-    show_cursor();
+    if (get_ASCII_code_keyboard() != 0) {
+        cputchar(READY_COLOR, get_ASCII_code_keyboard());
+        show_cursor();
+    }
 }
 
 void init_console()
