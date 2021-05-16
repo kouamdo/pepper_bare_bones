@@ -1,6 +1,6 @@
 extern void read_sectors(), call_second_boot();
 
-short bootdrive;
+int bootdrive;
 
 int err = 0; // contain 1 if error
 

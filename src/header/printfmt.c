@@ -57,6 +57,8 @@ void printf(const char* fmt, va_list arg)
                 break;
             case 'p':
                 p = va_arg(arg, void*);
+                putchar('0');
+                putchar('x');
                 printnum((uint32_t)p, 16);
                 break;
             default:

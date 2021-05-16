@@ -51,7 +51,7 @@ void* memcpy(void* dest, const void* src, uint32_t size)
     char *_dest_, *_src_;
 
     _dest_ = (char*)dest;
-    _src_ = (char*)src;
+    _src_  = (char*)src;
 
     while (size) {
         *(_dest_++) = *(_src_++);
@@ -61,18 +61,14 @@ void* memcpy(void* dest, const void* src, uint32_t size)
     return (void*)dest;
 }
 
-void* memset(void* mem, void* data, uint32_t size)
+void* memset(void* mem, int8_t data, int size)
 {
-    if (!mem)
-        return NULL;
+    int i = 0;
 
-    uint32_t* dest = mem;
+    int8_t* tmp = mem;
 
-    while (size) {
-        *dest = (uint32_t)data;
-        size--;
-        dest += 4;
-    }
+    for (i; i < size; i++)
+        tmp[i] = data;
 
     return (void*)mem;
 }

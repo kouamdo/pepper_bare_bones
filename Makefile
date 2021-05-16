@@ -30,7 +30,9 @@ OBJECTS		:= $(SOURCES:.c=.o)
 SOURCES_ASM := $(wildcard $(patsubst %,%/*.asm, $(SOURCEDIRS)))
 OBJECTS_ASM := $(SOURCES_ASM:.asm=.o)
 
-all: boot mixt disk cpy_obj_file
+log := -D serial.log
+
+all: boot kernel disk cpy_obj_file
 
 boot:
 	nasm -g -f elf32 -F dwarf -o $(BIN)/entry.o BOOT/entry.asm
@@ -55,7 +57,7 @@ run_boot:
 	dd if=bin/boot1.img of=disk.img bs=512 conv=notrunc
 	dd if=bin/boot2.img of=disk.img seek=1 bs=512 conv=notrunc
 	clear
-	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log
+	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log $(log)
 
 
 disk:
@@ -72,11 +74,12 @@ disk:
 
 qemu:
 	clear
-	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log
+	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log $(log)
+
 
 debug_first_boot:
 	make boot
-	qemu-system-i386 -fda disk.img -no-reboot -S -s &
+	qemu-system-i386 -fda disk.img -no-reboot -S -s $(log) &
 	gdb bin/boot1.elf  \
         -ex 'target remote localhost:1234' \
         -ex 'layout src' \
@@ -86,7 +89,7 @@ debug_first_boot:
 
 debug_second_boot:
 	make boot
-	qemu-system-i386 -fda disk.img -no-reboot -S -s &
+	qemu-system-i386 -fda disk.img -no-reboot -S -s $(log) &
 	gdb bin/boot2.elf  \
         -ex 'target remote localhost:1234' \
         -ex 'layout src' \
@@ -111,12 +114,12 @@ debug_kernel:
         -ex 'break main' \
 -ex 'continue' 
 
-cpy_obj_file: debug_link_file
+cpy_obj_file: debug_link_file boot
 	objdump -S bin/boot1.elf > obj/boot/boot1.asm
 	objdump -S bin/boot2.elf > obj/boot/boot2.asm
 	objdump -S bin/kernel.elf > obj/kernel/kernel.asm
 
-mixt: k_main.o $(OBJECTS) $(OBJECTS_ASM)
+kernel: k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"

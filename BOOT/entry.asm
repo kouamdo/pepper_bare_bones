@@ -22,14 +22,12 @@ entry:
 	mov ds , ax
 	mov ss , ax
 	mov es , ax
-	mov gs , ax
-	mov ss , ax
-	mov sp , __stack_top
+	mov sp , 0
 	cld
 	jmp main_boot
 
 call_second_boot:
-	push word[bootdrive]	;push the bootdrive hard disk
+	push dword[bootdrive]	;push the bootdrive hard disk
 	jmp 0x7e00
 
 
@@ -39,6 +37,7 @@ read_sectors:
 	mov [bootdrive] , dl
 
 	reset_disk:
+
 	xor ax , ax
 	int 0x13
 	jc reset_disk

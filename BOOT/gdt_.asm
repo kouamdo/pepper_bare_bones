@@ -42,9 +42,14 @@ load_gdt:
 		mov ax , 0x18
 		mov ss , ax
 
-		mov esp , 0x90000
-	 	
 
+		pop ecx
+		pop eax
+
+		mov ebp , 0x9000
+		add ebp , 16
+		mov esp , ebp
+		add esp , 0x4000
+		add esp , 16
 	
-
-		 jmp 0x9000
+		jmp dword 0x8:0x9000

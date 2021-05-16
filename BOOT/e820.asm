@@ -5,9 +5,9 @@ bits 16
 
 extern err_ , e820_mem_table
 
-global load_e820_mem_table
+global load_e820_mem_table , int_loop
 
-int_loop dd 6
+int_loop dd 0
 
 
 section .text
@@ -49,12 +49,17 @@ load_e820_mem_table:
 	inc bp			; got a good entry: ++count, move to next storage spot
 	add di, 24
 .skipent:
-	mov ecx , dword[int_loop]
-	cmp ecx , 0
-	je .e820f
-	dec ecx
 
+	;check if we have at the end of the memory
+	mov ecx , dword[es:di]
+	add ecx , dword[es:di+8]
+	cmp ecx , 0xFFFFFFFF
+	jz .e820f
+
+	mov ecx , dword[int_loop]
+	inc ecx
 	mov dword[int_loop] , ecx
+
 	test ebx, ebx		; if ebx resets to 0, list is complete
 	jne short .e820lp
 .e820f:

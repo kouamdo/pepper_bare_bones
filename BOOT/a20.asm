@@ -53,7 +53,7 @@ check_a20:
     mov byte [es:di], al
     mov ax, 0
     je check_a20__exit
-    mov ax, 1
+    mov ax, 1   ;A20 is enabled
 
 check_a20__exit:
     pop si

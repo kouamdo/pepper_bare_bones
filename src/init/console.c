@@ -20,11 +20,8 @@ void volatile cclean()
         screen[i + 1] = 0x0;
         i += 2;
     }
-    cputchar(READY_COLOR, 'K');
-    cputchar(READY_COLOR, '>');
-    cputchar(READY_COLOR, ' ');
 
-    CURSOR_X = 3;
+    CURSOR_X = 0;
     CURSOR_Y = 0;
 }
 
@@ -46,7 +43,7 @@ void volatile cscrollup()
     CURSOR_Y++;
 }
 
-void volatile cputchar(unsigned char color, const char c)
+void volatile cputchar(char color, const char c)
 {
 
     if ((CURSOR_Y) <= (25)) {

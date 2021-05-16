@@ -2,8 +2,7 @@ bits 16
 
 
 global entry, read_sectors
-extern main
-extern err_ , bootdrive
+extern main, err_ , bootdrive
 
 section .text
 
@@ -11,19 +10,23 @@ section .text
 
 entry:
 	cli
+
+	;Take disk drive id
+	pop eax
+	mov dl , al
+	mov dword[bootdrive] , eax
+	;-----
+
 	jmp main
 
 read_sectors:
-
-	;load the bootdrive 
-	mov ax , word[esp-2]
-	mov word[bootdrive] , ax
+	clc
 
 	reset_disk:
-	mov dl ,[bootdrive]
 	xor ax , ax
 	int 0x13
 	jc reset_disk
+	cli
 	
 
 	mov bx , 0x9000
@@ -47,6 +50,8 @@ read_sectors:
 
 	cmp dh , al
 	jne .disk_err_
+
+	cli
 
 	ret
 
