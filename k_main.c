@@ -22,7 +22,7 @@ void main()
     kprintf("Allocate [16384] bytes of stacks\n");
     kprintf("Firmware variables at [%p] length [%d] bytes \n", detect_bios_info(), detect_bios_info_end() - detect_bios_info());
 
-    //load Memory detection
+    //load Memory mapping
 
     //------------
 
