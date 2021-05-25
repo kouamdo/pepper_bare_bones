@@ -48,7 +48,8 @@ boot:
 	gcc -c -m16 -ggdb3 -ffreestanding -fno-PIE -nostartfiles -nostdlib -o $(BIN)/stage2_boot.o -std=c99 BOOT/stage2_boot.c
 	gcc -c -m16 -ggdb3 -ffreestanding -fno-PIE -nostartfiles -nostdlib -o $(BIN)/gdt.o -std=c99 BOOT/gdt.c
 	nasm  -felf32 -F dwarf -o $(BIN)/a20.o BOOT/a20.asm
-	ld -m elf_i386 -o $(BIN)/boot2.elf -T BOOT/linker2.ld $(BIN)/entry2.o $(BIN)/stage2_boot.o $(BIN)/a20.o $(BIN)/gdt.o $(BIN)/gdt_.o $(BIN)/e820.o
+	gcc -o $(BIN)/main_boot.o -c BOOT/main.c $(CFLAGS) $(CINCLUDES)
+	ld -m elf_i386 -o $(BIN)/boot2.elf -T BOOT/linker2.ld $(BIN)/entry2.o $(BIN)/stage2_boot.o $(BIN)/a20.o $(BIN)/gdt.o $(BIN)/gdt_.o $(BIN)/e820.o $(BIN)/main_boot.o
 	objcopy -O binary bin/boot2.elf bin/boot2.img
 
 run_boot:
@@ -74,7 +75,7 @@ disk:
 
 qemu:
 	clear
-	qemu-system-x86_64 -fda disk.img -d cpu_reset -d int file:serial.log $(log)
+	qemu-system-x86_64 -fda disk.img -no-shutdown -no-reboot -d cpu_reset -d int file:serial.log $(log)
 
 
 debug_first_boot:
@@ -98,10 +99,10 @@ debug_second_boot:
 	-ex 'continue'
 
 
-debug_link_file: k_main.o $(OBJECTS) $(OBJECTS_ASM)
+debug_link_file: entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"
-	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
 	rm $(OBJECTS)
 	rm $(OBJECTS_ASM)
 
@@ -119,11 +120,11 @@ cpy_obj_file: debug_link_file boot
 	objdump -S bin/boot2.elf > obj/boot/boot2.asm
 	objdump -S bin/kernel.elf > obj/kernel/kernel.asm
 
-kernel: k_main.o $(OBJECTS) $(OBJECTS_ASM)
+kernel: entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"
-	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	$(LDFLAGS) entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
 	objcopy -O binary bin/kernel.elf bin/kernel.img
 	
 

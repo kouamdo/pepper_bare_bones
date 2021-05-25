@@ -7,6 +7,8 @@
 /* desactive les interruptions */
 #define cli __asm__ __volatile__("cli" ::)
 
+#define cld __asm__ __volatile__("cld" ::)
+
 /* reactive les interruptions */
 #define sti __asm__ __volatile__("sti" ::)
 
@@ -45,5 +47,22 @@
                      : "d"(port));                    \
         _v;                                           \
     })
+static inline uint32_t
+inl(int port)
+{
+    uint32_t data;
+    asm volatile("inl %w1,%0"
+                 : "=a"(data)
+                 : "d"(port));
+    return data;
+}
 
+static inline void
+insl(int port, void* addr, int cnt)
+{
+    asm volatile("cld\n\trepne\n\tinsl"
+                 : "=D"(addr), "=c"(cnt)
+                 : "d"(port), "0"(addr), "1"(cnt)
+                 : "memory", "cc");
+}
 #endif // !_IO_H

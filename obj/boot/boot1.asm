@@ -72,9 +72,9 @@ read_sectors:
 	
 
 	mov bx , 0x7E00
-    7c28:	bb 00 7e b6 04       	mov    $0x4b67e00,%ebx
+    7c28:	bb 00 7e b6 05       	mov    $0x5b67e00,%ebx
 
-	mov dh , 4
+	mov dh , 5
 
 	push dx
     7c2d:	52                   	push   %edx
