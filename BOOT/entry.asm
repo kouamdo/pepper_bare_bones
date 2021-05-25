@@ -7,7 +7,6 @@ global read_sectors
 global call_second_boot
 
 extern err , main_boot
-extern __stack_top
 
 
 extern bootdrive , second_boot
@@ -27,7 +26,8 @@ entry:
 	jmp main_boot
 
 call_second_boot:
-	push dword[bootdrive]	;push the bootdrive hard disk
+
+	push dword[bootdrive]	;push the bootdrive id of the hard disk
 	jmp 0x7e00
 
 

@@ -5,7 +5,8 @@
 
 #include <stdint.h>
 
-typedef enum boolean { true = (uint8_t)0, false = (uint8_t)1 } bool;
+typedef enum boolean { true  = (uint8_t)0,
+                       false = (uint8_t)1 } bool;
 
 typedef unsigned long physaddr_t;
 

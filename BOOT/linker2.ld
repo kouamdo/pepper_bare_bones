@@ -25,7 +25,7 @@ SECTIONS
         *(COMMON);
         *(.bss);
     }
-    . = ALIGN(200);
+    . = ALIGN(0x200);
 
     END_SECOND_BOOT = . ;
 

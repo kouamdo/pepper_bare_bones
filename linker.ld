@@ -22,15 +22,7 @@ SECTIONS
         BYTE(0)
     }
 
-    .page_table_section :
-    {
-        PROVIDE(__PAGE_TABLE_BEGIN__ = .);
-        *.(page_table_section)
-        PROVIDE(__PAGE_TABLE_END__ = .);
-        BYTE(0)
-    }
-
-    /* Include debugging information in kernel memory */
+     /* Include debugging information in kernel memory */
 	.stab : {
 		PROVIDE(__STAB_BEGIN__ = .);
 		*(.stab);
@@ -47,6 +39,15 @@ SECTIONS
 				   for this section */
 	}
 
+    . = ALIGN(0x1000);
+
+    .page_table_section :
+    {
+        PROVIDE(__PAGE_TABLE_BEGIN__ = .);
+        *.(page_table_section)
+        PROVIDE(__PAGE_TABLE_END__ = .);
+        BYTE(0)
+    }
 
     end = .;
 }

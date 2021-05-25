@@ -4,7 +4,9 @@
 #include <init/console.h>
 #include <init/gdt.h>
 #include <init/idt.h>
+#include <kernel/memlayout.h>
 #include <kernel/printf.h>
+#include <lib.h>
 
 extern void* end;
 char *       bios_info_begin, bios_info_end;
@@ -13,30 +15,25 @@ void *detect_bios_info(), *detect_bios_info_end();
 
 void main()
 {
-    cli;
 
     init_console();
 
-    //Kernel Mapping
-    kprintf("PEPPER_Kernel init at [%p] length [%d] bytes \n", main, &end - (void**)main);
-    kprintf("Allocate [16384] bytes of stacks\n");
-    kprintf("Firmware variables at [%p] length [%d] bytes \n", detect_bios_info(), detect_bios_info_end() - detect_bios_info());
-
-    //load Memory mapping
-
-    //------------
-
-    init_gdt(); //Init GDT secondly
+    init_gdt();
 
     init_idt();
 
-    sti;
+    //Kernel Mapping
+    kprintf("Pepper kernel info : \n");
+    kprintf("PEPPER_Kernel init at [%p] length [%d] bytes \n", main, &end - (void**)main);
+    kprintf("Allocate [16384] bytes of stacks\n");
+    kprintf("Firmware variables at [%p] length [%d] bytes \n", detect_bios_info(), detect_bios_info_end() - detect_bios_info());
+    //--------------
 
     while (1)
         ;
 }
 
-//detect BIOS info
+//detect BIOS info--------------------------
 void* detect_bios_info()
 {
     int       i = 0;
@@ -64,3 +61,4 @@ void* detect_bios_info_end()
 
     return (void*)(&bios_info[i]);
 }
+//----------------------------------------------

@@ -1,8 +1,8 @@
 #include <init/keyboard.h>
 #include <kernel/printf.h>
-#include <lib.h>
 #include <stdint.h>
 #include <string.h>
+#include <x86.h>
 
 extern uint8_t* _KBD_BUFFER;
 extern uint8_t  size_buffer_inside;

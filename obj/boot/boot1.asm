@@ -39,7 +39,8 @@ entry:
 00007c15 <call_second_boot>:
 
 call_second_boot:
-	push dword[bootdrive]	;push the bootdrive hard disk
+
+	push dword[bootdrive]	;push the bootdrive id of the hard disk
     7c15:	66 ff 36             	pushw  (%esi)
     7c18:	50                   	push   %eax
     7c19:	7d e9                	jge    7c04 <entry+0x4>

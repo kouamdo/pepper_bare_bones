@@ -3,43 +3,37 @@
 
 #define LIB_h
 
-#include "i386types.h"
-
-#define cpuid(code)                        \
-    ({                                     \
-        uint32_t edx;                      \
-        __asm__ __volatile__("cpuid"       \
-                             : "=d"(edx)   \
-                             : "a"(code)); \
-        edx;                               \
+// Efficient min and max operations
+#define MIN(_a, _b)             \
+    ({                          \
+        typeof(_a) __a = (_a);  \
+        typeof(_b) __b = (_b);  \
+        __a <= __b ? __a : __b; \
+    })
+#define MAX(_a, _b)             \
+    ({                          \
+        typeof(_a) __a = (_a);  \
+        typeof(_b) __b = (_b);  \
+        __a >= __b ? __a : __b; \
     })
 
-#define cpuid_string(code)                                             \
-    ({                                                                 \
-        uint32_t registers[0x4];                                       \
-        __asm__ __volatile__("cpuid"                                   \
-                             : "=a"(registers[0]), "=b"(registers[1]), \
-                               "=c"(registers[2]), "=d"(registers[3])  \
-                             : "a"(code));                             \
-        registers;                                                     \
+// Rounding operations (efficient when n is a power of 2)
+// Round down to the nearest multiple of n
+#define ROUNDDOWN(a, n)               \
+    ({                                \
+        uint32_t __a = (uint32_t)(a); \
+        (typeof(a))(__a - __a % (n)); \
+    })
+// Round up to the nearest multiple of n
+#define ROUNDUP(a, n)                                         \
+    ({                                                        \
+        uint32_t __n = (uint32_t)(n);                         \
+        (typeof(a))(ROUNDDOWN((uint32_t)(a) + __n - 1, __n)); \
     })
 
-static inline uint32_t
-read_ebp(void)
-{
-    uint32_t ebp;
-    asm volatile("movl %%ebp,%0"
-                 : "=r"(ebp));
-    return ebp;
-}
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
-static inline uint32_t
-read_esp(void)
-{
-    uint32_t esp;
-    asm volatile("movl %%esp,%0"
-                 : "=r"(esp));
-    return esp;
-}
+// Return the offset of 'member' relative to the beginning of a struct type
+#define offsetof(type, member) ((size_t)(&((type*)0)->member))
 
 #endif // !LIB_h

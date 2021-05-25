@@ -4,7 +4,6 @@
 
 #include "../../include/i386types.h"
 
-#define GDTBASE 0x0  /* addr. physique ou doit resider la gdt */
 #define GDTSIZE 0xFF /* nombre max. de descripteurs dans la table */
 
 /* Present bit. This must be 1 for all valid selectors.*/

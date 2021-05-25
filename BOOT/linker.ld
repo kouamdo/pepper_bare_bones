@@ -14,8 +14,7 @@ SECTIONS
 
     .bss : {*(.bss)}
 
-
-  .sig : AT(ADDR(.text) + 512 - 2)
+  .sig : AT(ADDR(.text) + 510)
   {
       SHORT(0xaa55);
   }

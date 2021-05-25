@@ -5,7 +5,7 @@
 extern void enable_a20();
 
 extern char *bios_info_begin, *bios_info_end;
-extern void  load_gdt(), read_sectors();
+extern void  load_gdt(), read_sectors(), jump_kernel();
 
 extern int int_loop;
 
@@ -38,21 +38,25 @@ void main()
 
     enable_a20();
 
-    if (err_ == 1) error_message("A20 disabled");
+    if (err_ == 1) error_message("A20 disabled\n");
+
+    init_gdt();
+
+    load_gdt();
+
+    load_e820_mem_table();
+
+    if (err_ == 1) error_message("E820 doesn't enable\n");
 
     read_sectors(); //Load kernel at the good space
 
     //Load some information of BIOS In kernel memory
 
-    load_e820_mem_table();
-
     if (err_ == 1) error_message("E820 doesn't supported by your firmware");
-
-    init_gdt();
 
     //-----------------------------------------------
 
-    load_gdt();
+    _simple_print_boot__("_");
 
 end:
     goto end;
