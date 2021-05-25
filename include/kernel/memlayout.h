@@ -11,7 +11,7 @@
 #define PGSIZE 4096
 
 // Kernel stack.
-#define KSTACKTOP (KERNBASE - PGSIZE)
-#define KSTKSIZE  (10 * PGSIZE - 2) // size of a kernel stack
+#define KSTACKTOP (0x100000)
+#define KSTKSIZE  (0xa000) // size of a kernel stack
 
 #endif // !_PEPPER_KERNEL_MEMLAYOUT_H_
