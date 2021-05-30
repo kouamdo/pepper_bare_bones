@@ -3,7 +3,7 @@
 
 *Kernel from scratch for intel core 32 bits*
 
-My goal is to make OS that will use in networking and telecommunications research and engineering.
+My goal is to make OS that will use in networking research and engineering.
 
 
 For now, we are still at the initialisation steps, ... :
@@ -17,10 +17,7 @@ For now, we are still at the initialisation steps, ... :
 - Kernel console and monitor for execute some instructions
 
 
-
-
-
-**Why is OS kernel for telecommunications research design/implementation hard/interesting?
+**Why is OS kernel for performance networking research design/implementation hard/interesting?
   * the environment is unforgiving: quirky h/w, weak debugger
   * it must be efficient (thus low-level?)
   ...but abstract/portable (thus high-level?)
@@ -31,21 +28,11 @@ For now, we are still at the initialisation steps, ... :
   * open problems: security; performance; exploiting new hardware
 
 
- What is the OS kernel design approach?
+**What is the OS kernel design approach?
   * the small view: a h/w management library
   * the big view: physical machine -> abstract one w/ better properties
 
-
-What services does an O/S kernel typically provide?
-  * processes
-  * memory allocation
-  * file contents
-  * directories and file names
-  * security
-  * many others: users, IPC, network, time, terminals
-
-
-Wé implement operating systems kernel if we...
+**We implement operating systems kernel if we...
   * want to work on the above problems
   * care about what's going on under the hood
   * have to build high-performance systems
