@@ -3,7 +3,7 @@
 
 *Kernel from scratch for intel core 32 bits*
 
-My goal is to make OS that will use in networking research and engineering.
+My goal is to make OS that will use for performance networking research and engineering.
 
 
 For now, we are still at the initialisation steps, ... :
