@@ -120,11 +120,11 @@ cpy_obj_file: debug_link_file boot
 	objdump -S bin/boot2.elf > obj/boot/boot2.asm
 	objdump -S bin/kernel.elf > obj/kernel/kernel.asm
 
-kernel: entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM)
+kernel:k_main.o $(OBJECTS) $(OBJECTS_ASM)
 	clear
 	@echo "$(OBJECTS)"
 	@echo "$(OBJECTS_ASM)"
-	$(LDFLAGS) entry.o k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
+	$(LDFLAGS) k_main.o $(OBJECTS) $(OBJECTS_ASM) -o bin/kernel.elf
 	objcopy -O binary bin/kernel.elf bin/kernel.img
 	
 
