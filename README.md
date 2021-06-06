@@ -27,13 +27,8 @@ For now, we are still at the initialisation steps, ... :
   * behaviors interact: CPU priority vs memory allocator
   * open problems: security; performance; exploiting new hardware
 
-
-**What is the OS kernel design approach?
-  * the small view: a h/w management library
-  * the big view: physical machine -> abstract one w/ better properties
-
 **We implement operating systems kernel if we...
   * want to work on the above problems
   * care about what's going on under the hood
-  * have to build high-performance systems
+  * have to find high-performance systems
   * need to diagnose bugs or security problems
