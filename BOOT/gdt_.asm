@@ -1,5 +1,5 @@
 bits 16
-extern __gdt_entry__ , bootmain
+extern __gdt_entry__ , kern_init , bootdrive , err_
 global load_gdt
 
 gdtr dw 0	;for limit
@@ -31,7 +31,7 @@ load_gdt:
 		jmp 0x08:next_
 
 	bits 32
-		 next_:
+	next_:
 
 		mov ax , 0x10
 		mov ds , ax
@@ -45,5 +45,8 @@ load_gdt:
 
 		pop ecx
 		pop eax
-	
-		call bootmain	;Jump to kernel init
+
+		 mov ebp, 0x90000
+    	mov esp, ebp
+
+		call 0x9000

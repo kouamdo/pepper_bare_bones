@@ -1,9 +1,7 @@
-#define KERNEL__PAGE_MM
-#define KERNEL__Vir_MM
-
-#include <init/console.h>
+#include <driver/console.h>
 #include <init/gdt.h>
 #include <init/idt.h>
+#include <init/io.h>
 #include <kernel/memlayout.h>
 #include <kernel/printf.h>
 #include <lib.h>
@@ -15,17 +13,18 @@ void *detect_bios_info(), *detect_bios_info_end();
 
 void main()
 {
+    cli;
+    cld;
 
     init_console();
 
-    init_gdt();
+    init_gdt_kernel();
 
     init_idt();
 
     //Kernel Mapping
     kprintf("Pepper kernel info : \n");
     kprintf("PEPPER_Kernel init at [%p] length [%d] bytes \n", main, &end - (void**)main);
-    kprintf("Allocate [16384] bytes of stacks\n");
     kprintf("Firmware variables at [%p] length [%d] bytes \n", detect_bios_info(), detect_bios_info_end() - detect_bios_info());
     //--------------
 

@@ -2,7 +2,7 @@
 #ifndef _IO_H
 #define _IO_H
 
-#include "../i386types.h"
+#include "../lib/i386types.h"
 
 /* desactive les interruptions */
 #define cli __asm__ __volatile__("cli" ::)

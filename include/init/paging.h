@@ -1,7 +1,7 @@
 #ifndef _PAGING_H_
 #define _PAGING_H_
 
-#include <i386types.h>
+#include <lib/i386types.h>
 #define PAGE_DIRECTORY_OFFSET 0x400
 #define PAGE_DIRECTORY_SIZE   0X1000
 
@@ -51,7 +51,7 @@ extern void _EnablingPaging_();
 */
 physaddr_t map_page(virtaddr_t virtual_address, uint16_t flag_directory, uint16_t flag_table);
 
-#include "../lib.h"
+#include "../lib/lib.h"
 // Determiner la technologie de Pagination
 // Detecté le PSE
 /*

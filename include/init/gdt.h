@@ -2,7 +2,7 @@
 
 #define _GDT_H_
 
-#include "../../include/i386types.h"
+#include "../lib/i386types.h"
 
 #define GDTSIZE 0xFF /* nombre max. de descripteurs dans la table */
 
@@ -113,6 +113,6 @@ typedef struct gdtdesc {
     uint8_t  base24_31;
 } __attribute__((packed)) gdt_entry_desc;
 
-void init_gdt(void);
+void init_gdt_kernel(void);
 
 #endif // !_GDT_H_

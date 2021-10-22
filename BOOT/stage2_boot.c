@@ -26,11 +26,6 @@ void error_message(char* message)
     __asm__("hlt");
 }
 
-void free_mem_bios_info()
-{
-    memset((void*)(&bios_info_begin), 0, (&bios_info_end - &bios_info_begin));
-}
-
 void main()
 {
 
@@ -46,12 +41,15 @@ void main()
 
     if (err_ == 1) error_message("E820 doesn't supported by your firmware");
 
+    err_ = 0;
+
     init_gdt();
+
+    read_sectors();
+
+    if (err_ == 1) error_message("Kernel doesn't loaded\n");
 
     //-----------------------------------------------
 
-    load_gdt(); //Load gdt and jump to kernel initialization
-
-end:
-    goto end;
+    load_gdt(); //Load gdt and jump to kernel initializations
 }

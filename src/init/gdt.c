@@ -27,7 +27,7 @@ static void init_gdt_entry(uint32_t base, uint32_t limite, uint8_t access, uint8
  * a ete initialisee par le secteur de boot et qui ne correspond
  * pas forcement a celle que l'on souhaite.
  */
-void init_gdt(void)
+void init_gdt_kernel(void)
 {
     /* initialisation des descripteurs de segment */
     init_gdt_entry(0x0, 0x0, 0x0, 0x0, &__gdt_entry__[0]);
