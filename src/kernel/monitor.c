@@ -1,14 +1,12 @@
-#include <init/keyboard.h>
+#include <driver/keyboard.h>
 #include <kernel/printf.h>
 #include <stdint.h>
 #include <string.h>
-#include <x86.h>
 
 extern uint8_t* _KBD_BUFFER;
 extern uint8_t  size_buffer_inside;
 
 int mon_help(int argc, char** argv);
-int backtrace(int argc, char** argv);
 
 struct Command {
     const char* name;
@@ -20,25 +18,7 @@ struct Command {
 static struct Command commands[]
     = {
           { "help", "Display this list of commands", mon_help },
-          { "backtrace", "Affiche le trace des piles", backtrace },
       };
-
-int backtrace(int argc, char** argv)
-{
-    // Your code here.
-    int ebp = read_ebp(), *eip = (int*)(ebp + 4), *ptr;
-
-    while (ebp != 0) {
-        kprintf("ebp %x eip %x\n", ebp, *eip);
-
-        ptr = (int*)(ebp);
-
-        ebp = (int)(*ptr);
-
-        eip = (int*)(ebp + 4);
-    }
-    return 0;
-}
 
 int mon_help(int argc, char** argv)
 {
