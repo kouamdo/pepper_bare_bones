@@ -1,7 +1,9 @@
 #define TEST_H
 #include <init/idt.h>
 #include <lib.h>
-
+//Intel Maual , Volume 3 , System programming Guide
+//Chapter 6 : Interrupt and exception handling
+//Exception and interrupt referrence
 
 __idt_entry__ __idt__[IDTSIZE];
 
@@ -9,10 +11,10 @@ extern void load_idt();
 
 static void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t vector)
 {
-    __idt__[vector].selector = selector; // Kernelcode segment offset
-    __idt__[vector].type_attr = type;    // Interrupt gate
-    __idt__[vector].zero = 0;            // Only zero
-    __idt__[vector].offset_lowerbits = (offset & 0xFFFF);
+    __idt__[vector].selector          = selector; // Kernelcode segment offset
+    __idt__[vector].type_attr         = type;     // Interrupt gate
+    __idt__[vector].zero              = 0;        // Only zero
+    __idt__[vector].offset_lowerbits  = (offset & 0xFFFF);
     __idt__[vector].offset_higherbits = (offset & 0xFFFF0000) >> 16;
 }
 
@@ -20,7 +22,6 @@ void init_idt()
 {
     Init_PIT((uint16_t)0xDAAD);
 
-    
     // On itiialise les intérruptions qu'on va utiliser
     PIC_remap(0x20, 0x28);
 
