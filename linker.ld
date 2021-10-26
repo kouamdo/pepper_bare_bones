@@ -11,8 +11,6 @@ SECTIONS
 
     .rodata : {*(.rodata)}
 
-    .data : {*(.data)}
-
     .bss :
     {
         PROVIDE(__EDATA__ = .);
@@ -38,6 +36,8 @@ SECTIONS
 		BYTE(0)		/* Force the linker to allocate space
 				   for this section */
 	}
+
+	.data : {*(.data)}
 
     . = ALIGN(0x1000);
 
